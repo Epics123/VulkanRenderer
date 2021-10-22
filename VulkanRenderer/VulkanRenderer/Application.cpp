@@ -5,6 +5,8 @@ Application::Application()
 	name = "Vulkan App";
 	width = 800;
 	height = 600;
+
+	window = nullptr;
 }
 
 Application::Application(const char* appName, uint32_t appWidth, uint32_t appHeight)
@@ -12,6 +14,8 @@ Application::Application(const char* appName, uint32_t appWidth, uint32_t appHei
 	name = appName;
 	width = appWidth;
 	height = appHeight;
+
+	window = nullptr;
 }
 
 void Application::run()
@@ -33,7 +37,18 @@ void Application::initWindow()
 
 void Application::vulkanInit()
 {
+	createVulkanInstance();
+}
 
+void Application::createVulkanInstance()
+{
+	VkApplicationInfo appInfo{};
+	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+	appInfo.pApplicationName = "Triangle";
+	appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+	appInfo.pEngineName = "No Engine";
+	appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+	appInfo.apiVersion = VK_API_VERSION_1_0;
 }
 
 void Application::update()

@@ -17,6 +17,7 @@ public:
 private:
 	void initWindow();
 	void vulkanInit();
+	void createVulkanInstance();
 	void update();
 	void cleanup();
 
@@ -26,4 +27,5 @@ private:
 	uint32_t height;
 
 	GLFWwindow* window;
+	VkInstance instance;
 };
