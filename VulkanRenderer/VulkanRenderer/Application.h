@@ -19,18 +19,34 @@ public:
 private:
 	// Initialize window using GLFW
 	void initWindow();
+
 	// Initialize Vulkan library
 	void vulkanInit();
+
 	// Create Vulkan instance that will interact with the application
 	void createVulkanInstance();
+
 	// Check if requested validation layers are available
 	bool checkValidationLayerSupport();
+
 	// Get required GLFW Extensions
 	std::vector<const char*> getRequiredExtensions();
+
 	// Update application
 	void update();
+
 	// Clean up application
 	void cleanup();
+
+	void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
+
+	void setupDebugMessenger();
+
+	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
+		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, 
+		VkDebugUtilsMessageTypeFlagsEXT messageType, 
+		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+		void* pUserData);
 
 private:
 	const char* name;
@@ -39,6 +55,7 @@ private:
 
 	GLFWwindow* window;
 	VkInstance instance;
+	VkDebugUtilsMessengerEXT debugMessenger;
 
 	const std::vector<const char*> validationLayers =
 	{
