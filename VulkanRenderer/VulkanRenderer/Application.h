@@ -25,6 +25,8 @@ private:
 	void createVulkanInstance();
 	// Check if requested validation layers are available
 	bool checkValidationLayerSupport();
+	// Get required GLFW Extensions
+	std::vector<const char*> getRequiredExtensions();
 	// Update application
 	void update();
 	// Clean up application

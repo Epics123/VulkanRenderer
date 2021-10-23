@@ -69,15 +69,10 @@ void Application::createVulkanInstance()
 		createInfo.enabledLayerCount = 0;
 	}
 
-	// Get GLFW extension count
-	uint32_t glfwExtensionCount = 0;
-	const char** glfwExtensions;
-	glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
-	createInfo.enabledExtensionCount = glfwExtensionCount;
-	createInfo.ppEnabledExtensionNames = glfwExtensions;
-
-	createInfo.enabledLayerCount = 0;
+	// Get GLFW extensions
+	std::vector<const char*> glfwExtensions = getRequiredExtensions();
+	createInfo.enabledExtensionCount = static_cast<uint32_t>(glfwExtensions.size());
+	createInfo.ppEnabledExtensionNames = glfwExtensions.data();
 
 	// Create Vulkan instance
 	if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
@@ -128,6 +123,22 @@ bool Application::checkValidationLayerSupport()
 	}
 
 	return true;
+}
+
+std::vector<const char*> Application::getRequiredExtensions()
+{
+	// Get the number of required extensions
+	uint32_t glfwExtensionCount = 0;
+	const char** glfwExtensions;
+	glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+
+	// Allocate extensions array
+	std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
+
+	if(enableValidationLayers)
+		extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+
+	return extensions;
 }
 
 void Application::update()
