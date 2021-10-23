@@ -168,6 +168,40 @@ std::vector<const char*> Application::getRequiredExtensions()
 	return extensions;
 }
 
+void Application::selectPhysicalDevice()
+{
+	// Get device count
+	uint32_t deviceCount = 0;
+	vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+
+	// Check if there are any devices that support Vulkan
+	if(deviceCount == 0)
+		throw std::runtime_error("Failed to find GPUs with Vulkan support!");
+
+	// Set available devices
+	std::vector<VkPhysicalDevice> devices(deviceCount);
+	vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+
+	for (uint32_t i = 0; i < devices.size(); i++)
+	{
+		// Check if the device is suitable
+		if (isDeviceSuitable(devices.at(i)))
+		{
+			physicalDevice = devices.at(i);
+			break;
+		}
+	}
+
+	if(physicalDevice == VK_NULL_HANDLE)
+		throw std::runtime_error("Failed to find a compatible GPU!");
+}
+
+bool Application::isDeviceSuitable(VkPhysicalDevice device)
+{
+	// Can be extended later (see https://vulkan-tutorial.com/Drawing_a_triangle/Setup/Physical_devices_and_queue_families)
+	return true; 
+}
+
 void Application::update()
 {
 	while(!glfwWindowShouldClose(window))

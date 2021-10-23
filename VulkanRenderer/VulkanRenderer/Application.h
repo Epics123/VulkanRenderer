@@ -32,6 +32,11 @@ private:
 	// Get required GLFW Extensions
 	std::vector<const char*> getRequiredExtensions();
 
+	// Select compatible GPU to use
+	void selectPhysicalDevice();
+
+	bool isDeviceSuitable(VkPhysicalDevice device);
+
 	// Update application
 	void update();
 
@@ -55,6 +60,7 @@ private:
 
 	GLFWwindow* window;
 	VkInstance instance;
+	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE; // GPU
 	VkDebugUtilsMessengerEXT debugMessenger;
 
 	const std::vector<const char*> validationLayers =
