@@ -7,6 +7,17 @@
 #include <stdexcept>
 #include <cstdlib>
 #include <vector>
+#include <optional>
+
+struct QueueFamilyIndicies
+{
+	std::optional<uint32_t> graphicsFamily;
+
+	bool isComplete()
+	{
+		return graphicsFamily.has_value();
+	}
+};
 
 class Application
 {
@@ -35,7 +46,13 @@ private:
 	// Select compatible GPU to use
 	void selectPhysicalDevice();
 
+	// Check if device is supported
 	bool isDeviceSuitable(VkPhysicalDevice device);
+
+	// Find graphics queue family
+	QueueFamilyIndicies findQueueFamilies(VkPhysicalDevice device);
+
+	void createLogicalDevice();
 
 	// Update application
 	void update();
@@ -58,9 +75,12 @@ private:
 	uint32_t width;
 	uint32_t height;
 
+	//Window window;
 	GLFWwindow* window;
 	VkInstance instance;
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE; // GPU
+	VkDevice device; // Logical device
+	VkQueue graphicsQueue;
 	VkDebugUtilsMessengerEXT debugMessenger;
 
 	const std::vector<const char*> validationLayers =
