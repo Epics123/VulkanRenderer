@@ -1,8 +1,9 @@
 #pragma once
 
 #define GLFW_INCLUDE_VULKAN
-#include "glfw3.h"
 
+#include <glfw3.h>
+#include <glfw3native.h>
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
@@ -54,6 +55,8 @@ private:
 
 	void createLogicalDevice();
 
+	void createSurface();
+
 	// Update application
 	void update();
 
@@ -75,12 +78,12 @@ private:
 	uint32_t width;
 	uint32_t height;
 
-	//Window window;
 	GLFWwindow* window;
 	VkInstance instance;
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE; // GPU
 	VkDevice device; // Logical device
 	VkQueue graphicsQueue;
+	VkSurfaceKHR surface;
 	VkDebugUtilsMessengerEXT debugMessenger;
 
 	const std::vector<const char*> validationLayers =

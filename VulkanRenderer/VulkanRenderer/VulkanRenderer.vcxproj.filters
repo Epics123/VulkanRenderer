@@ -30,15 +30,9 @@
     <ClCompile Include="Application.cpp">
       <Filter>Source Files\Application</Filter>
     </ClCompile>
-    <ClCompile Include="Window.cpp">
-      <Filter>Source Files\Application</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
-      <Filter>Header Files\Application</Filter>
-    </ClInclude>
-    <ClInclude Include="Window.h">
       <Filter>Header Files\Application</Filter>
     </ClInclude>
   </ItemGroup>

@@ -273,6 +273,12 @@ void Application::createLogicalDevice()
 	vkGetDeviceQueue(device, indicies.graphicsFamily.value(), 0, &graphicsQueue);
 }
 
+void Application::createSurface()
+{
+	if(glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS)
+		throw std::runtime_error("Failed to create window surface!");
+}	
+
 void Application::update()
 {
 	while(!glfwWindowShouldClose(window))
@@ -284,6 +290,7 @@ void Application::cleanup()
 	if(enableValidationLayers)
 		DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
 	vkDestroyDevice(device, nullptr);
+	vkDestroySurfaceKHR(instance, surface, nullptr);
 	vkDestroyInstance(instance, nullptr);
 	glfwDestroyWindow(window);
 	glfwTerminate();
