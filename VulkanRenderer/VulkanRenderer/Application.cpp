@@ -1,4 +1,5 @@
 #include "Application.h"
+#include <set>
 
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger)
 {
@@ -63,6 +64,7 @@ void Application::vulkanInit()
 {
 	createVulkanInstance();
 	setupDebugMessenger();
+	createSurface();
 	selectPhysicalDevice();
 	createLogicalDevice();
 }
@@ -222,6 +224,11 @@ QueueFamilyIndicies Application::findQueueFamilies(VkPhysicalDevice device)
 		if(queueFamilies.at(i).queueFlags & VK_QUEUE_GRAPHICS_BIT)
 			indicies.graphicsFamily = i;
 
+		VkBool32 presentSupport = false;
+		vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
+		if(presentSupport)
+			indicies.presentFamily = i;
+
 		if(indicies.isComplete())
 			break;
 	}
@@ -233,15 +240,28 @@ void Application::createLogicalDevice()
 {
 	QueueFamilyIndicies indicies = findQueueFamilies(physicalDevice);
 
-	// Specify queues to be created
-	VkDeviceQueueCreateInfo queueCreateInfo{};
-	queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-	queueCreateInfo.queueFamilyIndex = indicies.graphicsFamily.value();
-	queueCreateInfo.queueCount = 1;
+	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+	std::set<uint32_t> uniqueQueueFamilies = {indicies.graphicsFamily.value(), indicies.presentFamily.value()};
+
+	
 
 	// Set queue priority
 	float queuePriority = 1.0f; // must be between 0.0 and 1.0f
-	queueCreateInfo.pQueuePriorities = &queuePriority;
+	
+	// Specify queues to be created
+	std::set<uint32_t>::iterator it;
+	for (it = uniqueQueueFamilies.begin(); it != uniqueQueueFamilies.end(); ++it)
+	{
+		
+		VkDeviceQueueCreateInfo queueCreateInfo{};
+		queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+		queueCreateInfo.queueFamilyIndex = *it;
+		queueCreateInfo.queueCount = 1;
+		queueCreateInfo.pQueuePriorities = &queuePriority;
+		queueCreateInfos.push_back(queueCreateInfo);
+	}
+
+	
 
 	// Specify device features
 	VkPhysicalDeviceFeatures deviceFeatures{};
@@ -249,8 +269,8 @@ void Application::createLogicalDevice()
 	// Create logical device info
 	VkDeviceCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-	createInfo.pQueueCreateInfos = &queueCreateInfo;
-	createInfo.queueCreateInfoCount = 1;
+	createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+	createInfo.pQueueCreateInfos = queueCreateInfos.data();
 	createInfo.pEnabledFeatures = &deviceFeatures;
 
 	// Set device specific validation layers
@@ -271,6 +291,7 @@ void Application::createLogicalDevice()
 
 	// Get queue handles
 	vkGetDeviceQueue(device, indicies.graphicsFamily.value(), 0, &graphicsQueue);
+	vkGetDeviceQueue(device, indicies.presentFamily.value(), 0, &presentQueue);
 }
 
 void Application::createSurface()

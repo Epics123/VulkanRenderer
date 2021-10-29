@@ -13,10 +13,11 @@
 struct QueueFamilyIndicies
 {
 	std::optional<uint32_t> graphicsFamily;
+	std::optional<uint32_t> presentFamily;
 
 	bool isComplete()
 	{
-		return graphicsFamily.has_value();
+		return graphicsFamily.has_value() && presentFamily.has_value();
 	}
 };
 
@@ -83,6 +84,7 @@ private:
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE; // GPU
 	VkDevice device; // Logical device
 	VkQueue graphicsQueue;
+	VkQueue presentQueue; // Presentation queue
 	VkSurfaceKHR surface;
 	VkDebugUtilsMessengerEXT debugMessenger;
 
