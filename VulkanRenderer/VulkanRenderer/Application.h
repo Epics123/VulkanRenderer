@@ -80,6 +80,8 @@ private:
 
 	void createSurface();
 
+	void createRenderer();
+
 	// Update application
 	void update();
 
