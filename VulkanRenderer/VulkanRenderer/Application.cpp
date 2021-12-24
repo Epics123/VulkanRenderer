@@ -71,7 +71,7 @@ void Application::vulkanInit()
 	createLogicalDevice();
 	createSwapChain();
 	createImageViews();
-	createRenderer();
+	createGraphicsPipeline();
 }
 
 void Application::createVulkanInstance()
@@ -482,7 +482,7 @@ void Application::createSurface()
 		throw std::runtime_error("Failed to create window surface!");
 }	
 
-void Application::createRenderer()
+void Application::createGraphicsPipeline()
 {
 	
 }
