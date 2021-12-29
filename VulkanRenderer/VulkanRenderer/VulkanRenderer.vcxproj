@@ -155,6 +155,10 @@
     <ClInclude Include="Application.h" />
     <ClInclude Include="Renderer.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\vulkan\shaders\Test.frag" />
+    <None Include="resources\vulkan\shaders\Test.vert" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

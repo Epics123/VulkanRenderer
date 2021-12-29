@@ -22,6 +22,18 @@
     <Filter Include="Source Files\Application">
       <UniqueIdentifier>{7a6202c8-cfd5-4a50-8f6f-48cc2c4fbf9e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\vulkan">
+      <UniqueIdentifier>{44d72239-612f-47a6-b4b2-2ed326c878fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\vulkan\shaders">
+      <UniqueIdentifier>{ade54193-3cd2-446b-94c5-ccac0152abcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\vulkan\shaders\vert">
+      <UniqueIdentifier>{f6daccd4-2518-4561-a1b8-a03fad42e21c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\vulkan\shaders\frag">
+      <UniqueIdentifier>{cdb8478a-0a5d-4e42-8fd8-1c36676fff59}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -41,5 +53,13 @@
     <ClInclude Include="Renderer.h">
       <Filter>Header Files\Application</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\vulkan\shaders\Test.frag">
+      <Filter>Resource Files\vulkan\shaders\frag</Filter>
+    </None>
+    <None Include="resources\vulkan\shaders\Test.vert">
+      <Filter>Resource Files\vulkan\shaders\vert</Filter>
+    </None>
   </ItemGroup>
 </Project>
