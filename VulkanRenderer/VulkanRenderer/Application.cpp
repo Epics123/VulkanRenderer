@@ -2,6 +2,7 @@
 #include <set>
 #include <cstdint>
 #include <algorithm>
+#include <fstream>
 
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger)
 {
@@ -484,7 +485,25 @@ void Application::createSurface()
 
 void Application::createGraphicsPipeline()
 {
-	
+	//std::vector<char> vertShaderCode = readBinaryFile("resources/vulkan/shaders/Test.vert");
+	//std::vector<char> fragShaderCode = readBinaryFile("resources/vulkan/shaders/Test.frag");
+}
+
+std::vector<char>Application::readBinaryFile(const std::string& filename)
+{
+	// start reading at end of file and read as a binary file
+	std::ifstream file(filename, std::ios::ate | std::ios::binary); 
+	if(!file.is_open())
+		throw std::runtime_error("Failed to open file!");
+
+	size_t fileSize = (size_t) file.tellg(); // Get file size from read position
+	std::vector<char> buffer(fileSize);
+
+	file.seekg(0); // Return to start of file
+	file.read(buffer.data(), fileSize); // Read file
+	file.close();
+
+	return buffer;
 }
 
 void Application::update()

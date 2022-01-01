@@ -92,6 +92,8 @@ private:
 
 	void setupDebugMessenger();
 
+	static std::vector<char> readBinaryFile(const std::string& filename);
+
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, 
 		VkDebugUtilsMessageTypeFlagsEXT messageType, 
