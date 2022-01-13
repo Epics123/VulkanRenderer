@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Libraries">
+      <UniqueIdentifier>{0259E1F6-6EC3-956D-B701-471323AB73C2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\glfw">
+      <UniqueIdentifier>{011ED80E-EDEB-CB14-D67F-3C3BC2ECA779}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\glfw\include">
+      <UniqueIdentifier>{74B61F6B-60B0-48BD-491D-DFCD35B6AE29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\glfw\include\GLFW">
+      <UniqueIdentifier>{339A72D3-9FA7-A0B9-288E-9CA4949A6C70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\glm">
+      <UniqueIdentifier>{519425CA-BD54-A100-868F-EA7DF20EE6DC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\glm\glm">
+      <UniqueIdentifier>{20DFA4D0-8CF5-A266-D56C-2E8841C273EE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\glm\glm\detail">
+      <UniqueIdentifier>{E2926823-CEB7-B7A3-F702-9D33E386B6C1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\glm\glm\simd">
+      <UniqueIdentifier>{7CAFC053-68A9-E9A5-5116-80B63DAF4F12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\glm\test">
+      <UniqueIdentifier>{80C747E5-6CAB-083B-D50B-038EC10EF3BC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\glm\test\bug">
+      <UniqueIdentifier>{ADFDFA4A-99F7-239D-8264-BAAD6EFD8909}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\glm\test\cmake">
+      <UniqueIdentifier>{10C7BEF5-FCEB-0D76-2537-F30511BB0C94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\glm\test\core">
+      <UniqueIdentifier>{F8275BAA-645F-A341-6D69-0765D91FCA3A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\glm\test\ext">
+      <UniqueIdentifier>{E00AFB4A-CC04-249D-B571-BAADA10A8A09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\glm\test\gtc">
+      <UniqueIdentifier>{CD12FB4A-B90C-249D-A279-BAAD8E128A09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\glm\test\gtx">
+      <UniqueIdentifier>{E212FB4A-CE0C-249D-B779-BAADA3128A09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\glm\test\perf">
+      <UniqueIdentifier>{5C1E62AA-C855-AA41-D15F-0E653D16D13A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MainApp">
+      <UniqueIdentifier>{6BCAF114-D7A9-70B0-E0C1-FB864C20D711}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MainApp\Application.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\Renderer.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="MainApp\Application.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\Main.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\Renderer.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

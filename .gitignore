@@ -27,6 +27,7 @@ x86/
 [Aa][Rr][Mm]64/
 bld/
 [Bb]in/
+[Bb]in-int/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
@@ -353,3 +354,4 @@ MigrationBackup/
 .html
 docs/
 Lib/
+VulkanSDK/
