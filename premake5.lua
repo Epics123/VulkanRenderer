@@ -41,7 +41,7 @@ project "VulkanRenderer"
 
 	links
 	{
-		"glfw3dll.lib",
+		"glfw3_mt.lib",
 		"vulkan-1.lib",
 		"kernel32.lib",
 		"user32.lib",
