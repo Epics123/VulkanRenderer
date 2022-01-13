@@ -22,7 +22,9 @@ project "VulkanRenderer"
 	files
 	{
 		"%{prj.name}/MainApp/**.h",
-		"%{prj.name}/MainApp/**.cpp"
+		"%{prj.name}/MainApp/**.cpp",
+		"%{prj.name}/MainApp/resources/**.vert",
+		"%{prj.name}/MainApp/resources/**.frag",
 	}
 
 	includedirs
