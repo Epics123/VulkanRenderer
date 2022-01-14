@@ -74,6 +74,8 @@ private:
 
 	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
+	VkShaderModule createShaderModule(const std::vector<char>& code);
+
 	void createImageViews();
 
 	void createLogicalDevice();
@@ -120,6 +122,8 @@ private:
 	VkExtent2D swapChainImageExtent;
 	std::vector<VkImage> swapChainImages;
 	std::vector<VkImageView> swapChainImageViews;
+
+	VkPipelineLayout pipelineLayout;
 
 
 	const std::vector<const char*> validationLayers =

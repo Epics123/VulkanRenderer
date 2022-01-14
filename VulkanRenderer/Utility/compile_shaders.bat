@@ -1,4 +1,4 @@
 @echo off
-cd ../VulkanRenderer/resources/vulkan/shaders/
-for /r %%i in (*.frag, *.vert) do D:/VulkanSDK/Bin/glslangValidator.exe -V %%i
+cd ../MainApp/resources/vulkan/shaders/
+for /r %%i in (*.frag, *.vert) do C:/VulkanSDK/1.2.189.2/Bin/glslangValidator.exe -V %%i
 pause
