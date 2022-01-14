@@ -86,6 +86,12 @@ private:
 
 	void createRenderPass();
 
+	void createFrameBuffers();
+
+	void createCommandPool();
+
+	void createCommandBuffers();
+
 	// Update application
 	void update();
 
@@ -124,10 +130,13 @@ private:
 	VkExtent2D swapChainImageExtent;
 	std::vector<VkImage> swapChainImages;
 	std::vector<VkImageView> swapChainImageViews;
+	std::vector<VkFramebuffer> swapChainFramebuffers;
 
 	VkRenderPass renderPass;
 	VkPipelineLayout pipelineLayout;
 	VkPipeline graphicsPipeline;
+	VkCommandPool commandPool;
+	std::vector<VkCommandBuffer> commandBuffers;
 
 
 	const std::vector<const char*> validationLayers =
