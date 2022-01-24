@@ -92,8 +92,12 @@ private:
 
 	void createCommandBuffers();
 
+	void createSyncObjects();
+
 	// Update application
 	void update();
+
+	void drawFrame();
 
 	// Clean up application
 	void cleanup();
@@ -138,6 +142,11 @@ private:
 	VkCommandPool commandPool;
 	std::vector<VkCommandBuffer> commandBuffers;
 
+	std::vector<VkSemaphore> imageAvailableSemaphores;
+	std::vector<VkSemaphore> renderFinishedSemaphores;
+	std::vector<VkFence> inFlightFences;
+	std::vector<VkFence> imagesInFlight;
+	size_t currentFrame = 0;
 
 	const std::vector<const char*> validationLayers =
 	{
@@ -148,6 +157,8 @@ private:
 	{
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
+
+	const int MAX_FRAMES_IN_FLIGHT = 2;
 
 	#ifdef NDEBUG // not debug
 		const bool enableValidationLayers = false;
