@@ -118,6 +118,8 @@ private:
 		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
 		void* pUserData);
 
+	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
+
 private:
 	const char* name;
 	uint32_t width;
@@ -151,6 +153,7 @@ private:
 	std::vector<VkFence> inFlightFences;
 	std::vector<VkFence> imagesInFlight;
 	size_t currentFrame = 0;
+	bool framebufferResized = false;
 
 	const std::vector<const char*> validationLayers =
 	{

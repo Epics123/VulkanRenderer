@@ -7,7 +7,7 @@
 
 int main()
 {
-	Application app = Application("Vulkan Renderer", 1920, 1080);
+	Application app = Application("Vulkan Renderer", 1280, 720);
 
 	try
 	{

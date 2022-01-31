@@ -59,8 +59,17 @@ void Application::initWindow()
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // Disable window resizing (for now)
 
-	//// Create Window
+	// Create Window
 	window = glfwCreateWindow(width, height, name, nullptr, nullptr);
+
+	glfwSetWindowUserPointer(window, this);
+	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+}
+
+void Application::framebufferResizeCallback(GLFWwindow* window, int width, int height)
+{
+	Application* app = reinterpret_cast<Application*>(glfwGetWindowUserPointer(window));
+	app->framebufferResized = true;
 }
 
 void Application::vulkanInit()
@@ -836,6 +845,15 @@ void Application::cleanupSwapChain()
 
 void Application::recreateSwapChain() 
 {
+	// Check if window is minimized
+	int width = 0, height = 0;
+	glfwGetFramebufferSize(window, &width, &height);
+	while (width == 0 || height == 0)
+	{
+		glfwGetFramebufferSize(window, &width, &height);
+		glfwWaitEvents();
+	}
+
 	vkDeviceWaitIdle(device);
 
 	createSwapChain();
@@ -882,6 +900,7 @@ void Application::drawFrame()
 	VkResult res = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
 	if (res == VK_ERROR_OUT_OF_DATE_KHR)
 	{
+		framebufferResized = false;
 		recreateSwapChain();
 		return;
 	}
@@ -927,6 +946,7 @@ void Application::drawFrame()
 	res = vkQueuePresentKHR(presentQueue, &presentInfo);
 	if (res == VK_ERROR_OUT_OF_DATE_KHR)
 	{
+		framebufferResized = false;
 		recreateSwapChain();
 		return;
 	}
