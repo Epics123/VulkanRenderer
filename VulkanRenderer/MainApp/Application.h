@@ -94,6 +94,10 @@ private:
 
 	void createSyncObjects();
 
+	void cleanupSwapChain();
+
+	void recreateSwapChain();
+
 	// Update application
 	void update();
 

@@ -158,7 +158,7 @@ void Application::createSwapChain()
 	createInfo.minImageCount = imageCount;
 	createInfo.imageFormat = surfaceFormat.format;
 	createInfo.imageColorSpace = surfaceFormat.colorSpace;
-	//createInfo.imageExtent = extent;
+	createInfo.imageExtent = extent;
 	createInfo.imageArrayLayers = 1;
 	createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT; // can use VK_IMAGE_USAGE_TRANSFER_DST_BIT for post processing
 
@@ -813,6 +813,39 @@ void Application::createSyncObjects()
 	}
 }
 
+void Application::cleanupSwapChain()
+{
+	for (int i = 0; i < swapChainFramebuffers.size(); i++)
+	{
+		vkDestroyFramebuffer(device, swapChainFramebuffers[i], nullptr);
+	}
+
+	vkFreeCommandBuffers(device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+
+	vkDestroyPipeline(device, graphicsPipeline, nullptr);
+	vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+	vkDestroyRenderPass(device, renderPass, nullptr);
+
+	for (int i = 0; i < swapChainImageViews.size(); i++)
+	{
+		vkDestroyImageView(device, swapChainImageViews[i], nullptr);
+	}
+
+	vkDestroySwapchainKHR(device, swapChain, nullptr);
+}
+
+void Application::recreateSwapChain() 
+{
+	vkDeviceWaitIdle(device);
+
+	createSwapChain();
+	createImageViews();
+	createRenderPass();
+	createGraphicsPipeline();
+	createFrameBuffers();
+	createCommandBuffers();
+}
+
 std::vector<char>Application::readBinaryFile(const std::string& filename)
 {
 	// start reading at end of file and read as a binary file
@@ -847,6 +880,13 @@ void Application::drawFrame()
 
 	uint32_t imageIndex;
 	VkResult res = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+	if (res == VK_ERROR_OUT_OF_DATE_KHR)
+	{
+		recreateSwapChain();
+		return;
+	}
+	else if (res != VK_SUCCESS && res != VK_SUBOPTIMAL_KHR)
+		throw std::runtime_error("Failed to aquire swap chain image!");
 
 	if(imagesInFlight[imageIndex] != VK_NULL_HANDLE)
 		vkWaitForFences(device, 1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
@@ -884,7 +924,14 @@ void Application::drawFrame()
 	presentInfo.pImageIndices = &imageIndex;
 	presentInfo.pResults = nullptr; // Optional
 
-	vkQueuePresentKHR(presentQueue, &presentInfo);
+	res = vkQueuePresentKHR(presentQueue, &presentInfo);
+	if (res == VK_ERROR_OUT_OF_DATE_KHR)
+	{
+		recreateSwapChain();
+		return;
+	}
+	else if (res != VK_SUCCESS && res != VK_SUBOPTIMAL_KHR)
+		throw std::runtime_error("Failed to aquire swap chain image!");
 
 	vkQueueWaitIdle(presentQueue);
 
@@ -893,8 +940,7 @@ void Application::drawFrame()
 
 void Application::cleanup()
 {
-	if(enableValidationLayers)
-		DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
+	cleanupSwapChain();
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
@@ -905,22 +951,11 @@ void Application::cleanup()
 
 	vkDestroyCommandPool(device, commandPool, nullptr);
 	
-	for (int i = 0; i < swapChainFramebuffers.size(); i++)
-	{
-		vkDestroyFramebuffer(device, swapChainFramebuffers[i], nullptr);
-	}
-
-	vkDestroyPipeline(device, graphicsPipeline, nullptr);
-	vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
-	vkDestroyRenderPass(device, renderPass, nullptr);
-
-	for (int i = 0; i < swapChainImageViews.size(); i++)
-	{
-		vkDestroyImageView(device, swapChainImageViews[i], nullptr);
-	}
-
-	vkDestroySwapchainKHR(device, swapChain, nullptr);
 	vkDestroyDevice(device, nullptr);
+
+	if (enableValidationLayers)
+		DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
+
 	vkDestroySurfaceKHR(instance, surface, nullptr);
 	vkDestroyInstance(instance, nullptr);
 
