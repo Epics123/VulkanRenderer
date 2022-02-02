@@ -10,6 +10,8 @@
 #include <vector>
 #include <optional>
 
+#include "VertexBuffer.h"
+
 struct QueueFamilyIndices
 {
 	std::optional<uint32_t> graphicsFamily;
@@ -154,6 +156,8 @@ private:
 	std::vector<VkFence> imagesInFlight;
 	size_t currentFrame = 0;
 	bool framebufferResized = false;
+
+	VertexBuffer vertexBuffer;
 
 	const std::vector<const char*> validationLayers =
 	{

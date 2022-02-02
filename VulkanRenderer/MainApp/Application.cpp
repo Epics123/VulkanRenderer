@@ -57,7 +57,7 @@ void Application::initWindow()
 	// Init GLFW
 	glfwInit();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // Disable window resizing (for now)
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // Disable window resizing (for now)
 
 	// Create Window
 	window = glfwCreateWindow(width, height, name, nullptr, nullptr);
@@ -76,15 +76,19 @@ void Application::vulkanInit()
 {
 	createVulkanInstance();
 	setupDebugMessenger();
+
 	createSurface();
 	selectPhysicalDevice();
 	createLogicalDevice();
+	
 	createSwapChain();
 	createImageViews();
 	createRenderPass();
 	createGraphicsPipeline();
+	
 	createFrameBuffers();
 	createCommandPool();
+	vertexBuffer.createBuffer(device, physicalDevice);
 	createCommandBuffers();
 	createSyncObjects();
 }
@@ -533,12 +537,15 @@ void Application::createGraphicsPipeline()
 
 	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
+	VkVertexInputBindingDescription bindingDescription = Vertex::getBindingDescription();
+	std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions = Vertex::getAttributeDescriptions();
+
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vertexInputInfo.vertexBindingDescriptionCount = 0;
-	vertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
-	vertexInputInfo.vertexAttributeDescriptionCount = 0;
-	vertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
+	vertexInputInfo.vertexBindingDescriptionCount = 1;
+	vertexInputInfo.pVertexBindingDescriptions = &bindingDescription; // Optional
+	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data(); // Optional
 
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
 	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -785,7 +792,12 @@ void Application::createCommandBuffers()
 
 		vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 		vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
-		vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+
+		VkBuffer vertexbuffers[] = {vertexBuffer.buffer};
+		VkDeviceSize offsets[] = {0};
+		vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexbuffers, offsets);
+
+		vkCmdDraw(commandBuffers[i], static_cast<uint32_t>(verticies.size()), 1, 0, 0);
 		vkCmdEndRenderPass(commandBuffers[i]);
 
 		if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS)
@@ -961,6 +973,9 @@ void Application::drawFrame()
 void Application::cleanup()
 {
 	cleanupSwapChain();
+
+	vertexBuffer.destroyBuffer(device);
+	vertexBuffer.freeBufferMemory(device);
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
