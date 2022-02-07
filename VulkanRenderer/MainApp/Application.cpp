@@ -517,6 +517,9 @@ void Application::createSurface()
 
 void Application::createGraphicsPipeline()
 {
+	// TODO: Shift this to the actual proper API call
+	system("TMPcompile_shaders.bat");
+
 	std::vector<char> vertShaderCode = readBinaryFile("MainApp/resources/vulkan/shaders/vert.spv");
 	std::vector<char> fragShaderCode = readBinaryFile("MainApp/resources/vulkan/shaders/frag.spv");
 
