@@ -138,7 +138,7 @@ VkResult IndexBuffer::createIndexBuffer(VkDevice device, VkPhysicalDevice physic
 	memcpy(data, indices.data(), (size_t)bufferSize);
 	vkUnmapMemory(device, stagingBufferMemory);
 
-	result = createBuffer(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+	result = createBuffer(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
 		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, buffer, bufferMemory, bufferInfo);
 
 	copyBuffer(device, commandPool, graphicsQueue, stagingBuffer, buffer, bufferSize);
