@@ -53,33 +53,28 @@ const std::vector<uint32_t> indices =
 	0, 1, 2, 2, 3, 0
 };
 
-static VkResult createBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory, VkBufferCreateInfo& bufferInfo);
-static uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
-struct VertexBuffer
+struct Buffer
 {
 	VkBuffer buffer;
 	VkDeviceMemory bufferMemory;
 	VkBufferCreateInfo bufferInfo{};
 
-	VkResult createVertexBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue);
-	
-	void copyBuffer(VkDevice device, VkCommandPool commandPool, VkQueue graphicsQueue, VkBuffer src, VkBuffer dst, VkDeviceSize size);
-	
-	void destroyBuffer(VkDevice device);
-	void freeBufferMemory(VkDevice device);
+	static VkResult createBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory, VkBufferCreateInfo& bufferInfo);
+	static uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties);
+
+	virtual void copyBuffer(VkDevice device, VkCommandPool commandPool, VkQueue graphicsQueue, VkBuffer src, VkBuffer dst, VkDeviceSize size);
+
+	virtual void destroyBuffer(VkDevice device);
+	virtual void freeBufferMemory(VkDevice device);
 };
 
-struct IndexBuffer
+struct VertexBuffer : Buffer
 {
-	VkBuffer buffer;
-	VkDeviceMemory bufferMemory;
-	VkBufferCreateInfo bufferInfo{};
+	VkResult createVertexBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue);
+};
 
+struct IndexBuffer : Buffer
+{
 	VkResult createIndexBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue);
-
-	void copyBuffer(VkDevice device, VkCommandPool commandPool, VkQueue graphicsQueue, VkBuffer src, VkBuffer dst, VkDeviceSize size);
-
-	void destroyBuffer(VkDevice device);
-	void freeBufferMemory(VkDevice device);
 };
