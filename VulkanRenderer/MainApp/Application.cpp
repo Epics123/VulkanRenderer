@@ -88,7 +88,10 @@ void Application::vulkanInit()
 	
 	createFrameBuffers();
 	createCommandPool();
+
 	vertexBuffer.createVertexBuffer(device, physicalDevice, commandPool, graphicsQueue);
+	indexBuffer.createIndexBuffer(device, physicalDevice, commandPool, graphicsQueue);
+
 	createCommandBuffers();
 	createSyncObjects();
 }
@@ -976,6 +979,8 @@ void Application::cleanup()
 
 	vertexBuffer.destroyBuffer(device);
 	vertexBuffer.freeBufferMemory(device);
+	indexBuffer.destroyBuffer(device);
+	indexBuffer.freeBufferMemory(device);
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{

@@ -158,6 +158,7 @@ private:
 	bool framebufferResized = false;
 
 	VertexBuffer vertexBuffer;
+	IndexBuffer indexBuffer;
 
 	const std::vector<const char*> validationLayers =
 	{

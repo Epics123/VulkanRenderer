@@ -42,10 +42,19 @@ struct Vertex
 
 const std::vector<Vertex> verticies = 
 {
-	{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-	{{0.5f, 0.5f} , {0.0f, 1.0f, 0.0f}},
-	{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+	{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+	{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+	{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+	{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
 };
+
+const std::vector<uint32_t> indices = 
+{
+	0, 1, 2, 2, 3, 0
+};
+
+static VkResult createBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory, VkBufferCreateInfo& bufferInfo);
+static uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 struct VertexBuffer
 {
@@ -54,12 +63,23 @@ struct VertexBuffer
 	VkBufferCreateInfo bufferInfo{};
 
 	VkResult createVertexBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue);
-	VkResult createBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 	
 	void copyBuffer(VkDevice device, VkCommandPool commandPool, VkQueue graphicsQueue, VkBuffer src, VkBuffer dst, VkDeviceSize size);
 	
 	void destroyBuffer(VkDevice device);
 	void freeBufferMemory(VkDevice device);
+};
 
-	uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties);
+struct IndexBuffer
+{
+	VkBuffer buffer;
+	VkDeviceMemory bufferMemory;
+	VkBufferCreateInfo bufferInfo{};
+
+	VkResult createIndexBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue);
+
+	void copyBuffer(VkDevice device, VkCommandPool commandPool, VkQueue graphicsQueue, VkBuffer src, VkBuffer dst, VkDeviceSize size);
+
+	void destroyBuffer(VkDevice device);
+	void freeBufferMemory(VkDevice device);
 };

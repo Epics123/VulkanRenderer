@@ -8,7 +8,7 @@ VkResult VertexBuffer::createVertexBuffer(VkDevice device, VkPhysicalDevice phys
 
 	VkResult result = createBuffer(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 									VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-									stagingBuffer, stagingBufferMemory);
+									stagingBuffer, stagingBufferMemory, bufferInfo);
 
 	void* data;
 	result = vkMapMemory(device, stagingBufferMemory, 0, bufferInfo.size, 0, &data);
@@ -16,7 +16,7 @@ VkResult VertexBuffer::createVertexBuffer(VkDevice device, VkPhysicalDevice phys
 	vkUnmapMemory(device, stagingBufferMemory);
 
 	result = createBuffer(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-							VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, buffer, bufferMemory);
+							VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, buffer, bufferMemory, bufferInfo);
 
 	copyBuffer(device, commandPool, graphicsQueue, stagingBuffer, buffer, bufferSize);
 
@@ -26,7 +26,7 @@ VkResult VertexBuffer::createVertexBuffer(VkDevice device, VkPhysicalDevice phys
 	return result;
 }
 
-VkResult VertexBuffer::createBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
+VkResult createBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory, VkBufferCreateInfo& bufferInfo)
 {
 	// Create the vertex buffer
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -105,7 +105,7 @@ void VertexBuffer::freeBufferMemory(VkDevice device)
 	vkFreeMemory(device, bufferMemory, nullptr);
 }
 
-uint32_t VertexBuffer::findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties)
+uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties)
 {
 	VkPhysicalDeviceMemoryProperties memProperties;
 	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties); // Query GPU for available memory types
@@ -118,4 +118,77 @@ uint32_t VertexBuffer::findMemoryType(VkPhysicalDevice physicalDevice, uint32_t 
 	}
 
 	throw std::runtime_error("Failed to find suitable memory type!");
+}
+
+VkResult IndexBuffer::createIndexBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue)
+{
+	VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+
+	VkBuffer stagingBuffer;
+	VkDeviceMemory stagingBufferMemory;
+
+	VkResult result = createBuffer(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+		stagingBuffer, stagingBufferMemory, bufferInfo);
+
+	void* data;
+	result = vkMapMemory(device, stagingBufferMemory, 0, bufferInfo.size, 0, &data);
+	memcpy(data, indices.data(), (size_t)bufferSize);
+	vkUnmapMemory(device, stagingBufferMemory);
+
+	result = createBuffer(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, buffer, bufferMemory, bufferInfo);
+
+	copyBuffer(device, commandPool, graphicsQueue, stagingBuffer, buffer, bufferSize);
+
+	vkDestroyBuffer(device, stagingBuffer, nullptr);
+	vkFreeMemory(device, stagingBufferMemory, nullptr);
+
+	return result;
+}
+
+void IndexBuffer::copyBuffer(VkDevice device, VkCommandPool commandPool, VkQueue graphicsQueue, VkBuffer src, VkBuffer dst, VkDeviceSize size)
+{
+	VkCommandBufferAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandPool = commandPool;
+	allocInfo.commandBufferCount = 1;
+
+	VkCommandBuffer commandBuffer;
+	vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer);
+
+	VkCommandBufferBeginInfo beginInfo{};
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+	vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+	VkBufferCopy copyRegion{};
+	copyRegion.srcOffset = 0; // Optional
+	copyRegion.dstOffset = 0; // Optional
+	copyRegion.size = size;
+	vkCmdCopyBuffer(commandBuffer, src, dst, 1, &copyRegion);
+
+	vkEndCommandBuffer(commandBuffer);
+
+	VkSubmitInfo submitInfo{};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &commandBuffer;
+
+	vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+	vkQueueWaitIdle(graphicsQueue);
+
+	vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
+}
+
+void IndexBuffer::destroyBuffer(VkDevice device)
+{
+	vkDestroyBuffer(device, buffer, nullptr);
+}
+
+void IndexBuffer::freeBufferMemory(VkDevice device)
+{
+	vkFreeMemory(device, bufferMemory, nullptr);
 }
