@@ -88,7 +88,7 @@ void Application::vulkanInit()
 	
 	createFrameBuffers();
 	createCommandPool();
-	vertexBuffer.createBuffer(device, physicalDevice);
+	vertexBuffer.createVertexBuffer(device, physicalDevice, commandPool, graphicsQueue);
 	createCommandBuffers();
 	createSyncObjects();
 }

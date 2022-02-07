@@ -53,7 +53,11 @@ struct VertexBuffer
 	VkDeviceMemory bufferMemory;
 	VkBufferCreateInfo bufferInfo{};
 
-	VkResult createBuffer(VkDevice device, VkPhysicalDevice physicalDevice);
+	VkResult createVertexBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue);
+	VkResult createBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+	
+	void copyBuffer(VkDevice device, VkCommandPool commandPool, VkQueue graphicsQueue, VkBuffer src, VkBuffer dst, VkDeviceSize size);
+	
 	void destroyBuffer(VkDevice device);
 	void freeBufferMemory(VkDevice device);
 
