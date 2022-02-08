@@ -1,6 +1,6 @@
 #include "VertexBuffer.h"
 
-VkResult VertexBuffer::createVertexBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue)
+VkResult VertexBuffer::createVertexBuffer(VkDevice device, VertexSTDVector verticies, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue)
 {
 	VkDeviceSize bufferSize = sizeof(verticies[0]) * verticies.size();
 	VkBuffer stagingBuffer;
@@ -122,9 +122,9 @@ uint32_t Buffer::findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFi
 	throw std::runtime_error("Failed to find suitable memory type!");
 }
 
-VkResult IndexBuffer::createIndexBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue)
+VkResult IndexBuffer::createIndexBuffer(VkDevice device, IndexSTDVector indicies, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue)
 {
-	VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+	VkDeviceSize bufferSize = sizeof(indicies[0]) * indicies.size();
 
 	VkBuffer stagingBuffer;
 	VkDeviceMemory stagingBufferMemory;
@@ -135,7 +135,7 @@ VkResult IndexBuffer::createIndexBuffer(VkDevice device, VkPhysicalDevice physic
 
 	void* data;
 	result = vkMapMemory(device, stagingBufferMemory, 0, bufferInfo.size, 0, &data);
-	memcpy(data, indices.data(), (size_t)bufferSize);
+	memcpy(data, indicies.data(), (size_t)bufferSize);
 	vkUnmapMemory(device, stagingBufferMemory);
 
 	result = createBuffer(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,

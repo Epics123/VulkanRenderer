@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <algorithm>
 #include <fstream>
+
+#define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
 
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger)
@@ -32,6 +34,9 @@ Application::Application()
 	name = "Vulkan App";
 	width = 800;
 	height = 600;
+
+	modelPath = "models/teapot/teapot.obj";
+	texturePath = "textures/bricks/Bricks_basecolor.png";
 
 	//window = nullptr;
 }
@@ -90,8 +95,8 @@ void Application::vulkanInit()
 	createFrameBuffers();
 	createCommandPool();
 
-	vertexBuffer.createVertexBuffer(device, physicalDevice, commandPool, graphicsQueue);
-	indexBuffer.createIndexBuffer(device, physicalDevice, commandPool, graphicsQueue);
+	vertexBuffer.createVertexBuffer(device, vertices, physicalDevice, commandPool, graphicsQueue);
+	indexBuffer.createIndexBuffer(device, indices, physicalDevice, commandPool, graphicsQueue);
 
 	createCommandBuffers();
 	createSyncObjects();
@@ -911,6 +916,30 @@ void Application::update()
 	}
 
 	vkDeviceWaitIdle(device);
+}
+
+void Application::loadModel()
+{
+	// Attribute struct, holds vertices, weights, normals, texcoords, etc
+	tinyobj::attrib_t attributes;
+	std::vector<tinyobj::shape_t> shapes;	// I don't entirely understand the purpose of these yet  but it seems to be a seperate storage container for individual objects in an obj file?
+	std::vector<tinyobj::material_t> materials;	// .obj files can define specific materials per face, we currently ignore this
+	std::string warn, err;
+
+	// TinyObjectLoader has MTL compatibility
+	// 	   TODO:: implement MTL loading via TOL
+	// if(!tinyobj::LoadMtl())
+	if (!tinyobj::LoadObj(&attributes, &shapes, &materials, &warn, &err, modelPath.c_str()))
+	{
+		throw std::runtime_error(warn + err);
+	}
+
+	// The load function already triangulates faces; at this point it can be assumed that there are 3 vertices on each face
+	for (std::vector<tinyobj::shape_t>::iterator i = shapes.begin(); i != shapes.end(); i++)
+	{
+		vertices;
+		vertexBuffer;
+	}
 }
 
 void Application::drawFrame()

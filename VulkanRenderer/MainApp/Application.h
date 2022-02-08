@@ -100,6 +100,9 @@ private:
 
 	void recreateSwapChain();
 
+	// Load the model
+	void loadModel();
+
 	// Update application
 	void update();
 
@@ -126,6 +129,8 @@ private:
 	const char* name;
 	uint32_t width;
 	uint32_t height;
+	std::string modelPath;
+	std::string texturePath;
 
 	GLFWwindow* window;
 	VkInstance instance;
@@ -157,6 +162,8 @@ private:
 	size_t currentFrame = 0;
 	bool framebufferResized = false;
 
+	VertexSTDVector vertices;
+	IndexSTDVector indices;
 	VertexBuffer vertexBuffer;
 	IndexBuffer indexBuffer;
 
