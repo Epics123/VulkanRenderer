@@ -7,6 +7,9 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger)
 {
 	auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
@@ -957,6 +960,36 @@ void Application::loadModel()
 			indices.push_back((uint32_t)indices.size());
 		}
 	}
+}
+
+// Loads image from file using stb_image.h
+void Application::createTextureImage()
+{
+	int texWidth, texHeight, texChannels;
+	stbi_uc* pixels = stbi_load(texturePath.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+	
+	// RBGA * area values
+	VkDeviceSize imageSize = texWidth * texHeight * 4;
+
+	if (!pixels)
+	{
+		throw std::runtime_error("Failed to load texture image");
+	}
+
+	// Create buffer to transfer pixel data
+	Buffer stagingBuffer;
+	Buffer::createBuffer(device, physicalDevice, imageSize, 
+				VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 
+				stagingBuffer.buffer, stagingBuffer.bufferMemory, stagingBuffer.bufferInfo);
+
+	// Copy pixel values from image loading library to staging buffer
+	void* data;
+	vkMapMemory(device, stagingBuffer.bufferMemory, 0, imageSize, 0, &data);
+	memcpy(data, pixels, static_cast<size_t>(imageSize));
+	vkUnmapMemory(device, stagingBuffer.bufferMemory);
+
+	// Clean up image loading
+	stbi_image_free(pixels);
 }
 
 void Application::drawFrame()

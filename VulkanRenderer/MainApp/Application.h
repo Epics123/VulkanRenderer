@@ -103,6 +103,8 @@ private:
 	// Load the model
 	void loadModel();
 
+	void createTextureImage();
+
 	// Update application
 	void update();
 
@@ -162,18 +164,21 @@ private:
 	size_t currentFrame = 0;
 	bool framebufferResized = false;
 
-	VertexSTDVector vertices{
+	VertexSTDVector vertices/*{
 		{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
 		{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
 		{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
 		{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
-	};
+	};*/;
 	IndexSTDVector indices
 	{
 		0, 1, 2, 2, 3, 0
 	};
 	VertexBuffer vertexBuffer;
 	IndexBuffer indexBuffer;
+
+	VkImage textureImage;
+	VkDeviceMemory textureImageMemory;
 
 	const std::vector<const char*> validationLayers =
 	{
