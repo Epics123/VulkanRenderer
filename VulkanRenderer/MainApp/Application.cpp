@@ -937,8 +937,7 @@ void Application::loadModel()
 	// The load function already triangulates faces; at this point it can be assumed that there are 3 vertices on each face
 	for (std::vector<tinyobj::shape_t>::iterator i = shapes.begin(); i != shapes.end(); i++)
 	{
-		vertices;
-		vertexBuffer;
+		
 	}
 }
 
