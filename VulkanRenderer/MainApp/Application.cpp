@@ -937,10 +937,22 @@ void Application::loadModel()
 	// The load function already triangulates faces; at this point it can be assumed that there are 3 vertices on each face
 	for (std::vector<tinyobj::shape_t>::iterator shapeIter = shapes.begin(); shapeIter != shapes.end(); shapeIter++)
 	{
-		for (const tinyobj::index_t& index : shapeIter._Ptr->mesh.indices)	// I would like to not be using foreach but good lord the types
+		for (const tinyobj::index_t index : shapeIter._Ptr->mesh.indices)	// I would like to not be using foreach but good lord the types
 		{
 			Vertex vertex{};
 
+			vertex.pos = {
+				attributes.vertices[3 * index.vertex_index + 0],
+				attributes.vertices[3 * index.vertex_index + 1],
+				attributes.vertices[3 * index.vertex_index + 2]
+			};
+
+			//vertex.texCoord = {
+			//
+			//};
+
+			// We are asssuming that each vertex is unique here
+			// TODO: account for duplicate vertices
 			vertices.push_back(vertex);
 			indices.push_back((uint32_t)indices.size());
 		}
