@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <algorithm>
 #include <fstream>
+#include <tiny_obj_loader.h>
 
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger)
 {
