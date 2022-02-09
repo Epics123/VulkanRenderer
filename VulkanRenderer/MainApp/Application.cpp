@@ -486,7 +486,7 @@ void Application::createImageViews()
 		//if(vkCreateImageView(device, &createInfo, nullptr, &swapChainImageViews[i]) != VK_SUCCESS)
 		//	throw std::runtime_error("Failed to create image views!");
 
-		swapChainImageViews[i] = createImageView(swapChainImages[i], swapChainImageFormat);
+		swapChainImageViews[i] = createImageView(swapChainImages[i], swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
 	}
 }
 
@@ -1198,10 +1198,10 @@ void Application::createTextureImageView()
 	//{
 	//	throw std::runtime_error("Failed to create texture image view");
 	//}
-	textureImageView = createImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB);
+	textureImageView = createImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
 }
 
-VkImageView Application::createImageView(VkImage image, VkFormat format)
+VkImageView Application::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags)
 {
 	VkImageViewCreateInfo viewInfo{};
 	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -1212,7 +1212,7 @@ VkImageView Application::createImageView(VkImage image, VkFormat format)
 	viewInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
 	viewInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
 	viewInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-	viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	viewInfo.subresourceRange.aspectMask = aspectFlags;
 	viewInfo.subresourceRange.baseMipLevel = 0;
 	viewInfo.subresourceRange.levelCount = 1;
 	viewInfo.subresourceRange.baseArrayLayer = 0;
@@ -1296,7 +1296,11 @@ void Application::drawFrame()
 
 void Application::createDepthResources()
 {
+	VkFormat depthFormat = findDepthFormat();
 
+	Image::createImage(device, physicalDevice, swapChainImageExtent.width, swapChainImageExtent.height, depthFormat, 
+		VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage, depthImageMemory);
+	depthImageView = createImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
 }
 
 // Checks a list of format options, assumed to be in order from most to least desireable, and returns the first one supported by physical device

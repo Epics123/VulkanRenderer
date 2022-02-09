@@ -119,7 +119,7 @@ private:
 
 	void createTextureImageView();
 
-	VkImageView createImageView(VkImage image, VkFormat format);
+	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 
 	void createDepthResources();
 
