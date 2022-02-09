@@ -1301,6 +1301,8 @@ void Application::createDepthResources()
 	Image::createImage(device, physicalDevice, swapChainImageExtent.width, swapChainImageExtent.height, depthFormat, 
 		VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage, depthImageMemory);
 	depthImageView = createImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
+
+	Image::transitionImageLayout(graphicsQueue, device, commandPool, depthImage, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 }
 
 // Checks a list of format options, assumed to be in order from most to least desireable, and returns the first one supported by physical device
