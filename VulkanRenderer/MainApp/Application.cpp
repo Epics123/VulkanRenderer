@@ -45,8 +45,8 @@ Application::Application()
 	width = 800;
 	height = 600;
 
-	modelPath = "models/teapot/teapot.obj";
-	texturePath = "textures/bricks/Bricks_basecolor.png";
+	modelPath = "MainApp/resources/vulkan/models/teapot/teapot.obj";
+	texturePath = "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png";
 
 	//window = nullptr;
 }
@@ -56,6 +56,9 @@ Application::Application(const char* appName, uint32_t appWidth, uint32_t appHei
 	name = appName;
 	width = appWidth;
 	height = appHeight;
+
+	modelPath = "MainApp/resources/vulkan/models/teapot/teapot.obj";
+	texturePath = "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png";
 
 	//window = nullptr;
 }
@@ -105,6 +108,8 @@ void Application::vulkanInit()
 	
 	createFrameBuffers();
 	createCommandPool();
+
+	createTextureImage();
 
 	vertexBuffer.createVertexBuffer(device, vertices, physicalDevice, commandPool, graphicsQueue);
 	indexBuffer.createIndexBuffer(device, indices, physicalDevice, commandPool, graphicsQueue);
@@ -1098,7 +1103,9 @@ void Application::createTextureImage()
 {
 	int texWidth, texHeight, texChannels;
 	stbi_uc* pixels = stbi_load(texturePath.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+	//stbi_uc* pixels = stbi_load("MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 	
+
 	// RBGA * area values
 	VkDeviceSize imageSize = texWidth * texHeight * 4;
 
@@ -1131,6 +1138,10 @@ void Application::createTextureImage()
 
 	// Transition image to format for shader read access
 	Image::transitionImageLayout(graphicsQueue, device, commandPool, textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+	// Cleanup
+	vkDestroyBuffer(device, stagingBuffer.buffer, nullptr);
+	vkFreeMemory(device, stagingBuffer.bufferMemory, nullptr);
 }
 
 void Application::drawFrame()
@@ -1205,6 +1216,9 @@ void Application::cleanup()
 	cleanupSwapChain();
 
 	vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+
+	vkDestroyImage(device, textureImage, nullptr);
+	vkFreeMemory(device, textureImageMemory, nullptr);
 
 	vertexBuffer.destroyBuffer(device);
 	vertexBuffer.freeBufferMemory(device);
