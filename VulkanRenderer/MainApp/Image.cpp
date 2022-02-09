@@ -69,7 +69,7 @@ void Image::transitionImageLayout(VkQueue&graphicsQueue, VkDevice&device, VkComm
 
 	if (newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
 	{
-		barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+		barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;// | VK_IMAGE_ASPECT_STENCIL_BIT;
 		
 		//TODO: switch to this when the stencil check is accessible, remove or above
 		/*if (hasStencilComponent(format))

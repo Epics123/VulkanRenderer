@@ -57,8 +57,12 @@ Application::Application(const char* appName, uint32_t appWidth, uint32_t appHei
 	width = appWidth;
 	height = appHeight;
 
-	modelPath = "MainApp/resources/vulkan/models/teapot/teapot.obj";
+	//modelPath = "MainApp/resources/vulkan/models/teapot/teapot.obj";
+	modelPath = "MainApp/resources/vulkan/models/teapot/downScaledPot.obj";
+	//modelPath = "MainApp/resources/vulkan/models/room/room.obj";
+	//texturePath = "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png";
 	texturePath = "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png";
+	//texturePath = "MainApp/resources/vulkan/textures/room/viking_room.png";
 
 	//window = nullptr;
 }
@@ -114,6 +118,8 @@ void Application::vulkanInit()
 	createTextureImage();
 	createTextureImageView();
 	createTextureSampler(device, physicalDevice, textureSampler);
+
+	loadModel();
 
 	vertexBuffer.createVertexBuffer(device, vertices, physicalDevice, commandPool, graphicsQueue);
 	indexBuffer.createIndexBuffer(device, indices, physicalDevice, commandPool, graphicsQueue);
@@ -1030,7 +1036,7 @@ void Application::updateUniformBuffer(uint32_t currentImage)
 	UniformBufferObject ubo{};
 	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	ubo.proj = glm::perspective(glm::radians(45.0f), swapChainImageExtent.width / (float) swapChainImageExtent.height, 0.1f, 10.0f);
+	ubo.proj = glm::perspective(glm::radians(45.0f), swapChainImageExtent.width / (float) swapChainImageExtent.height, 0.1f, 20.0f);
 	ubo.proj[1][1] *= -1;
 	ubo.mvp = ubo.proj * ubo.view * ubo.model;
 
@@ -1042,6 +1048,10 @@ void Application::updateUniformBuffer(uint32_t currentImage)
 
 void Application::cleanupSwapChain()
 {
+	vkDestroyImageView(device, depthImageView, nullptr);
+	vkDestroyImage(device, depthImage, nullptr);
+	vkFreeMemory(device, depthImageMemory, nullptr);
+
 	for (int i = 0; i < swapChainFramebuffers.size(); i++)
 	{
 		vkDestroyFramebuffer(device, swapChainFramebuffers[i], nullptr);
@@ -1086,6 +1096,7 @@ void Application::recreateSwapChain()
 	createImageViews();
 	createRenderPass();
 	createGraphicsPipeline();
+	createDepthResources();
 	createFrameBuffers();
 	createUniformBuffers();
 	createDescriptorPool();
@@ -1146,15 +1157,18 @@ void Application::loadModel()
 		{
 			Vertex vertex{};
 
-			/*vertex.pos = {
+			vertex.pos = {
 				attributes.vertices[3 * index.vertex_index + 0],
 				attributes.vertices[3 * index.vertex_index + 1],
 				attributes.vertices[3 * index.vertex_index + 2]
-			};*/
+			};
 
-			//vertex.texCoord = {
-			//
-			//};
+			vertex.texCoord = {
+				attributes.texcoords[2 * index.texcoord_index + 0],
+				attributes.texcoords[2 * index.texcoord_index + 1]
+			};
+
+			vertex.color = { 1.0f, 1.0f, 1.0f };
 
 			// We are asssuming that each vertex is unique here
 			// TODO: account for duplicate vertices
