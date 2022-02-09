@@ -15,6 +15,7 @@ struct Image
 	// TODO: abstract out find memory type
 	static uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties);
 	static void transitionImageLayout(VkQueue&graphicsQueue, VkDevice&device, VkCommandPool&commandPool, VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+	static void copyBufferToImage(VkQueue& graphicsQueue, VkDevice& device, VkCommandPool& commandPool, VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
 };
 
 #endif // !IMAGE_H
