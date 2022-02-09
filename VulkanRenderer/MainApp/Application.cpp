@@ -886,14 +886,22 @@ void Application::createDescriptorSetLayout()
 	uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT; // Which stage this descriptor is going to be referenced
 	uboLayoutBinding.pImmutableSamplers = nullptr; // Used for image sampling
 
+	VkDescriptorSetLayoutBinding samplerLayoutBinding{};
+	samplerLayoutBinding.binding = 1;
+	samplerLayoutBinding.descriptorCount = 1;
+	samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	samplerLayoutBinding.pImmutableSamplers = nullptr;
+	samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+	std::array<VkDescriptorSetLayoutBinding, 2> bindings = { uboLayoutBinding, samplerLayoutBinding };
 	VkDescriptorSetLayoutCreateInfo layoutInfo{};
 	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	layoutInfo.bindingCount = 1;
-	layoutInfo.pBindings = &uboLayoutBinding;
+	layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
+	layoutInfo.pBindings = bindings.data();
 
 	VkResult result = vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayout);
 
-	if(result != VK_SUCCESS)
+	if (result != VK_SUCCESS)
 		throw std::runtime_error("Failed to create descriptor set layout!");
 }
 
@@ -909,14 +917,16 @@ void Application::createUniformBuffers()
 
 void Application::createDescriptorPool()
 {
-	VkDescriptorPoolSize poolSize{};
-	poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	poolSize.descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+	std::array<VkDescriptorPoolSize, 2> poolSizes{};
+	poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	poolSizes[0].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+	poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	poolSizes[1].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
 
 	VkDescriptorPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	poolInfo.poolSizeCount = 1;
-	poolInfo.pPoolSizes = &poolSize;
+	poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+	poolInfo.pPoolSizes = poolSizes.data();
 	poolInfo.maxSets = static_cast<uint32_t>(swapChainImages.size());
 
 	VkResult result = vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool);
