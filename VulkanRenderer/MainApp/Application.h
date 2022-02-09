@@ -121,6 +121,14 @@ private:
 
 	VkImageView createImageView(VkImage image, VkFormat format);
 
+	void createDepthResources();
+
+	VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+
+	VkFormat findDepthFormat();
+
+	bool hasStencilComponent(VkFormat format);
+
 	// Update application
 	void update();
 
@@ -207,6 +215,10 @@ private:
 	VkDeviceMemory textureImageMemory;
 	VkImageView textureImageView;
 	VkSampler textureSampler;
+
+	VkImage depthImage;
+	VkDeviceMemory depthImageMemory;
+	VkImageView depthImageView;
 
 	const std::vector<const char*> validationLayers =
 	{

@@ -109,6 +109,7 @@ void Application::vulkanInit()
 	createFrameBuffers();
 	createCommandPool();
 
+	createDepthResources();
 	createTextureImage();
 	createTextureImageView();
 	createTextureSampler(device, physicalDevice, textureSampler);
@@ -1291,6 +1292,44 @@ void Application::drawFrame()
 	//vkQueueWaitIdle(presentQueue);
 
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+}
+
+void Application::createDepthResources()
+{
+
+}
+
+// Checks a list of format options, assumed to be in order from most to least desireable, and returns the first one supported by physical device
+VkFormat Application::findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features)
+{
+	for (VkFormat format : candidates)
+	{
+		VkFormatProperties properties;
+		vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &properties);
+
+		if (tiling == VK_IMAGE_TILING_LINEAR && (properties.linearTilingFeatures & features) == features)
+		{
+			return format;
+		}
+		else if (tiling == VK_IMAGE_TILING_OPTIMAL && (properties.optimalTilingFeatures & features) == features)
+		{
+			return format;
+		}
+	}
+	
+	throw std::runtime_error("Failed to find supported format");
+}
+
+// Returns the most desireable depth format supported by the physical device
+VkFormat Application::findDepthFormat()
+{
+	return findSupportedFormat({ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
+		VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+}
+
+bool Application::hasStencilComponent(VkFormat format)
+{
+	return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
 }
 
 void Application::cleanup()
