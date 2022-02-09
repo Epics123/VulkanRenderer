@@ -110,6 +110,8 @@ void Application::vulkanInit()
 	createCommandPool();
 
 	createTextureImage();
+	createTextureImageView();
+	createTextureSampler(device, physicalDevice, textureSampler);
 
 	vertexBuffer.createVertexBuffer(device, vertices, physicalDevice, commandPool, graphicsQueue);
 	indexBuffer.createIndexBuffer(device, indices, physicalDevice, commandPool, graphicsQueue);
