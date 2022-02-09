@@ -199,6 +199,7 @@ private:
 	VkImage textureImage;
 	VkDeviceMemory textureImageMemory;
 	VkImageView textureImageView;
+	VkSampler textureSampler;
 
 	const std::vector<const char*> validationLayers =
 	{

@@ -1,13 +1,12 @@
 #include "TextureSampler.h"
 
-#define GLFW_INCLUDE_VULKAN
-
-#include <glfw3.h>
-#include <glfw3native.h>
+#include <stdexcept>
 
 // Currently does all sampling linearly
-void createTextureSampler(VkPhysicalDevice&physicalDevice)
+void createTextureSampler(VkDevice& device, VkPhysicalDevice&physicalDevice, VkSampler&sampler)
 {
+	// Get physical device properties in order to calculate reasonable values for hardware
+	// TODO: break this out, query at beginning of runtime and pass relevant data in
 	VkPhysicalDeviceProperties properties{};
 	vkGetPhysicalDeviceProperties(physicalDevice, &properties);
 
@@ -22,7 +21,24 @@ void createTextureSampler(VkPhysicalDevice&physicalDevice)
 	samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 	samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 	samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;	// Can not be an arbitrary colour
 
 	samplerInfo.anisotropyEnable = VK_TRUE;
-	samplerInfo.maxAnisotropy = 
+	samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
+
+	// False = 0,1 UV, True = 0,texwidth/height
+	samplerInfo.unnormalizedCoordinates = VK_FALSE;
+
+	samplerInfo.compareEnable = VK_FALSE;
+	samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+
+	samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+	samplerInfo.mipLodBias = 0.0f;
+	samplerInfo.minLod = 0.0f;
+	samplerInfo.maxLod = 0.0f;
+
+	if (vkCreateSampler(device, &samplerInfo, nullptr, &sampler) != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to create texture sampler");
+	}
 }

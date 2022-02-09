@@ -1270,6 +1270,7 @@ void Application::cleanup()
 
 	vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
 
+	vkDestroySampler(device, textureSampler, nullptr);
 	vkDestroyImageView(device, textureImageView, nullptr);
 	vkDestroyImage(device, textureImage, nullptr);
 	vkFreeMemory(device, textureImageMemory, nullptr);
