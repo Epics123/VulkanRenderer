@@ -604,7 +604,7 @@ void Application::createGraphicsPipeline()
 	rasterizer.rasterizerDiscardEnable = VK_FALSE; // If true geometry will not pass through rasterization stage
 	rasterizer.polygonMode = VK_POLYGON_MODE_FILL; // see https://vulkan-tutorial.com/Drawing_a_triangle/Graphics_pipeline_basics/Fixed_functions for more options
 	rasterizer.lineWidth = 1.0f;
-	rasterizer.cullMode = VK_CULL_MODE_NONE;//VK_CULL_MODE_BACK_BIT;
+	rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
 	rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 	rasterizer.depthBiasEnable = VK_FALSE;
 	rasterizer.depthBiasConstantFactor = 0.0f; // Optional
