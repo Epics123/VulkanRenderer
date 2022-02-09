@@ -59,5 +59,26 @@ void Image::transitionImageLayout(VkQueue&graphicsQueue, VkDevice&device, VkComm
 {
 	VkCommandBuffer commandBuffer = beginSingleTimeCommands(device, commandPool);
 
+	VkImageMemoryBarrier barrier{};
+	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	barrier.oldLayout = oldLayout;
+	barrier.newLayout = newLayout;
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.image = image;
+	barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	barrier.subresourceRange.baseMipLevel = 0;
+	barrier.subresourceRange.levelCount = 1;
+	barrier.subresourceRange.baseArrayLayer = 0;
+	barrier.subresourceRange.layerCount = 1;
+	
+	// TODO: Set masks once transition is set
+	barrier.srcAccessMask = 0;
+	barrier.dstAccessMask = 0;
+
+	// TODO: Set synchronization for barrier once transition is set
+	// https://www.khronos.org/registry/vulkan/specs/1.3-extensions/html/chap7.html#synchronization-access-types-supported
+	vkCmdPipelineBarrier(commandBuffer, 0, 0, 0, 0, nullptr, 0, nullptr, 1, &barrier);
+
 	endSingleTimeCommands(graphicsQueue, device, commandBuffer, commandPool);
 }
