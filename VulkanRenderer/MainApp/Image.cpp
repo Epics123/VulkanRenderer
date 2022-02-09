@@ -1,4 +1,5 @@
 #include "Image.h"
+#include "CommandBuffer.h"
 
 void Image::createImage(VkDevice device, VkPhysicalDevice physicalDevice, uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
 						VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory)
@@ -54,9 +55,9 @@ uint32_t Image::findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFil
 	throw std::runtime_error("Failed to find suitable memory type");
 }
 
-void Image::transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout)
+void Image::transitionImageLayout(VkQueue&graphicsQueue, VkDevice&device, VkCommandPool&commandPool, VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout)
 {
-	VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+	VkCommandBuffer commandBuffer = beginSingleTimeCommands(device, commandPool);
 
-	endSingleTimeCommands(commandBuffer);
+	endSingleTimeCommands(graphicsQueue, device, commandBuffer, commandPool);
 }

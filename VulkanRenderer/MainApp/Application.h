@@ -116,9 +116,6 @@ private:
 
 	void createTextureImage();
 
-	VkCommandBuffer beginSingleTimeCommands();
-	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
-
 	// Update application
 	void update();
 

@@ -93,14 +93,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="MainApp\Image.h" />
     <ClInclude Include="MainApp\Application.h" />
+    <ClInclude Include="MainApp\CommandBuffer.h" />
+    <ClInclude Include="MainApp\Image.h" />
     <ClInclude Include="MainApp\Renderer.h" />
     <ClInclude Include="MainApp\VertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MainApp\Image.cpp" />
     <ClCompile Include="MainApp\Application.cpp" />
+    <ClCompile Include="MainApp\CommandBuffer.cpp" />
+    <ClCompile Include="MainApp\Image.cpp" />
     <ClCompile Include="MainApp\Main.cpp" />
     <ClCompile Include="MainApp\Renderer.cpp" />
     <ClCompile Include="MainApp\VertexBuffer.cpp" />
