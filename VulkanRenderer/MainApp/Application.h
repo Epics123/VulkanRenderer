@@ -11,6 +11,7 @@
 #include <optional>
 
 #include "VertexBuffer.h"
+#include "Image.h"
 
 struct QueueFamilyIndices
 {
@@ -104,6 +105,9 @@ private:
 	void loadModel();
 
 	void createTextureImage();
+
+	VkCommandBuffer beginSingleTimeCommands();
+	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 
 	// Update application
 	void update();
