@@ -327,7 +327,10 @@ bool Application::isDeviceSuitable(VkPhysicalDevice device)
 		swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
 	}
 
-	return indicies.isComplete() && extensionSupported && swapChainAdequate; 
+	VkPhysicalDeviceFeatures supportedFeatures;
+	vkGetPhysicalDeviceFeatures(device, &supportedFeatures);	// Rather than forcing anisotropy could make it conditional
+
+	return indicies.isComplete() && extensionSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy; 
 }
 
 bool Application::checkDeviceExtensionSupport(VkPhysicalDevice device)
@@ -511,6 +514,7 @@ void Application::createLogicalDevice()
 
 	// Specify device features
 	VkPhysicalDeviceFeatures deviceFeatures{};
+	deviceFeatures.samplerAnisotropy = VK_TRUE;
 
 	// Create logical device info
 	VkDeviceCreateInfo createInfo{};

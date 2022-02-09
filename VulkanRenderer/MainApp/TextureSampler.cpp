@@ -23,6 +23,7 @@ void createTextureSampler(VkDevice& device, VkPhysicalDevice&physicalDevice, VkS
 	samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 	samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;	// Can not be an arbitrary colour
 
+	// Rather than forcing anisotropy could make it conditional depending on device capabilities (would set maxanisotropy to 1.0f)
 	samplerInfo.anisotropyEnable = VK_TRUE;
 	samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
 
