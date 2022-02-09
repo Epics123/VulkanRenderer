@@ -11,6 +11,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 
+#define TINYOBJLOADER_IMPLEMENTATION
+#include <tiny_obj_loader.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger)
 {
 	auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
@@ -38,6 +44,9 @@ Application::Application()
 	name = "Vulkan App";
 	width = 800;
 	height = 600;
+
+	modelPath = "models/teapot/teapot.obj";
+	texturePath = "textures/bricks/Bricks_basecolor.png";
 
 	//window = nullptr;
 }
@@ -97,8 +106,8 @@ void Application::vulkanInit()
 	createFrameBuffers();
 	createCommandPool();
 
-	vertexBuffer.createVertexBuffer(device, physicalDevice, commandPool, graphicsQueue);
-	indexBuffer.createIndexBuffer(device, physicalDevice, commandPool, graphicsQueue);
+	vertexBuffer.createVertexBuffer(device, vertices, physicalDevice, commandPool, graphicsQueue);
+	indexBuffer.createIndexBuffer(device, indices, physicalDevice, commandPool, graphicsQueue);
 	createUniformBuffers();
 	createDescriptorPool();
 	createDescriptorSets();
@@ -828,6 +837,40 @@ void Application::createCommandBuffers()
 	}
 }
 
+VkCommandBuffer Application::beginSingleTimeCommands()
+{
+	VkCommandBufferAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandPool = commandPool;
+	allocInfo.commandBufferCount = 1;
+
+	VkCommandBuffer commandBuffer;
+	vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer);
+
+	VkCommandBufferBeginInfo beginInfo{};
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+	vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+	return commandBuffer;
+}
+
+void Application::endSingleTimeCommands(VkCommandBuffer commandBuffer)
+{
+	vkEndCommandBuffer(commandBuffer);
+
+	VkSubmitInfo submitInfo{};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &commandBuffer;
+
+	vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+	vkQueueWaitIdle(graphicsQueue);
+
+	vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
+}
+
 void Application::createSyncObjects()
 {
 	imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
@@ -1041,6 +1084,80 @@ void Application::update()
 	}
 
 	vkDeviceWaitIdle(device);
+}
+
+void Application::loadModel()
+{
+	// Attribute struct, holds vertices, weights, normals, texcoords, etc
+	tinyobj::attrib_t attributes;
+	std::vector<tinyobj::shape_t> shapes;	// I don't entirely understand the purpose of these yet  but it seems to be a seperate storage container for individual objects in an obj file?
+	std::vector<tinyobj::material_t> materials;	// .obj files can define specific materials per face, we currently ignore this
+	std::string warn, err;
+
+	// TinyObjectLoader has MTL compatibility
+	// 	   TODO:: implement MTL loading via TOL
+	// if(!tinyobj::LoadMtl())
+	if (!tinyobj::LoadObj(&attributes, &shapes, &materials, &warn, &err, modelPath.c_str()))
+	{
+		throw std::runtime_error(warn + err);
+	}
+
+	// The load function already triangulates faces; at this point it can be assumed that there are 3 vertices on each face
+	for (std::vector<tinyobj::shape_t>::iterator shapeIter = shapes.begin(); shapeIter != shapes.end(); shapeIter++)
+	{
+		for (const tinyobj::index_t index : shapeIter._Ptr->mesh.indices)	// I would like to not be using foreach but good lord the types
+		{
+			Vertex vertex{};
+
+			/*vertex.pos = {
+				attributes.vertices[3 * index.vertex_index + 0],
+				attributes.vertices[3 * index.vertex_index + 1],
+				attributes.vertices[3 * index.vertex_index + 2]
+			};*/
+
+			//vertex.texCoord = {
+			//
+			//};
+
+			// We are asssuming that each vertex is unique here
+			// TODO: account for duplicate vertices
+			vertices.push_back(vertex);
+			indices.push_back((uint32_t)indices.size());
+		}
+	}
+}
+
+// Loads image from file using stb_image.h
+void Application::createTextureImage()
+{
+	int texWidth, texHeight, texChannels;
+	stbi_uc* pixels = stbi_load(texturePath.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+	
+	// RBGA * area values
+	VkDeviceSize imageSize = texWidth * texHeight * 4;
+
+	if (!pixels)
+	{
+		throw std::runtime_error("Failed to load texture image");
+	}
+
+	// Create buffer to transfer pixel data
+	Buffer stagingBuffer;
+	Buffer::createBuffer(device, physicalDevice, imageSize, 
+				VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 
+				stagingBuffer.buffer, stagingBuffer.bufferMemory, stagingBuffer.bufferInfo);
+
+	// Copy pixel values from image loading library to staging buffer
+	void* data;
+	vkMapMemory(device, stagingBuffer.bufferMemory, 0, imageSize, 0, &data);
+	memcpy(data, pixels, static_cast<size_t>(imageSize));
+	vkUnmapMemory(device, stagingBuffer.bufferMemory);
+
+	// Clean up image loading
+	stbi_image_free(pixels);
+
+	Image::createImage(device, physicalDevice, texWidth, texHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+						VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory);
 }
 
 void Application::drawFrame()

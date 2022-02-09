@@ -48,18 +48,25 @@ struct UniformBufferObject
 	glm::mat4 mvp;
 };
 
-const std::vector<Vertex> verticies = 
-{
-	{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-	{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-	{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-	{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
-};
 
-const std::vector<uint32_t> indices = 
-{
-	0, 1, 2, 2, 3, 0
-};
+typedef std::vector<Vertex> VertexSTDVector;
+typedef std::vector<uint32_t> IndexSTDVector;
+
+typedef std::vector<Vertex>::iterator VertexIter;
+typedef std::vector<uint32_t>::iterator IndexIter;
+
+//const std::vector<Vertex> verticies = 
+//{
+//	{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+//	{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+//	{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+//	{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+//};
+//
+//const std::vector<uint32_t> indices = 
+//{
+//	0, 1, 2, 2, 3, 0
+//};
 
 
 struct Buffer
@@ -79,12 +86,12 @@ struct Buffer
 
 struct VertexBuffer : Buffer
 {
-	VkResult createVertexBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue);
+	VkResult createVertexBuffer(VkDevice device, VertexSTDVector verticies, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue);
 };
 
 struct IndexBuffer : Buffer
 {
-	VkResult createIndexBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue);
+	VkResult createIndexBuffer(VkDevice device, IndexSTDVector indicies, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue);
 };
 
 struct UniformBuffer : Buffer

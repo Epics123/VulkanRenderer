@@ -11,6 +11,7 @@
 #include <optional>
 
 #include "VertexBuffer.h"
+#include "Image.h"
 
 struct QueueFamilyIndices
 {
@@ -110,6 +111,14 @@ private:
 
 	void recreateSwapChain();
 
+	// Load the model
+	void loadModel();
+
+	void createTextureImage();
+
+	VkCommandBuffer beginSingleTimeCommands();
+	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+
 	// Update application
 	void update();
 
@@ -136,6 +145,8 @@ private:
 	const char* name;
 	uint32_t width;
 	uint32_t height;
+	std::string modelPath;
+	std::string texturePath;
 
 	GLFWwindow* window;
 	VkInstance instance;
@@ -170,9 +181,22 @@ private:
 	size_t currentFrame = 0;
 	bool framebufferResized = false;
 
+	VertexSTDVector vertices{
+		{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+		{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+		{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+		{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+	};
+	IndexSTDVector indices
+	{
+		0, 1, 2, 2, 3, 0
+	};
 	VertexBuffer vertexBuffer;
 	IndexBuffer indexBuffer;
 	std::vector<UniformBuffer> uniformBuffers;
+
+	VkImage textureImage;
+	VkDeviceMemory textureImageMemory;
 
 	const std::vector<const char*> validationLayers =
 	{

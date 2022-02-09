@@ -355,3 +355,6 @@ MigrationBackup/
 docs/
 Lib/
 VulkanSDK/
+
+# Keep 3D object files
+!**/[Mm]odels/*/*.obj

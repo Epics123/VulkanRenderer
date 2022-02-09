@@ -15,12 +15,14 @@
     <ClInclude Include="MainApp\Application.h" />
     <ClInclude Include="MainApp\Renderer.h" />
     <ClInclude Include="MainApp\VertexBuffer.h" />
+    <ClInclude Include="MainApp\Image.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainApp\Application.cpp" />
     <ClCompile Include="MainApp\Main.cpp" />
     <ClCompile Include="MainApp\Renderer.cpp" />
     <ClCompile Include="MainApp\VertexBuffer.cpp" />
+    <ClCompile Include="MainApp\Image.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MainApp\resources\vulkan\shaders\Test.frag">

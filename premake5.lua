@@ -31,7 +31,9 @@ project "VulkanRenderer"
 	{
 		"%{IncludeDir.VulkanSDK}",
 		"%{IncludeDir.GLFW}",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.ObjLoader}",
+		"%{IncludeDir.ImgLoader}"
 	}
 
 	libdirs
