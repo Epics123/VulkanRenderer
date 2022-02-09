@@ -459,26 +459,28 @@ void Application::createImageViews()
 	swapChainImageViews.resize(swapChainImages.size());
 	for (int i = 0; i < swapChainImages.size(); i++)
 	{
-		VkImageViewCreateInfo createInfo{};
-		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		createInfo.image = swapChainImages[i];
-		createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D; // treat images as a 2D texture, can also use 1D, 3D, and cube maps
-		createInfo.format = swapChainImageFormat;
+		//VkImageViewCreateInfo createInfo{};
+		//createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		//createInfo.image = swapChainImages[i];
+		//createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D; // treat images as a 2D texture, can also use 1D, 3D, and cube maps
+		//createInfo.format = swapChainImageFormat;
 
-		// Swizzle color channels (default for now)
-		createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+		//// Swizzle color channels (default for now)
+		//createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+		//createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+		//createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+		//createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
 
-		createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT; // Color targets
-		createInfo.subresourceRange.baseMipLevel = 0;  // No mipmaps
-		createInfo.subresourceRange.levelCount = 1;
-		createInfo.subresourceRange.baseArrayLayer = 0;
-		createInfo.subresourceRange.layerCount = 1;
+		//createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT; // Color targets
+		//createInfo.subresourceRange.baseMipLevel = 0;  // No mipmaps
+		//createInfo.subresourceRange.levelCount = 1;
+		//createInfo.subresourceRange.baseArrayLayer = 0;
+		//createInfo.subresourceRange.layerCount = 1;
 
-		if(vkCreateImageView(device, &createInfo, nullptr, &swapChainImageViews[i]) != VK_SUCCESS)
-			throw std::runtime_error("Failed to create image views!");
+		//if(vkCreateImageView(device, &createInfo, nullptr, &swapChainImageViews[i]) != VK_SUCCESS)
+		//	throw std::runtime_error("Failed to create image views!");
+
+		swapChainImageViews[i] = createImageView(swapChainImages[i], swapChainImageFormat);
 	}
 }
 
@@ -1142,6 +1144,57 @@ void Application::createTextureImage()
 	// Cleanup
 	vkDestroyBuffer(device, stagingBuffer.buffer, nullptr);
 	vkFreeMemory(device, stagingBuffer.bufferMemory, nullptr);
+}
+
+void Application::createTextureImageView()
+{
+	//// This create image view could be abstracted into a seperate function that takes in the image and format as parameters, used here and in createImageView for the swapchain
+	//VkImageViewCreateInfo viewInfo{};
+	//viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	//viewInfo.image = textureImage;
+	//viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+	//viewInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
+	//viewInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+	//viewInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+	//viewInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+	//viewInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+	//viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	//viewInfo.subresourceRange.baseMipLevel = 0;
+	//viewInfo.subresourceRange.levelCount = 1;
+	//viewInfo.subresourceRange.baseArrayLayer = 0;
+	//viewInfo.subresourceRange.layerCount = 1;
+
+	//if (vkCreateImageView(device, &viewInfo, nullptr, &textureImageView) != VK_SUCCESS)
+	//{
+	//	throw std::runtime_error("Failed to create texture image view");
+	//}
+	textureImageView = createImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB);
+}
+
+VkImageView Application::createImageView(VkImage image, VkFormat format)
+{
+	VkImageViewCreateInfo viewInfo{};
+	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	viewInfo.image = image;
+	viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+	viewInfo.format = format;
+	viewInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+	viewInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+	viewInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+	viewInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+	viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	viewInfo.subresourceRange.baseMipLevel = 0;
+	viewInfo.subresourceRange.levelCount = 1;
+	viewInfo.subresourceRange.baseArrayLayer = 0;
+	viewInfo.subresourceRange.layerCount = 1;
+	
+	VkImageView imageView;
+	if (vkCreateImageView(device, &viewInfo, nullptr, &imageView) != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to create texture image view");
+	}
+
+	return imageView;
 }
 
 void Application::drawFrame()

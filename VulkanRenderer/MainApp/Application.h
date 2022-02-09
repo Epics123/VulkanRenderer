@@ -116,6 +116,10 @@ private:
 
 	void createTextureImage();
 
+	void createTextureImageView();
+
+	VkImageView createImageView(VkImage image, VkFormat format);
+
 	// Update application
 	void update();
 
@@ -194,6 +198,7 @@ private:
 
 	VkImage textureImage;
 	VkDeviceMemory textureImageMemory;
+	VkImageView textureImageView;
 
 	const std::vector<const char*> validationLayers =
 	{
