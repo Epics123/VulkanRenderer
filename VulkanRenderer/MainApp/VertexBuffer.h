@@ -40,6 +40,14 @@ struct Vertex
 	}
 };
 
+struct UniformBufferObject
+{
+	glm::mat4 model;
+	glm::mat4 view;
+	glm::mat4 proj;
+	glm::mat4 mvp;
+};
+
 const std::vector<Vertex> verticies = 
 {
 	{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
@@ -77,4 +85,9 @@ struct VertexBuffer : Buffer
 struct IndexBuffer : Buffer
 {
 	VkResult createIndexBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue);
+};
+
+struct UniformBuffer : Buffer
+{
+	VkResult createUniformBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue);
 };

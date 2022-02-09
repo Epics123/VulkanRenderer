@@ -96,6 +96,16 @@ private:
 
 	void createSyncObjects();
 
+	void createDescriptorSetLayout();
+
+	void createUniformBuffers();
+
+	void createDescriptorPool();
+
+	void createDescriptorSets();
+
+	void updateUniformBuffer(uint32_t currentImage);
+
 	void cleanupSwapChain();
 
 	void recreateSwapChain();
@@ -146,9 +156,12 @@ private:
 
 	VkRenderPass renderPass;
 	VkPipelineLayout pipelineLayout;
+	VkDescriptorSetLayout descriptorSetLayout;
+	VkDescriptorPool descriptorPool;
 	VkPipeline graphicsPipeline;
 	VkCommandPool commandPool;
 	std::vector<VkCommandBuffer> commandBuffers;
+	std::vector<VkDescriptorSet> descriptorSets;
 
 	std::vector<VkSemaphore> imageAvailableSemaphores;
 	std::vector<VkSemaphore> renderFinishedSemaphores;
@@ -159,6 +172,7 @@ private:
 
 	VertexBuffer vertexBuffer;
 	IndexBuffer indexBuffer;
+	std::vector<UniformBuffer> uniformBuffers;
 
 	const std::vector<const char*> validationLayers =
 	{
