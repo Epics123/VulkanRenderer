@@ -95,6 +95,8 @@ void Buffer::copyBuffer(VkDevice device, VkCommandPool commandPool, VkQueue grap
 	vkQueueWaitIdle(graphicsQueue);
 
 	vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
+
+	// TODO: replace this function with single time command buffer function implementation (see texture mapping/images)
 }
 
 void Buffer::destroyBuffer(VkDevice device)

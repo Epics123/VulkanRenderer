@@ -53,3 +53,10 @@ uint32_t Image::findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFil
 
 	throw std::runtime_error("Failed to find suitable memory type");
 }
+
+void Image::transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout)
+{
+	VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+
+	endSingleTimeCommands(commandBuffer);
+}
