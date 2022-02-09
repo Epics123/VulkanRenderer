@@ -10,7 +10,7 @@
 
 struct Vertex
 {
-	glm::vec3 pos;
+	glm::vec2 pos;
 	glm::vec3 color;
 
 	static VkVertexInputBindingDescription getBindingDescription()
@@ -39,6 +39,15 @@ struct Vertex
 		return attributeDescriptions;
 	}
 };
+
+struct UniformBufferObject
+{
+	glm::mat4 model;
+	glm::mat4 view;
+	glm::mat4 proj;
+	glm::mat4 mvp;
+};
+
 
 typedef std::vector<Vertex> VertexSTDVector;
 typedef std::vector<uint32_t> IndexSTDVector;
@@ -83,4 +92,9 @@ struct VertexBuffer : Buffer
 struct IndexBuffer : Buffer
 {
 	VkResult createIndexBuffer(VkDevice device, IndexSTDVector indicies, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue);
+};
+
+struct UniformBuffer : Buffer
+{
+	VkResult createUniformBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue);
 };

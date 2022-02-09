@@ -31,7 +31,7 @@ VkResult Buffer::createBuffer(VkDevice device, VkPhysicalDevice physicalDevice, 
 	// Create the vertex buffer
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	bufferInfo.size = size; // size of buffer in bytes
-	bufferInfo.usage = usage; // this buffer will be used as a vertex buffer
+	bufferInfo.usage = usage; 
 	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 	VkResult result = vkCreateBuffer(device, &bufferInfo, nullptr, &buffer);
@@ -53,7 +53,7 @@ VkResult Buffer::createBuffer(VkDevice device, VkPhysicalDevice physicalDevice, 
 
 	if (result != VK_SUCCESS)
 	{
-		throw std::runtime_error("Failed to allocate vertex buffer memory!");
+		throw std::runtime_error("Failed to allocate buffer memory!");
 	}
 
 	vkBindBufferMemory(device, buffer, bufferMemory, 0);
@@ -148,5 +148,15 @@ VkResult IndexBuffer::createIndexBuffer(VkDevice device, IndexSTDVector indicies
 	vkDestroyBuffer(device, stagingBuffer, nullptr);
 	vkFreeMemory(device, stagingBufferMemory, nullptr);
 
+	return result;
+}
+
+VkResult UniformBuffer::createUniformBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue)
+{
+	VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+
+	VkResult result = createBuffer(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, 
+									VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 
+									buffer, bufferMemory, bufferInfo);
 	return result;
 }
