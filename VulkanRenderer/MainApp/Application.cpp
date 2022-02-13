@@ -85,6 +85,10 @@ void Application::initWindow()
 	// Create Window
 	window = glfwCreateWindow(width, height, name, nullptr, nullptr);
 
+	glfwSetKeyCallback(window, keyCallback);
+	glfwSetCursorPosCallback(window, cursorPosCallback);
+	glfwSetMouseButtonCallback(window, mouseButtonCallback);
+
 	glfwSetWindowUserPointer(window, this);
 	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 }
@@ -1128,6 +1132,7 @@ void Application::update()
 	while (!glfwWindowShouldClose(window))
 	{
 		glfwPollEvents();
+
 		drawFrame();
 	}
 
@@ -1444,6 +1449,23 @@ void Application::setupDebugMessenger()
 	{
 		throw std::runtime_error("Failed to set up debug messenger!");
 	}
+}
+
+void Application::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if(key == GLFW_KEY_E && action == GLFW_PRESS)
+		printf("E Key Pressed! \n");
+}
+
+void Application::cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
+{
+	printf("%f, %f\n", (float)xpos, (float)ypos);
+}
+
+void Application::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+	if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+		printf("Left mouse clicked!\n");
 }
 
 VKAPI_ATTR VkBool32 VKAPI_CALL Application::debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)

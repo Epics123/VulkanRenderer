@@ -141,6 +141,12 @@ private:
 
 	void setupDebugMessenger();
 
+	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+	static void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
+
+	static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+
 	static std::vector<char> readBinaryFile(const std::string& filename);
 
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
