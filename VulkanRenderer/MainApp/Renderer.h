@@ -133,6 +133,8 @@ public:
 
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
+	static std::vector<char> readBinaryFile(const std::string& filename);
+
 private:
 	Window* window;
 

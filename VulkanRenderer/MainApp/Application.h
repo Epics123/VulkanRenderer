@@ -14,7 +14,7 @@
 #include "Window.h"
 #include "VertexBuffer.h"
 #include "Image.h"
-#include "TextureSampler.h"\
+#include "TextureSampler.h"
 
 class Renderer;
 
