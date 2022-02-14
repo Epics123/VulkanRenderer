@@ -13,6 +13,7 @@
 #include "VertexBuffer.h"
 #include "Image.h"
 #include "TextureSampler.h"
+#include "Window.h"
 
 struct QueueFamilyIndices
 {
