@@ -1,13 +1,14 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <glfw3.h>
-#include <glfw3native.h>
+
 #include <stdexcept>
 
 //#define GLM_FORCE_RADIANS
 //#define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
 //#include <glm/glm.hpp>
+
+class GLFWwindow;
 
 class Window 
 {
@@ -21,6 +22,8 @@ private:
 	const char* name;
 	uint32_t width;
 	uint32_t height;
+
+	GLFWwindow* window;
 };
 
 #endif // !WINDOW_H
