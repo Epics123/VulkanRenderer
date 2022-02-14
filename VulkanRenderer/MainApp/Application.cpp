@@ -80,6 +80,7 @@ void Application::run()
 	cleanup();
 }
 
+// Will be refactored into window
 void Application::initWindow()
 {
 	// Init GLFW
