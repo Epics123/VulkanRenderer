@@ -432,7 +432,7 @@ VkExtent2D Application::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabil
 	else
 	{
 		int extentWidth, extentHeight;
-		glfwGetFramebufferSize(window, &extentWidth, &extentHeight);
+		window->getFrameBufferSize(&extentWidth, &extentHeight);
 
 		VkExtent2D actualExtent = { static_cast<uint32_t>(extentWidth), static_cast<uint32_t>(extentHeight) };
 		actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
@@ -544,7 +544,7 @@ void Application::createLogicalDevice()
 
 void Application::createSurface()
 {
-	if(glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS)
+	if(glfwCreateWindowSurface(instance, window->getWindow(), nullptr, &surface) != VK_SUCCESS)
 		throw std::runtime_error("Failed to create window surface!");
 }	
 
