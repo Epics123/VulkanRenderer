@@ -18,6 +18,8 @@ public:
 
 	void initWindow();
 
+	GLFWwindow* getWindow() { return window; };
+
 private:
 	const char* name;
 	uint32_t width;
