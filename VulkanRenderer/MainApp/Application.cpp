@@ -50,6 +50,8 @@ Application::Application()
 	modelPath = "MainApp/resources/vulkan/models/teapot/teapot.obj";
 	texturePath = "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png";
 
+	window = new Window(name, width, height);
+	vulkanRenderer = new Renderer();
 	//window = nullptr;
 }
 
@@ -65,39 +67,41 @@ Application::Application(const char* appName, uint32_t appWidth, uint32_t appHei
 	//texturePath = "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png";
 	texturePath = "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png";
 	//texturePath = "MainApp/resources/vulkan/textures/room/viking_room.png";
-
+	window = new Window(name, width, height);
+	vulkanRenderer = new Renderer();
 	//window = nullptr;
 }
 
 void Application::run()
 {
-	initWindow();
+	//initWindow();
+	window->initWindow(keyCallback, cursorPosCallback, mouseButtonCallback, framebufferResizeCallback, this);
 	vulkanInit();
 
-	vulkanRenderer = new Renderer();
+	
 
 	update();
 	cleanup();
 }
 
 // Will be refactored into window
-void Application::initWindow()
-{
-	// Init GLFW
-	glfwInit();
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // Disable window resizing (for now)
-
-	// Create Window
-	window = glfwCreateWindow(width, height, name, nullptr, nullptr);
-
-	glfwSetKeyCallback(window, keyCallback);
-	glfwSetCursorPosCallback(window, cursorPosCallback);
-	glfwSetMouseButtonCallback(window, mouseButtonCallback);
-
-	glfwSetWindowUserPointer(window, this);
-	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
-}
+//void Application::initWindow()
+//{
+//	// Init GLFW
+//	glfwInit();
+//	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+//	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // Disable window resizing (for now)
+//
+//	// Create Window
+//	window = glfwCreateWindow(width, height, name, nullptr, nullptr);
+//
+//	glfwSetKeyCallback(window, keyCallback);
+//	glfwSetCursorPosCallback(window, cursorPosCallback);
+//	glfwSetMouseButtonCallback(window, mouseButtonCallback);
+//
+//	glfwSetWindowUserPointer(window, this);
+//	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+//}
 
 void Application::framebufferResizeCallback(GLFWwindow* window, int width, int height)
 {
