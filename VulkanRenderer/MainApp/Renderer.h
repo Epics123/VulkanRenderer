@@ -134,6 +134,8 @@ public:
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 private:
+	Window* window;
+
 	VkInstance instance;
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE; // GPU
 	VkDevice device; // Logical device
