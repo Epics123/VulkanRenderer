@@ -10,31 +10,13 @@
 #include <vector>
 #include <optional>
 
-//#include "Renderer.h"
+#include "Renderer.h"
 #include "Window.h"
 #include "VertexBuffer.h"
 #include "Image.h"
 #include "TextureSampler.h"
 
-class Renderer;
-
-struct QueueFamilyIndices
-{
-	std::optional<uint32_t> graphicsFamily;
-	std::optional<uint32_t> presentFamily;
-
-	bool isComplete()
-	{
-		return graphicsFamily.has_value() && presentFamily.has_value();
-	}
-};
-
-struct SwapChainSupportDetails
-{
-	VkSurfaceCapabilitiesKHR capabilities;
-	std::vector<VkSurfaceFormatKHR> formats;
-	std::vector<VkPresentModeKHR> presentModes;
-};
+//class Renderer;
 
 class Application
 {
@@ -45,9 +27,6 @@ public:
 	void run();
 
 private:
-	// Initialize window using GLFW
-	void initWindow();
-
 	// Initialize Vulkan library
 	void vulkanInit();
 
@@ -174,7 +153,6 @@ private:
 	std::string modelPath;
 	std::string texturePath;
 
-	GLFWwindow* window;
 	VkInstance instance;
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE; // GPU
 	VkDevice device; // Logical device

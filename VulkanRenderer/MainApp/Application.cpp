@@ -5,7 +5,7 @@
 #include <fstream>
 #include <chrono>
 
-#include "Renderer.h"
+//#include "Renderer.h"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
@@ -50,7 +50,8 @@ Application::Application()
 	modelPath = "MainApp/resources/vulkan/models/teapot/teapot.obj";
 	texturePath = "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png";
 
-	//window = nullptr;
+	window = new Window(name, width, height);
+	vulkanRenderer = new Renderer();
 }
 
 Application::Application(const char* appName, uint32_t appWidth, uint32_t appHeight)
@@ -65,37 +66,16 @@ Application::Application(const char* appName, uint32_t appWidth, uint32_t appHei
 	//texturePath = "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png";
 	texturePath = "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png";
 	//texturePath = "MainApp/resources/vulkan/textures/room/viking_room.png";
-
-	//window = nullptr;
+	window = new Window(name, width, height);
+	vulkanRenderer = new Renderer();
 }
 
 void Application::run()
 {
-	initWindow();
+	window->initWindow(keyCallback, cursorPosCallback, mouseButtonCallback, framebufferResizeCallback, this);
 	vulkanInit();
-
-	vulkanRenderer = new Renderer();
-
 	update();
 	cleanup();
-}
-
-void Application::initWindow()
-{
-	// Init GLFW
-	glfwInit();
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // Disable window resizing (for now)
-
-	// Create Window
-	window = glfwCreateWindow(width, height, name, nullptr, nullptr);
-
-	glfwSetKeyCallback(window, keyCallback);
-	glfwSetCursorPosCallback(window, cursorPosCallback);
-	glfwSetMouseButtonCallback(window, mouseButtonCallback);
-
-	glfwSetWindowUserPointer(window, this);
-	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 }
 
 void Application::framebufferResizeCallback(GLFWwindow* window, int width, int height)
@@ -452,7 +432,7 @@ VkExtent2D Application::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabil
 	else
 	{
 		int extentWidth, extentHeight;
-		glfwGetFramebufferSize(window, &extentWidth, &extentHeight);
+		window->getFrameBufferSize(&extentWidth, &extentHeight);
 
 		VkExtent2D actualExtent = { static_cast<uint32_t>(extentWidth), static_cast<uint32_t>(extentHeight) };
 		actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
@@ -564,7 +544,7 @@ void Application::createLogicalDevice()
 
 void Application::createSurface()
 {
-	if(glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS)
+	if(glfwCreateWindowSurface(instance, window->getWindow(), nullptr, &surface) != VK_SUCCESS)
 		throw std::runtime_error("Failed to create window surface!");
 }	
 
@@ -1092,10 +1072,10 @@ void Application::recreateSwapChain()
 {
 	// Check if window is minimized
 	int width = 0, height = 0;
-	glfwGetFramebufferSize(window, &width, &height);
+	window->getFrameBufferSize(&width, &height);
 	while (width == 0 || height == 0)
 	{
-		glfwGetFramebufferSize(window, &width, &height);
+		window->getFrameBufferSize(&width, &height);
 		glfwWaitEvents();
 	}
 
@@ -1134,7 +1114,7 @@ std::vector<char>Application::readBinaryFile(const std::string& filename)
 
 void Application::update()
 {
-	while (!glfwWindowShouldClose(window))
+	while (!glfwWindowShouldClose(window->getWindow()))
 	{
 		glfwPollEvents();
 
@@ -1429,10 +1409,12 @@ void Application::cleanup()
 	vkDestroySurfaceKHR(instance, surface, nullptr);
 	vkDestroyInstance(instance, nullptr);
 
-	glfwDestroyWindow(window);
+	//glfwDestroyWindow(window);
+	window->cleanupWindow();
 	glfwTerminate();
 
 	// Call renderer cleanup
+	delete window;
 	delete vulkanRenderer;
 }
 

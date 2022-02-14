@@ -8,7 +8,8 @@
 //#define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
 //#include <glm/glm.hpp>
 
-struct GLFWwindow;
+#include <glfw3.h>
+#include <glfw3native.h>
 
 class Window 
 {
@@ -16,7 +17,10 @@ public:
 	Window() = delete;
 	Window(const char* name, uint32_t width, uint32_t height);
 
-	void initWindow();
+	void initWindow(GLFWkeyfun keyCallback, GLFWcursorposfun cursorPosCallback, GLFWmousebuttonfun mouseButtonCallback, GLFWframebuffersizefun framebufferResizeCallback, void*user);
+	void cleanupWindow();
+
+	void getFrameBufferSize(int* width, int* height);
 
 	GLFWwindow* getWindow() { return window; };
 
