@@ -5,6 +5,8 @@
 #include <fstream>
 #include <chrono>
 
+#include "Renderer.h"
+
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
 #include <glm/glm.hpp>
@@ -71,6 +73,9 @@ void Application::run()
 {
 	initWindow();
 	vulkanInit();
+
+	vulkanRenderer = new Renderer();
+
 	update();
 	cleanup();
 }
@@ -1426,6 +1431,9 @@ void Application::cleanup()
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
+
+	// Call renderer cleanup
+	delete vulkanRenderer;
 }
 
 void Application::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)

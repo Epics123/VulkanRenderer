@@ -10,9 +10,13 @@
 #include <vector>
 #include <optional>
 
+//#include "Renderer.h"
+
 #include "VertexBuffer.h"
 #include "Image.h"
 #include "TextureSampler.h"
+
+class Renderer;
 
 struct QueueFamilyIndices
 {
@@ -158,6 +162,11 @@ private:
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 private:
+	// REFACTOR
+	Renderer*vulkanRenderer;
+
+
+	// PRE_REFACTOR
 	const char* name;
 	uint32_t width;
 	uint32_t height;
