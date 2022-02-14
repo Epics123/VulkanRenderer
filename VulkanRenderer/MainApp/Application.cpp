@@ -1409,10 +1409,12 @@ void Application::cleanup()
 	vkDestroySurfaceKHR(instance, surface, nullptr);
 	vkDestroyInstance(instance, nullptr);
 
-	glfwDestroyWindow(window);
+	//glfwDestroyWindow(window);
+	window->cleanupWindow();
 	glfwTerminate();
 
 	// Call renderer cleanup
+	delete window;
 	delete vulkanRenderer;
 }
 

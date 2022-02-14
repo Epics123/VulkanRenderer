@@ -27,3 +27,8 @@ void Window::initWindow(GLFWkeyfun keyCallback, GLFWcursorposfun cursorPosCallba
 	glfwSetWindowUserPointer(window, user);
 	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 }
+
+void Window::cleanupWindow()
+{
+	glfwDestroyWindow(window);
+}

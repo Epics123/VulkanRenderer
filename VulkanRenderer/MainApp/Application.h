@@ -27,9 +27,6 @@ public:
 	void run();
 
 private:
-	// Initialize window using GLFW
-	//void initWindow();
-
 	// Initialize Vulkan library
 	void vulkanInit();
 
