@@ -1072,10 +1072,10 @@ void Application::recreateSwapChain()
 {
 	// Check if window is minimized
 	int width = 0, height = 0;
-	glfwGetFramebufferSize(window, &width, &height);
+	window->getFrameBufferSize(&width, &height);
 	while (width == 0 || height == 0)
 	{
-		glfwGetFramebufferSize(window, &width, &height);
+		window->getFrameBufferSize(&width, &height);
 		glfwWaitEvents();
 	}
 
@@ -1114,7 +1114,7 @@ std::vector<char>Application::readBinaryFile(const std::string& filename)
 
 void Application::update()
 {
-	while (!glfwWindowShouldClose(window))
+	while (!glfwWindowShouldClose(window->getWindow()))
 	{
 		glfwPollEvents();
 

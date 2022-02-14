@@ -32,3 +32,8 @@ void Window::cleanupWindow()
 {
 	glfwDestroyWindow(window);
 }
+
+void Window::getFrameBufferSize(int* width, int* height)
+{
+	glfwGetFramebufferSize(window, width, height);
+}
