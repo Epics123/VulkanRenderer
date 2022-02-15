@@ -17,7 +17,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-Renderer::Renderer(Window* window)
+Renderer::Renderer(Window* appWindow)
 {
 	//modelPath = "MainApp/resources/vulkan/models/teapot/teapot.obj";
 	modelPath = "MainApp/resources/vulkan/models/teapot/downScaledPot.obj";
@@ -26,7 +26,8 @@ Renderer::Renderer(Window* window)
 	texturePath = "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png";
 	//texturePath = "MainApp/resources/vulkan/textures/room/viking_room.png";
 
-	window = window;
+	window = appWindow;
+	init();
 }
 
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger)
@@ -251,6 +252,11 @@ void Renderer::setupDebugMessenger()
 	{
 		throw std::runtime_error("Failed to set up debug messenger!");
 	}
+}
+
+void Renderer::deviceWaitIdle()
+{
+	vkDeviceWaitIdle(device);
 }
 
 void Renderer::framebufferResizeCallback(GLFWwindow* window, int width, int height)
@@ -1369,8 +1375,8 @@ void Renderer::cleanup()
 	vkDestroyInstance(instance, nullptr);
 
 	//glfwDestroyWindow(window);
-	window->cleanupWindow();
-	glfwTerminate();
+	//window->cleanupWindow();
+	//glfwTerminate();
 }
 
 void Renderer::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)

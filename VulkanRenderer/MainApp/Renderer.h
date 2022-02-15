@@ -36,7 +36,7 @@ struct SwapChainSupportDetails
 class Renderer
 {
 public:
-	Renderer(Window* window);
+	Renderer(Window* appWindow);
 
 	void init();
 
@@ -130,6 +130,8 @@ public:
 	void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
 
 	void setupDebugMessenger();
+
+	void deviceWaitIdle();
 
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
