@@ -1364,7 +1364,7 @@ VkFormat Application::findSupportedFormat(const std::vector<VkFormat>& candidate
 	throw std::runtime_error("Failed to find supported format");
 }
 
-// Returns the most desireable depth format supported by the physical device
+// Returns the most desirable depth format supported by the physical device
 VkFormat Application::findDepthFormat()
 {
 	return findSupportedFormat({ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },

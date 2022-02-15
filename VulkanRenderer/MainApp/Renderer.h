@@ -36,7 +36,7 @@ struct SwapChainSupportDetails
 class Renderer
 {
 public:
-	Renderer();
+	Renderer(Window* window);
 
 	void init();
 
@@ -135,8 +135,17 @@ public:
 
 	static std::vector<char> readBinaryFile(const std::string& filename);
 
+	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
+		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+		VkDebugUtilsMessageTypeFlagsEXT messageType,
+		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+		void* pUserData);
+
 private:
 	Window* window;
+
+	std::string modelPath;
+	std::string texturePath;
 
 	VkInstance instance;
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE; // GPU
