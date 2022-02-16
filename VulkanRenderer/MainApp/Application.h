@@ -24,6 +24,8 @@ private:
 	// Clean up application
 	void cleanup();
 
+	void processInput(GLFWwindow* window);
+
 	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 	static void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
@@ -41,6 +43,9 @@ private:
 	const char* name;
 	uint32_t width;
 	uint32_t height;
+
+	float deltaTime = 0.0f;
+	float lastFrame = 0.0f;
 
 	bool framebufferResized = false;
 };

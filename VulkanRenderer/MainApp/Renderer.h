@@ -14,6 +14,7 @@
 #include "Image.h"
 #include "TextureSampler.h"
 #include "Window.h"
+#include "Camera.h"
 
 struct QueueFamilyIndices
 {
@@ -133,6 +134,8 @@ public:
 
 	void deviceWaitIdle();
 
+	Camera& getActiveCamera();
+
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 	static std::vector<char> readBinaryFile(const std::string& filename);
@@ -145,6 +148,8 @@ public:
 
 private:
 	Window* window;
+
+	Camera mainCamera;
 
 	std::string modelPath;
 	std::string texturePath;

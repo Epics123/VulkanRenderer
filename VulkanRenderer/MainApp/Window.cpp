@@ -15,7 +15,7 @@ void Window::initWindow(GLFWkeyfun keyCallback, GLFWcursorposfun cursorPosCallba
 	// Init GLFW
 	glfwInit();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // Disable window resizing (for now)
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
 	// Create Window
 	window = glfwCreateWindow(width, height, name, nullptr, nullptr);
