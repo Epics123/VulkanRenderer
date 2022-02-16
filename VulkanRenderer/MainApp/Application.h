@@ -7,8 +7,6 @@
 #include "Renderer.h"
 #include "Window.h"
 
-//class Renderer;
-
 class Application
 {
 public:
@@ -32,6 +30,8 @@ private:
 
 	static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 
+	static void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
+
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 private:
@@ -46,6 +46,10 @@ private:
 
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
+
+	bool firstMouse = false;
+	float lastX = width / 2.0f;
+	float lastY = height / 2.0f;
 
 	bool framebufferResized = false;
 };

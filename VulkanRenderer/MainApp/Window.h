@@ -17,7 +17,7 @@ public:
 	Window() = delete;
 	Window(const char* name, uint32_t width, uint32_t height);
 
-	void initWindow(GLFWkeyfun keyCallback, GLFWcursorposfun cursorPosCallback, GLFWmousebuttonfun mouseButtonCallback, GLFWframebuffersizefun framebufferResizeCallback, void*user);
+	void initWindow(GLFWkeyfun keyCallback, GLFWcursorposfun cursorPosCallback, GLFWmousebuttonfun mouseButtonCallback, GLFWscrollfun mouseScrollCallback, GLFWframebuffersizefun framebufferResizeCallback, void*user);
 	void cleanupWindow();
 
 	void getFrameBufferSize(int* width, int* height);

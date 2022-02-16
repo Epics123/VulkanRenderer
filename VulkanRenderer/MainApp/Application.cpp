@@ -26,7 +26,7 @@ Application::Application(const char* appName, uint32_t appWidth, uint32_t appHei
 
 void Application::run()
 {
-	window->initWindow(keyCallback, cursorPosCallback, mouseButtonCallback, framebufferResizeCallback, this);
+	window->initWindow(keyCallback, cursorPosCallback, mouseButtonCallback, scrollCallback,framebufferResizeCallback, this);
 	vulkanRenderer = new Renderer(window);
 	update();
 	cleanup();
@@ -102,4 +102,10 @@ void Application::mouseButtonCallback(GLFWwindow* window, int button, int action
 {
 	if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
 		printf("Left mouse clicked!\n");
+}
+
+void Application::scrollCallback(GLFWwindow* window, double xOffset, double yOffset)
+{
+	printf("%f\n", yOffset);
+	
 }

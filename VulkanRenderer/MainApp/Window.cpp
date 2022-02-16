@@ -1,7 +1,5 @@
 #include "Window.h"
 
-
-
 Window::Window(const char* name, uint32_t width, uint32_t height) :
 	name(name),
 	width(width),
@@ -10,7 +8,7 @@ Window::Window(const char* name, uint32_t width, uint32_t height) :
 	window = nullptr;
 }
 
-void Window::initWindow(GLFWkeyfun keyCallback, GLFWcursorposfun cursorPosCallback, GLFWmousebuttonfun mouseButtonCallback, GLFWframebuffersizefun framebufferResizeCallback, void* user)
+void Window::initWindow(GLFWkeyfun keyCallback, GLFWcursorposfun cursorPosCallback, GLFWmousebuttonfun mouseButtonCallback, GLFWscrollfun mouseScrollCallback, GLFWframebuffersizefun framebufferResizeCallback, void* user)
 {
 	// Init GLFW
 	glfwInit();
@@ -23,6 +21,7 @@ void Window::initWindow(GLFWkeyfun keyCallback, GLFWcursorposfun cursorPosCallba
 	glfwSetKeyCallback(window, keyCallback);
 	glfwSetCursorPosCallback(window, cursorPosCallback);
 	glfwSetMouseButtonCallback(window, mouseButtonCallback);
+	glfwSetScrollCallback(window, mouseScrollCallback);
 
 	glfwSetWindowUserPointer(window, user);
 	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);

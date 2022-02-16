@@ -23,3 +23,13 @@ void Camera::updatePositon(int key, float speed)
 		position -= speed * up;
 	}
 }
+
+void Camera::updateFOV(double yOffset)
+{
+	if(fov > minFov && fov <= maxFov)
+		fov -= (float)yOffset;
+	if(fov <= minFov)
+		fov = minFov;
+	if(fov >= maxFov)
+		fov = maxFov;
+}
