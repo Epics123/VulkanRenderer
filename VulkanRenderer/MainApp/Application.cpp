@@ -27,7 +27,8 @@ Application::Application(const char* appName, uint32_t appWidth, uint32_t appHei
 void Application::run()
 {
 	window->initWindow(keyCallback, cursorPosCallback, mouseButtonCallback, scrollCallback,framebufferResizeCallback, this);
-	vulkanRenderer = new Renderer(window);
+	//vulkanRenderer = new Renderer(window);
+	vulkanRenderer = Renderer::initInstance(window);
 	update();
 	cleanup();
 }
@@ -57,7 +58,8 @@ void Application::update()
 
 void Application::cleanup()
 {
-	vulkanRenderer->cleanup();
+	//vulkanRenderer->cleanup();
+	Renderer::cleanupInstance();
 
 	//glfwDestroyWindow(window);
 	window->cleanupWindow();
@@ -65,7 +67,6 @@ void Application::cleanup()
 
 	// Call renderer cleanup
 	delete window;
-	delete vulkanRenderer;
 }
 
 void Application::processInput(GLFWwindow* window)

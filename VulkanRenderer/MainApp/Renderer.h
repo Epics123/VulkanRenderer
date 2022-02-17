@@ -37,7 +37,17 @@ struct SwapChainSupportDetails
 class Renderer
 {
 public:
-	Renderer(Window* appWindow);
+	static Renderer* rendererInstance;
+
+	static Renderer* initInstance(Window* window);
+
+	static void cleanupInstance();
+
+	Renderer() = delete;
+
+	Renderer(Renderer const&) = delete;
+
+	void operator=(Renderer const&) = delete;
 
 	void init();
 
@@ -147,6 +157,8 @@ public:
 		void* pUserData);
 
 private:
+	Renderer(Window* appWindow);
+
 	Window* window;
 
 	Camera mainCamera;

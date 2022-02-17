@@ -17,6 +17,31 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+Renderer* Renderer::rendererInstance = nullptr;
+
+Renderer* Renderer::initInstance(Window* window)
+{
+	if (!Renderer::rendererInstance)
+	{
+		Renderer::rendererInstance = new Renderer(window);
+
+		return Renderer::rendererInstance;
+	}
+
+	return Renderer::rendererInstance;
+}
+
+void Renderer::cleanupInstance()
+{
+	if (Renderer::rendererInstance)
+	{
+		Renderer::rendererInstance->cleanup();
+
+		delete Renderer::rendererInstance;
+		Renderer::rendererInstance = nullptr;
+	}
+}
+
 Renderer::Renderer(Window* appWindow)
 {
 	//modelPath = "MainApp/resources/vulkan/models/teapot/teapot.obj";
