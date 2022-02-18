@@ -107,6 +107,5 @@ void Application::mouseButtonCallback(GLFWwindow* window, int button, int action
 
 void Application::scrollCallback(GLFWwindow* window, double xOffset, double yOffset)
 {
-	printf("%f\n", yOffset);
-	
+	Renderer::rendererInstance->getActiveCamera().zoomCamera(yOffset);
 }

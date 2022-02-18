@@ -33,3 +33,8 @@ void Camera::updateFOV(double yOffset)
 	if(fov >= maxFov)
 		fov = maxFov;
 }
+
+void Camera::zoomCamera(double yOffset)
+{
+	position += (zoomScale * (float)yOffset) * forward;
+}

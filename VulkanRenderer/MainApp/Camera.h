@@ -20,9 +20,11 @@ struct Camera
 	float fov = 45.0f;
 	float minFov = 1.0f;
 	float maxFov = 120.0f;
+	float zoomScale = 1.0f;
 
 	void updatePositon(int key, float speed);
 	void updateFOV(double yOffset);
+	void zoomCamera(double yOffset);
 };
 
 
