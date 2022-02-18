@@ -24,6 +24,24 @@ void Camera::updatePositon(int key, float speed)
 	}
 }
 
+void Camera::updateCameraRotation(float yaw, float pitch, float roll)
+{
+	pitch += pitch;
+	yaw += yaw;
+	roll += roll;
+
+	if(pitch > 89.0f)
+		pitch = 89.0f;
+	if(pitch < -89.0f)
+		pitch = -89.0f;
+
+	glm::vec3 front;
+	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front.y = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front.z = sin(glm::radians(pitch)); 
+	forward = glm::normalize(front);
+}
+
 void Camera::updateFOV(double yOffset)
 {
 	if(fov > minFov && fov <= maxFov)

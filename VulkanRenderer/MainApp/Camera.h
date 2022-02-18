@@ -17,12 +17,14 @@ struct Camera
 
 	float yaw = -90.0f;
 	float pitch = 0.0f;
+	float roll = 0.0f;
 	float fov = 45.0f;
 	float minFov = 1.0f;
 	float maxFov = 120.0f;
 	float zoomScale = 1.0f;
 
 	void updatePositon(int key, float speed);
+	void updateCameraRotation(float pitch, float yaw, float roll);
 	void updateFOV(double yOffset);
 	void zoomCamera(double yOffset);
 };

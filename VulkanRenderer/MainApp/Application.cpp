@@ -97,6 +97,26 @@ void Application::keyCallback(GLFWwindow* window, int key, int scancode, int act
 void Application::cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 {
 	//printf("%f, %f\n", (float)xpos, (float)ypos);
+
+	if (firstMouse)
+	{
+		lastMouseX = (float)xpos;
+		lastMouseY = (float)ypos;
+		firstMouse = false;
+	}
+
+	float xOffset = (float)xpos - lastMouseX;
+	float yOffset = (float)ypos - lastMouseY;
+	lastMouseX = (float)xpos;
+	lastMouseY = (float)ypos;
+
+	float sensitivity = 0.1f;
+	xOffset *= sensitivity;
+	yOffset *= sensitivity;
+
+	printf("%f, %f\n", xOffset, yOffset);
+
+	//Renderer::rendererInstance->getActiveCamera().updateCameraRotation(xOffset, yOffset, 0.0f);
 }
 
 void Application::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
