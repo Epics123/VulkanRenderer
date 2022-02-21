@@ -24,16 +24,19 @@ void Camera::updatePositon(int key, float speed)
 	}
 }
 
-void Camera::updateCameraRotation(float yaw, float pitch, float roll)
+void Camera::updateCameraRotation(float yaw, float pitch, float roll, float dt)
 {
-	pitch += pitch;
-	yaw += yaw;
-	roll += roll;
+	pitch += pitch * sensitivity * dt;
+	yaw += yaw * sensitivity * dt;
+	//roll += roll * dt;
 
 	if(pitch > 89.0f)
 		pitch = 89.0f;
 	if(pitch < -89.0f)
 		pitch = -89.0f;
+
+	if(yaw > 360.0f || yaw < -360.0f)
+		yaw = 0.0f;
 
 	glm::vec3 front;
 	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));

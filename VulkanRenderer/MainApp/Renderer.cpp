@@ -1064,7 +1064,7 @@ void Renderer::createDescriptorSets()
 
 void Renderer::updateUniformBuffer(uint32_t currentImage)
 {
-	// Temp code
+	// Temp timer code
 	static auto startTime = std::chrono::high_resolution_clock::now();
 	auto currentTime = std::chrono::high_resolution_clock::now();
 

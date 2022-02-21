@@ -12,6 +12,18 @@ Application::Application()
 	width = 800;
 	height = 600;
 
+	dt = 0.0f;
+	lastFrame = 0.0f;
+
+	lastMouseX = 0.0f;
+	lastMouseY = 0.0f;
+	mouseX = 0.0;
+	mouseY = 0.0;
+	mouseOffsetX = 0.0f;
+	mouseOffsetY = 0.0f;
+
+	firstMouse = true;
+
 	window = new Window(name, width, height);
 }
 
@@ -21,13 +33,24 @@ Application::Application(const char* appName, uint32_t appWidth, uint32_t appHei
 	width = appWidth;
 	height = appHeight;
 
+	dt = 0.0f;
+	lastFrame = 0.0f;
+
+	lastMouseX = 0.0f;
+	lastMouseY = 0.0f;
+	mouseX = 0.0;
+	mouseY = 0.0;
+	mouseOffsetX = 0.0f;
+	mouseOffsetY = 0.0f;
+
+	firstMouse = true;
+
 	window = new Window(name, width, height);
 }
 
 void Application::run()
 {
 	window->initWindow(keyCallback, cursorPosCallback, mouseButtonCallback, scrollCallback,framebufferResizeCallback, this);
-	//vulkanRenderer = new Renderer(window);
 	vulkanRenderer = Renderer::initInstance(window);
 	update();
 	cleanup();
@@ -44,7 +67,7 @@ void Application::update()
 	while (!glfwWindowShouldClose(window->getWindow()))
 	{
 		float currentFrame = (float)glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
+		dt = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
 		glfwPollEvents();
@@ -71,7 +94,7 @@ void Application::cleanup()
 
 void Application::processInput(GLFWwindow* window)
 {
-	float cameraSpeed = 2.5f * deltaTime;
+	float cameraSpeed = 2.5f * dt;
 	if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		vulkanRenderer->getActiveCamera().updatePositon(GLFW_KEY_W, cameraSpeed);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -84,6 +107,23 @@ void Application::processInput(GLFWwindow* window)
 		vulkanRenderer->getActiveCamera().updatePositon(GLFW_KEY_E, cameraSpeed);
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 		vulkanRenderer->getActiveCamera().updatePositon(GLFW_KEY_Q, cameraSpeed);
+
+	glfwGetCursorPos(window, &mouseX, &mouseY);
+
+	if (moveCamera)
+	{
+		if (firstMouse)
+		{
+			lastMouseX = (float)mouseX;
+			lastMouseY = (float)mouseY;
+			firstMouse = false;
+		}
+
+		mouseOffsetX = (float)mouseX - lastMouseX;
+		mouseOffsetY = lastMouseY - (float)mouseY;
+
+		vulkanRenderer->getActiveCamera().updateCameraRotation(mouseOffsetX, mouseOffsetY, 0.0f, dt);
+	}
 }
 
 void Application::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -98,31 +138,45 @@ void Application::cursorPosCallback(GLFWwindow* window, double xpos, double ypos
 {
 	//printf("%f, %f\n", (float)xpos, (float)ypos);
 
-	if (firstMouse)
+	if (moveCamera)
 	{
+		/*float xOffset;
+		float yOffset;
+
+		if (firstMouse)
+		{
+			xOffset = 0.0f;
+			yOffset = 0.0f;
+			firstMouse = false;
+		}
+
+		xOffset = (float)xpos - lastMouseX;
+		yOffset = lastMouseY - (float)ypos;
 		lastMouseX = (float)xpos;
 		lastMouseY = (float)ypos;
-		firstMouse = false;
+
+		float sensitivity = 0.1f;
+		xOffset *= sensitivity;
+		yOffset *= sensitivity;*/
+
+		//printf("%f, %f\n", xOffset, yOffset);
+		//Renderer::rendererInstance->getActiveCamera().updateCameraRotation(0.0f, -10.0f, 0.0f);
+		//Renderer::rendererInstance->getActiveCamera().updateCameraRotation(xOffset, yOffset, 0.0f);
 	}
-
-	float xOffset = (float)xpos - lastMouseX;
-	float yOffset = (float)ypos - lastMouseY;
-	lastMouseX = (float)xpos;
-	lastMouseY = (float)ypos;
-
-	float sensitivity = 0.1f;
-	xOffset *= sensitivity;
-	yOffset *= sensitivity;
-
-	printf("%f, %f\n", xOffset, yOffset);
-
-	//Renderer::rendererInstance->getActiveCamera().updateCameraRotation(xOffset, yOffset, 0.0f);
 }
 
 void Application::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
-	if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-		printf("Left mouse clicked!\n");
+	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+	{
+		moveCamera = true;
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
+	{
+		moveCamera = false;
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	}
 }
 
 void Application::scrollCallback(GLFWwindow* window, double xOffset, double yOffset)

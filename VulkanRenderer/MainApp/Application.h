@@ -44,15 +44,18 @@ private:
 	uint32_t width;
 	uint32_t height;
 
-	float deltaTime = 0.0f;
+	float dt = 0.0f;
 	float lastFrame = 0.0f;
 
 	float lastX = width / 2.0f;
 	float lastY = height / 2.0f;
 
 	bool framebufferResized = false;
+
+	float lastMouseX, lastMouseY;
+	double mouseX, mouseY;
+	float mouseOffsetX, mouseOffsetY;
+	bool firstMouse;
 	
-	static inline bool firstMouse = true;
-	static inline float lastMouseX = 0.0f;
-	static inline float lastMouseY = 0.0f;
+	static inline bool moveCamera = false;
 };
