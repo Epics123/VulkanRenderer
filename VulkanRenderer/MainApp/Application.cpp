@@ -94,6 +94,7 @@ void Application::cleanup()
 
 void Application::processInput(GLFWwindow* window)
 {
+	// Keyboard Camera controls
 	float cameraSpeed = 2.5f * dt;
 	if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		vulkanRenderer->getActiveCamera().updatePositon(GLFW_KEY_W, cameraSpeed);
@@ -122,7 +123,7 @@ void Application::processInput(GLFWwindow* window)
 		mouseOffsetX = (float)mouseX - lastMouseX;
 		mouseOffsetY = lastMouseY - (float)mouseY;
 
-		vulkanRenderer->getActiveCamera().updateCameraRotation(mouseOffsetX, mouseOffsetY, 0.0f, dt);
+		vulkanRenderer->getActiveCamera().updateCameraRotation(-mouseOffsetX, mouseOffsetY, 0.0f, dt);
 	}
 }
 
