@@ -59,3 +59,19 @@ void Camera::zoomCamera(double yOffset)
 {
 	position += (zoomScale * (float)yOffset) * forward;
 }
+
+void Camera::updateView()
+{
+	glm::quat qPitch = glm::angleAxis(glm::radians(pitch), glm::vec3(1, 0, 0));
+	glm::quat qYaw = glm::angleAxis(glm::radians(yaw), glm::vec3(0, 1, 0));
+	glm::quat qRoll = glm::angleAxis(glm::radians(roll), glm::vec3(0, 0, 1));
+
+	glm::quat cameraOrientation = qPitch * qYaw;
+	orientation = glm::normalize(cameraOrientation);
+	glm::mat4 rotate = glm::mat4_cast(orientation);
+
+	glm::mat4 translate = glm::mat4(1.0f);
+	translate = glm::translate(translate, -position);
+
+	view = rotate * translate;
+}
