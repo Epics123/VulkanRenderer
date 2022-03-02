@@ -2,6 +2,8 @@
 
 void Camera::updatePositon(int key, float speed)
 {
+	glm::quat invOrient = glm::conjugate(orientation);
+	glm::vec3 worldOffset;
 	switch (key)
 	{
 	case GLFW_KEY_W:
@@ -17,10 +19,10 @@ void Camera::updatePositon(int key, float speed)
 		position += right * speed;
 		break;
 	case GLFW_KEY_E:
-		position += speed * up;
+		position -= speed * up;
 		break;
 	case GLFW_KEY_Q:
-		position -= speed * up;
+		position += speed * up;
 	}
 }
 
@@ -34,12 +36,9 @@ void Camera::updateCameraRotation(float yaw, float pitch, float roll)
 	/*if(pitch > 89.0f)
 		pitch = 89.0f;
 	if(pitch < -89.0f)
-		pitch = -89.0f;
+		pitch = -89.0f;*/
 
-	if(yaw > 360.0f || yaw < -360.0f)
-		yaw = 0.0f;
-
-	glm::vec3 front;
+	/*glm::vec3 front;
 	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 	front.y = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 	front.z = sin(glm::radians(pitch));
@@ -63,8 +62,14 @@ void Camera::zoomCamera(double yOffset)
 
 void Camera::updateView(float dt)
 {
+	if (yaw > 360.0f || yaw < -360.0f)
+		yaw = 0.0f;
+
+	if (pitch > 360.0f || pitch < -360.0f)
+		pitch = 0.0f;
+
 	glm::quat qPitch = glm::angleAxis(glm::radians(pitch), glm::vec3(1, 0, 0));
-	glm::quat qYaw = glm::angleAxis(glm::radians(yaw), glm::vec3(0, 1, 0));
+	glm::quat qYaw = glm::angleAxis(glm::radians(yaw), glm::vec3(0, 0, 1));
 	glm::quat qRoll = glm::angleAxis(glm::radians(roll), glm::vec3(0, 0, 1));
 
 	glm::quat cameraOrientation = qPitch * qYaw;
@@ -76,7 +81,7 @@ void Camera::updateView(float dt)
 	glm::mat4 translate = glm::mat4(1.0f);
 	translate = glm::translate(translate, position);
 
-	printf("%f\n", yaw);
+	printf("Pitch: %f, Yaw: %f\n", pitch, yaw);
 
 	//printf("%f, %f, %f\n", position.x, position.y, position.z);
 

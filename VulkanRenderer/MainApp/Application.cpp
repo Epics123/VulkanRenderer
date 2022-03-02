@@ -130,8 +130,6 @@ void Application::processInput(GLFWwindow* window)
 
 		vulkanRenderer->getActiveCamera().updateCameraRotation(-mouseOffsetX, mouseOffsetY, 0.0f);
 	}
-
-	//printf("%f, %f, %f\n", vulkanRenderer->getActiveCamera().forward.x, vulkanRenderer->getActiveCamera().forward.y, vulkanRenderer->getActiveCamera().forward.z);
 }
 
 void Application::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
