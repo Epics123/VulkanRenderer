@@ -2,11 +2,16 @@
 
 void Camera::updatePositon(int key, float speed)
 {
-	glm::quat invOrient = glm::conjugate(orientation);
-	glm::vec3 worldOffset;
+	invOrient = glm::conjugate(orientation);
+	
+	forward = invOrient * glm::vec3(0.0f, 0.0f, 1.0f);
+	cameraUp = invOrient * glm::vec3(0.0f, 1.0f, 0.0f);
+	right = glm::normalize(glm::cross(forward, cameraUp));
+
 	switch (key)
 	{
 	case GLFW_KEY_W:
+		
 		position += speed * forward;
 		break;
 	case GLFW_KEY_S:
@@ -19,10 +24,10 @@ void Camera::updatePositon(int key, float speed)
 		position += right * speed;
 		break;
 	case GLFW_KEY_E:
-		position -= speed * up;
+		position -= speed * cameraUp;
 		break;
 	case GLFW_KEY_Q:
-		position += speed * up;
+		position += speed * cameraUp;
 	}
 }
 

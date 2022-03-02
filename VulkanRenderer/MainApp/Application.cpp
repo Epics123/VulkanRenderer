@@ -128,7 +128,7 @@ void Application::processInput(GLFWwindow* window)
 		lastMouseX = (float)mouseX;
 		lastMouseY = (float)mouseY;
 
-		vulkanRenderer->getActiveCamera().updateCameraRotation(-mouseOffsetX, mouseOffsetY, 0.0f);
+		vulkanRenderer->getActiveCamera().updateCameraRotation(mouseOffsetX, -mouseOffsetY, 0.0f);
 	}
 }
 
