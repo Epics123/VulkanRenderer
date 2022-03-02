@@ -24,13 +24,14 @@ void Camera::updatePositon(int key, float speed)
 	}
 }
 
-void Camera::updateCameraRotation(float yaw, float pitch, float roll, float dt)
+void Camera::updateCameraRotation(float yaw, float pitch, float roll)
 {
-	pitch += pitch * sensitivity * dt;
-	yaw += yaw * sensitivity * dt;
+	this->pitch += pitch * sensitivity;
+	this->yaw += yaw * sensitivity;
+
 	//roll += roll * dt;
 
-	if(pitch > 89.0f)
+	/*if(pitch > 89.0f)
 		pitch = 89.0f;
 	if(pitch < -89.0f)
 		pitch = -89.0f;
@@ -41,8 +42,8 @@ void Camera::updateCameraRotation(float yaw, float pitch, float roll, float dt)
 	glm::vec3 front;
 	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 	front.y = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-	front.z = sin(glm::radians(pitch)); 
-	forward = glm::normalize(front);
+	front.z = sin(glm::radians(pitch));
+	forward = glm::normalize(front);*/
 }
 
 void Camera::updateFOV(double yOffset)
@@ -60,18 +61,22 @@ void Camera::zoomCamera(double yOffset)
 	position += (zoomScale * (float)yOffset) * forward;
 }
 
-void Camera::updateView()
+void Camera::updateView(float dt)
 {
 	glm::quat qPitch = glm::angleAxis(glm::radians(pitch), glm::vec3(1, 0, 0));
 	glm::quat qYaw = glm::angleAxis(glm::radians(yaw), glm::vec3(0, 1, 0));
 	glm::quat qRoll = glm::angleAxis(glm::radians(roll), glm::vec3(0, 0, 1));
 
 	glm::quat cameraOrientation = qPitch * qYaw;
+	//glm::quat delta = glm::mix(glm::quat(0, 0, 0, 0), cameraOrientation, dt);
+	//orientation = glm::normalize(delta) * cameraOrientation;
 	orientation = glm::normalize(cameraOrientation);
 	glm::mat4 rotate = glm::mat4_cast(orientation);
 
 	glm::mat4 translate = glm::mat4(1.0f);
 	translate = glm::translate(translate, position);
+
+	printf("%f\n", yaw);
 
 	//printf("%f, %f, %f\n", position.x, position.y, position.z);
 

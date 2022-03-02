@@ -110,7 +110,7 @@ public:
 
 	void createDescriptorSets();
 
-	void updateUniformBuffer(uint32_t currentImage);
+	void updateUniformBuffer(uint32_t currentImage, float dt);
 
 	void cleanupSwapChain();
 
@@ -133,7 +133,7 @@ public:
 
 	bool hasStencilComponent(VkFormat format);
 
-	void drawFrame();
+	void drawFrame(float dt);
 
 	// Clean up application
 	void cleanup();

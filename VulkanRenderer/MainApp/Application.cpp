@@ -73,7 +73,7 @@ void Application::update()
 		glfwPollEvents();
 		processInput(window->getWindow());
 
-		vulkanRenderer->drawFrame();
+		vulkanRenderer->drawFrame(dt);
 	}
 
 	vulkanRenderer->deviceWaitIdle();
@@ -109,7 +109,7 @@ void Application::processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 		vulkanRenderer->getActiveCamera().updatePositon(GLFW_KEY_Q, cameraSpeed);
 
-	/*glfwGetCursorPos(window, &mouseX, &mouseY);
+	glfwGetCursorPos(window, &mouseX, &mouseY);
 
 	if (moveCamera)
 	{
@@ -122,9 +122,11 @@ void Application::processInput(GLFWwindow* window)
 
 		mouseOffsetX = (float)mouseX - lastMouseX;
 		mouseOffsetY = lastMouseY - (float)mouseY;
+		lastMouseX = (float)mouseX;
+		lastMouseY = (float)mouseY;
 
-		vulkanRenderer->getActiveCamera().updateCameraRotation(-mouseOffsetX, mouseOffsetY, 0.0f, dt);
-	}*/
+		vulkanRenderer->getActiveCamera().updateCameraRotation(-mouseOffsetX, mouseOffsetY, 0.0f);
+	}
 
 	//printf("%f, %f, %f\n", vulkanRenderer->getActiveCamera().forward.x, vulkanRenderer->getActiveCamera().forward.y, vulkanRenderer->getActiveCamera().forward.z);
 }

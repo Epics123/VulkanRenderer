@@ -119,7 +119,7 @@ void Renderer::init()
 	createSyncObjects();
 
 	mainCamera = Camera();
-	mainCamera.updateView();
+	mainCamera.updateView(0.0f);
 }
 
 void Renderer::createVulkanInstance()
@@ -1063,7 +1063,7 @@ void Renderer::createDescriptorSets()
 	}
 }
 
-void Renderer::updateUniformBuffer(uint32_t currentImage)
+void Renderer::updateUniformBuffer(uint32_t currentImage, float dt)
 {
 	// Temp timer code
 	static auto startTime = std::chrono::high_resolution_clock::now();
@@ -1071,7 +1071,7 @@ void Renderer::updateUniformBuffer(uint32_t currentImage)
 
 	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
-	mainCamera.updateView();
+	mainCamera.updateView(dt);
 
 	UniformBufferObject ubo{};
 	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -1309,7 +1309,7 @@ bool Renderer::hasStencilComponent(VkFormat format)
 	return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
 }
 
-void Renderer::drawFrame()
+void Renderer::drawFrame(float dt)
 {
 	vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
@@ -1327,7 +1327,7 @@ void Renderer::drawFrame()
 	if (imagesInFlight[imageIndex] != VK_NULL_HANDLE)
 		vkWaitForFences(device, 1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
 
-	updateUniformBuffer(imageIndex);
+	updateUniformBuffer(imageIndex, dt);
 
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

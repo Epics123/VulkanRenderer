@@ -27,14 +27,14 @@ struct Camera
 	float maxFov = 120.0f;
 	float zoomScale = 1.0f;
 
-	float sensitivity = 0.001f;
+	float sensitivity = 0.5f;
 
 	void updatePositon(int key, float speed);
-	void updateCameraRotation(float pitch, float yaw, float roll, float dt);
+	void updateCameraRotation(float pitch, float yaw, float roll);
 	void updateFOV(double yOffset);
 	void zoomCamera(double yOffset);
 
-	void updateView();
+	void updateView(float dt);
 };
 
 
