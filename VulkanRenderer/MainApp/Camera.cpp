@@ -71,7 +71,9 @@ void Camera::updateView()
 	glm::mat4 rotate = glm::mat4_cast(orientation);
 
 	glm::mat4 translate = glm::mat4(1.0f);
-	translate = glm::translate(translate, -position);
+	translate = glm::translate(translate, position);
+
+	//printf("%f, %f, %f\n", position.x, position.y, position.z);
 
 	view = rotate * translate;
 }
