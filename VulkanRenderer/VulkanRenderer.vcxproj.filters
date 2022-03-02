@@ -20,6 +20,7 @@
     <ClInclude Include="MainApp\TextureSampler.h" />
     <ClInclude Include="MainApp\VertexBuffer.h" />
     <ClInclude Include="MainApp\Window.h" />
+    <ClInclude Include="MainApp\Pipeline.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainApp\Application.cpp" />
@@ -31,6 +32,7 @@
     <ClCompile Include="MainApp\TextureSampler.cpp" />
     <ClCompile Include="MainApp\VertexBuffer.cpp" />
     <ClCompile Include="MainApp\Window.cpp" />
+    <ClCompile Include="MainApp\Pipeline.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MainApp\resources\vulkan\shaders\Test.frag">
