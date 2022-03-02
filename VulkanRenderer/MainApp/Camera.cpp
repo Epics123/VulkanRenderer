@@ -4,10 +4,12 @@ void Camera::updatePositon(int key, float speed)
 {
 	invOrient = glm::conjugate(orientation);
 	
+	// Update camera vectors
 	forward = invOrient * glm::vec3(0.0f, 0.0f, 1.0f);
-	cameraUp = invOrient * glm::vec3(0.0f, 1.0f, 0.0f);
-	right = glm::normalize(glm::cross(forward, cameraUp));
+	up = invOrient * glm::vec3(0.0f, 1.0f, 0.0f);
+	right = glm::normalize(glm::cross(forward, up));
 
+	// Move camera 
 	switch (key)
 	{
 	case GLFW_KEY_W:
@@ -24,10 +26,10 @@ void Camera::updatePositon(int key, float speed)
 		position += right * speed;
 		break;
 	case GLFW_KEY_E:
-		position -= speed * cameraUp;
+		position -= speed * up;
 		break;
 	case GLFW_KEY_Q:
-		position += speed * cameraUp;
+		position += speed * up;
 	}
 }
 
@@ -37,17 +39,6 @@ void Camera::updateCameraRotation(float yaw, float pitch, float roll)
 	this->yaw += yaw * sensitivity;
 
 	//roll += roll * dt;
-
-	/*if(pitch > 89.0f)
-		pitch = 89.0f;
-	if(pitch < -89.0f)
-		pitch = -89.0f;*/
-
-	/*glm::vec3 front;
-	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	front.y = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-	front.z = sin(glm::radians(pitch));
-	forward = glm::normalize(front);*/
 }
 
 void Camera::updateFOV(double yOffset)
@@ -78,15 +69,15 @@ void Camera::updateView(float dt)
 	glm::quat qRoll = glm::angleAxis(glm::radians(roll), glm::vec3(0, 0, 1));
 
 	glm::quat cameraOrientation = qPitch * qYaw;
-	//glm::quat delta = glm::mix(glm::quat(0, 0, 0, 0), cameraOrientation, dt);
-	//orientation = glm::normalize(delta) * cameraOrientation;
+	//glm::quat delta = glm::slerp(orientation, cameraOrientation, dt);//glm::mix(glm::quat(0, 0, 0, 0), cameraOrientation, dt);
+	//orientation = glm::normalize(delta) * orientation;
 	orientation = glm::normalize(cameraOrientation);
 	glm::mat4 rotate = glm::mat4_cast(orientation);
 
 	glm::mat4 translate = glm::mat4(1.0f);
 	translate = glm::translate(translate, position);
 
-	printf("Pitch: %f, Yaw: %f\n", pitch, yaw);
+	//printf("Pitch: %f, Yaw: %f\n", pitch, yaw);
 
 	//printf("%f, %f, %f\n", position.x, position.y, position.z);
 
