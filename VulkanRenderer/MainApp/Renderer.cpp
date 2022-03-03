@@ -44,10 +44,10 @@ void Renderer::cleanupInstance()
 
 Renderer::Renderer(Window* appWindow)
 {
-	//modelPath = "MainApp/resources/vulkan/models/teapot/teapot.obj";
-	modelPath = "MainApp/resources/vulkan/models/teapot/downScaledPot.obj";
+	//modelPath = "MainApp/resources/vulkan/models/teapot/downScaledPot.obj";
+	//modelPath = "MainApp/resources/vulkan/models/debug/defCube.obj";
+	modelPath = "MainApp/resources/vulkan/models/debug/tri.obj";
 	//modelPath = "MainApp/resources/vulkan/models/room/room.obj";
-	//texturePath = "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png";
 	texturePath = "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png";
 	//texturePath = "MainApp/resources/vulkan/textures/room/viking_room.png";
 
@@ -1175,15 +1175,15 @@ void Renderer::loadModel()
 				attributes.vertices[3 * index.vertex_index + 2]
 			};
 
-			vertex.texCoord = {
-				attributes.texcoords[2 * index.texcoord_index + 0],
-				attributes.texcoords[2 * index.texcoord_index + 1]
-			};
-
 			vertex.vertexNormal = {
 				attributes.normals[3 * index.normal_index + 0],
 				attributes.normals[3 * index.normal_index + 1],
-				attributes.normals[3 * index.normal_index + 3]
+				attributes.normals[3 * index.normal_index + 2]
+			};
+
+			vertex.texCoord = {
+				attributes.texcoords[2 * index.texcoord_index + 0],
+				attributes.texcoords[2 * index.texcoord_index + 1]
 			};
 
 			vertex.color = { 1.0f, 1.0f, 1.0f };
