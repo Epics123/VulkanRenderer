@@ -15,13 +15,13 @@ void main() {
     //outColor = vec4(fragTexCoord, 0.0, 1.0);
     //outColor = vec4(fragColor, 1.0);
 
-    vec4 tmpLightPosition = vec4(2.0f, 3.0f, 4.0f, 1.0f);
+    vec4 tmpLightPosition = vec4(10.0f, 0.0f, 0.0f, 1.0f);
 
     vec4 lookDir = normalize(tmpLightPosition - vPosition);
     vec4 normal = normalize(vNormal);
     vec4 diffAlbedo = vec4(0.9f, 0.8f, 0.7f, 1.0f);
     vec4 diffCoef = max(dot(normal, lookDir), 0.0f) * diffAlbedo;
-    vec4 ambient = vec4(0.0f);
+    vec4 ambient = vec4(0.05f, 0.05f, 0.06f, 0.0f);
 
     outColor = texture(texSampler, fragTexCoord);
     outColor *= diffCoef + ambient;

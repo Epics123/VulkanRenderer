@@ -44,9 +44,9 @@ void Renderer::cleanupInstance()
 
 Renderer::Renderer(Window* appWindow)
 {
-	//modelPath = "MainApp/resources/vulkan/models/teapot/downScaledPot.obj";
+	modelPath = "MainApp/resources/vulkan/models/teapot/downScaledPot.obj";
 	//modelPath = "MainApp/resources/vulkan/models/debug/defCube.obj";
-	modelPath = "MainApp/resources/vulkan/models/debug/tri.obj";
+	//modelPath = "MainApp/resources/vulkan/models/debug/tri.obj";
 	//modelPath = "MainApp/resources/vulkan/models/room/room.obj";
 	texturePath = "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png";
 	//texturePath = "MainApp/resources/vulkan/textures/room/viking_room.png";
