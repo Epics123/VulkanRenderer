@@ -433,7 +433,7 @@ void Renderer::createGraphicsPipeline()
 	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
 	VkVertexInputBindingDescription bindingDescription = Vertex::getBindingDescription();
-	std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions = Vertex::getAttributeDescriptions();
+	std::array<VkVertexInputAttributeDescription, Vertex::VERTEX_ATTRIB_COUNT> attributeDescriptions = Vertex::getAttributeDescriptions();
 
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -1168,7 +1168,7 @@ void Renderer::loadModel()
 		for (const tinyobj::index_t index : shapeIter._Ptr->mesh.indices)	// I would like to not be using foreach but good lord the types
 		{
 			Vertex vertex{};
-
+			
 			vertex.pos = {
 				attributes.vertices[3 * index.vertex_index + 0],
 				attributes.vertices[3 * index.vertex_index + 1],
@@ -1178,6 +1178,12 @@ void Renderer::loadModel()
 			vertex.texCoord = {
 				attributes.texcoords[2 * index.texcoord_index + 0],
 				attributes.texcoords[2 * index.texcoord_index + 1]
+			};
+
+			vertex.vertexNormal = {
+				attributes.normals[3 * index.normal_index + 0],
+				attributes.normals[3 * index.normal_index + 1],
+				attributes.normals[3 * index.normal_index + 3]
 			};
 
 			vertex.color = { 1.0f, 1.0f, 1.0f };

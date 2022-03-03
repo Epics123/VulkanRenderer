@@ -7,6 +7,9 @@ layout(binding = 1) uniform sampler2D texSampler;
 
 layout(location = 0) out vec4 outColor;
 
+layout(location = 2) in vec4 vNormal;
+layout(location = 3) in vec4 vPosition;
+
 void main() {
     // Visualize texcoords
     //outColor = vec4(fragTexCoord, 0.0, 1.0);
