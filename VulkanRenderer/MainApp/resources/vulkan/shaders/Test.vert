@@ -29,5 +29,5 @@ void main() {
 
     mat4 mv = ubo.view * ubo.model;
     vPosition = mv * vec4(aPosition, 1.0f);
-    vNormal = mv * vec4(aPosition, 0.0f);
+    vNormal = mv * vec4(aNormal, 0.0f);
 }
