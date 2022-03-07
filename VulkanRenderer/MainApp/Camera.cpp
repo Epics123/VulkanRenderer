@@ -80,5 +80,5 @@ void Camera::updateModel(float dt)
 
 	//printf("%f, %f, %f\n", position.x, position.y, position.z);
 
-	model = rotate * translate;
+	invModel = rotate * translate;
 }
