@@ -31,6 +31,7 @@ struct Camera
 	float zoomScale = 1.0f;
 
 	float sensitivity = 0.5f;
+	float smoothing = 0.00001f;
 
 	void updatePositon(int key, float speed);
 	void updateCameraRotation(float pitch, float yaw, float roll);
