@@ -32,7 +32,7 @@ void main() {
     vec4 specCoef = pow(max(dot(reflection, view), 0.0f), 4) * specAlbedo;
 
     outColor = texture(texSampler, fragTexCoord);
-    outColor *= (diffCoef + specCoef) + ambient;
+    outColor *= (diffCoef + specCoef);// + ambient;
 
 
 }

@@ -28,12 +28,13 @@ void main() {
     fragColor = aColor;
     fragTexCoord = aTexCoord;
     
-    vec4 tmpLightPosition = vec4(10.0f, 0.0f, 0.0f, 1.0f);
+    //vec4 tmpLightPosition = vec4(10.0f, 0.0f, 0.0f, 1.0f);
 
-    mat4 mv = ubo.view * ubo.model;
+    mat4 mv = ubo.model * ubo.view;
     vPosition = mv * vec4(aPosition, 1.0f);
     gl_Position = ubo.proj * vPosition;
-    vNormal = transpose(mv) * vec4(aNormal, 0.0f);
+    //vNormal = transpose(mv) * vec4(aNormal, 0.0f);
+    vNormal = mv * vec4(aNormal, 0.0f);
     //vLightPos = ubo.mvp * tmpLightPosition;
     //vLightPos = mv * tmpLightPosition;
 }

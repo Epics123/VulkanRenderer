@@ -49,7 +49,7 @@ void Camera::zoomCamera(double yOffset)
 	position += (zoomScale * (float)yOffset) * forward;
 }
 
-void Camera::updateView(float dt)
+void Camera::updateModel(float dt)
 {
 	if (yaw > 360.0f || yaw < -360.0f)
 		yaw = 0.0f;
@@ -80,5 +80,5 @@ void Camera::updateView(float dt)
 
 	//printf("%f, %f, %f\n", position.x, position.y, position.z);
 
-	view = rotate * translate;
+	model = rotate * translate;
 }
