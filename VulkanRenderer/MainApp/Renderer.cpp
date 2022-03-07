@@ -418,6 +418,9 @@ void Renderer::createGraphicsPipeline()
 	VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
 	VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
 
+	//gPipeline = Pipeline(device);
+	//gPipeline.createDefaultPipeline(vertShaderModule, fragShaderModule, &renderPass, &pipelineLayout, &descriptorSetLayout, &swapChainImageExtent);
+
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
 	vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
@@ -569,6 +572,11 @@ void Renderer::createGraphicsPipeline()
 	{
 		throw std::runtime_error("Failed to create graphics pipeline!");
 	}
+
+	/*if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, gPipeline.getPipelineCreateInfo(), nullptr, gPipeline.getPipeline()) != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to create graphics pipeline!");
+	}*/
 
 	vkDestroyShaderModule(device, fragShaderModule, nullptr);
 	vkDestroyShaderModule(device, vertShaderModule, nullptr);

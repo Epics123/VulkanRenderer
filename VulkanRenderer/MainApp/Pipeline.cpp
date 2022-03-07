@@ -1,14 +1,27 @@
 #include "Pipeline.h"
+#include "VertexBuffer.h"
 
 #include <array>
+
+Pipeline::Pipeline()
+{
+	
+}
 
 Pipeline::Pipeline(VkDevice device)
 {
 	this->device = device;
 }
 
-void Pipeline::createDefaultPipeline(VkShaderModule vertShaderModule, VkShaderModule fragShaderModule)
+void Pipeline::createDefaultPipeline(VkShaderModule vertShaderModule, VkShaderModule fragShaderModule, VkRenderPass* pass, 
+										VkPipelineLayout* layout, VkDescriptorSetLayout* descriptorSet, 
+										VkExtent2D* swapChainExtent)
 {
+	renderPass = *pass;
+	pipelineLayout = *layout;
+	descriptorSetLayout = *descriptorSet;
+	swapChainImageExtent = *swapChainExtent;
+	
 	vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
 	vertShaderStageInfo.module = vertShaderModule;
@@ -141,4 +154,9 @@ void Pipeline::createDefaultPipeline(VkShaderModule vertShaderModule, VkShaderMo
 	pipelineInfo.subpass = 0;
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
 	pipelineInfo.basePipelineIndex = -1; // Optional
+}
+
+void Pipeline::setPolygonMode(VkPolygonMode mode)
+{
+	rasterizer.polygonMode = mode;
 }

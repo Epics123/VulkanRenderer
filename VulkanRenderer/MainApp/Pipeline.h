@@ -10,15 +10,28 @@
 class Pipeline
 {
 public:
+	Pipeline();
+
 	Pipeline(VkDevice device);
 
-	void createDefaultPipeline(VkShaderModule vertShaderModule, VkShaderModule fragShaderModule);
+	void createDefaultPipeline(VkShaderModule vertShaderModule, VkShaderModule fragShaderModule, 
+								VkRenderPass* renderPass, VkPipelineLayout* pipelineLayout, 
+								VkDescriptorSetLayout* descriptorSetLayout, VkExtent2D* swapChainExtent);
 
-	VkPipeline getPipeline() { return pipeline; }
+	VkPipeline* getPipeline() { return &pipeline; }
+
+	VkGraphicsPipelineCreateInfo* getPipelineCreateInfo() { return &pipelineInfo; }
+
+	void setPolygonMode(VkPolygonMode mode);
 
 private:
 	VkPipeline pipeline;
 	VkDevice device;
+
+	VkRenderPass renderPass;
+	VkPipelineLayout pipelineLayout;
+	VkDescriptorSetLayout descriptorSetLayout;
+	VkExtent2D swapChainImageExtent;
 
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo;
 	VkPipelineShaderStageCreateInfo fragShaderStageInfo;

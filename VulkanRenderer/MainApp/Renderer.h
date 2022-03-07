@@ -15,6 +15,7 @@
 #include "TextureSampler.h"
 #include "Window.h"
 #include "Camera.h"
+#include "Pipeline.h"
 
 struct QueueFamilyIndices
 {
@@ -190,6 +191,8 @@ private:
 	VkCommandPool commandPool;
 	std::vector<VkCommandBuffer> commandBuffers;
 	std::vector<VkDescriptorSet> descriptorSets;
+
+	Pipeline gPipeline;
 
 	std::vector<VkSemaphore> imageAvailableSemaphores;
 	std::vector<VkSemaphore> renderFinishedSemaphores;
