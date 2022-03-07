@@ -21,17 +21,19 @@ layout(location = 1) out vec2 fragTexCoord;
 
 layout(location = 2) out vec4 vNormal;
 layout(location = 3) out vec4 vPosition;
-layout(location = 4) out vec4 vLightPos;
+//layout(location = 4) out vec4 vLightPos;
 
 void main() {
-    gl_Position = ubo.mvp * vec4(aPosition, 1.0);
+    //gl_Position = ubo.mvp * vec4(aPosition, 1.0);
     fragColor = aColor;
     fragTexCoord = aTexCoord;
-
+    
     vec4 tmpLightPosition = vec4(10.0f, 0.0f, 0.0f, 1.0f);
 
     mat4 mv = ubo.view * ubo.model;
     vPosition = mv * vec4(aPosition, 1.0f);
-    vNormal = mv * vec4(aNormal, 0.0f);
-    vLightPos = mv * tmpLightPosition;
+    gl_Position = ubo.proj * vPosition;
+    vNormal = transpose(mv) * vec4(aNormal, 0.0f);
+    //vLightPos = ubo.mvp * tmpLightPosition;
+    //vLightPos = mv * tmpLightPosition;
 }
