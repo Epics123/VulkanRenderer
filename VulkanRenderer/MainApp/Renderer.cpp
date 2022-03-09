@@ -436,9 +436,6 @@ void Renderer::createGraphicsPipeline()
 	//VkVertexInputBindingDescription bindingDescription = Vertex::getBindingDescription();
 	//std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions = Vertex::getAttributeDescriptions();
 
-	//VkVertexInputBindingDescription bindingDescription = Vertex::getBindingDescription();
-	//std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions = Vertex::getAttributeDescriptions();
-
 	//VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 	//vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 	//vertexInputInfo.vertexBindingDescriptionCount = 1;
