@@ -20,7 +20,13 @@ public:
 
 	VkPipeline* getPipeline() { return &pipeline; }
 
+	VkPipelineLayout getPipelineLayout() { return pipelineLayout; }
+
 	VkGraphicsPipelineCreateInfo* getPipelineCreateInfo() { return &pipelineInfo; }
+
+	void bindPipeline(VkCommandBuffer commandBuffer, VkPipelineBindPoint pipelineBindPoint);
+
+	void destroyPipeline();
 
 	void setPolygonMode(VkPolygonMode mode);
 
