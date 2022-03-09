@@ -2,13 +2,6 @@
 
 void Camera::updatePositon(int key, float speed)
 {
-	invOrient = glm::conjugate(orientation);
-	
-	// Update camera vectors
-	forward = invOrient * glm::vec3(0.0f, 0.0f, 1.0f);
-	up = invOrient * glm::vec3(0.0f, 1.0f, 0.0f);
-	right = glm::normalize(glm::cross(forward, up));
-
 	// Move camera 
 	switch (key)
 	{
@@ -56,7 +49,7 @@ void Camera::zoomCamera(double yOffset)
 	position += (zoomScale * (float)yOffset) * forward;
 }
 
-void Camera::updateView(float dt)
+void Camera::updateModel(float dt)
 {
 	if (yaw > 360.0f || yaw < -360.0f)
 		yaw = 0.0f;
@@ -69,17 +62,23 @@ void Camera::updateView(float dt)
 	glm::quat qRoll = glm::angleAxis(glm::radians(roll), glm::vec3(0, 0, 1));
 
 	glm::quat cameraOrientation = qPitch * qYaw;
-	//glm::quat delta = glm::slerp(orientation, cameraOrientation, dt);//glm::mix(glm::quat(0, 0, 0, 0), cameraOrientation, dt);
-	//orientation = glm::normalize(delta) * orientation;
-	orientation = glm::normalize(cameraOrientation);
+	//orientation = glm::normalize(cameraOrientation);
+	orientation = glm::normalize(glm::slerp(orientation, cameraOrientation, 1 - powf(smoothing, dt)));
 	glm::mat4 rotate = glm::mat4_cast(orientation);
 
 	glm::mat4 translate = glm::mat4(1.0f);
 	translate = glm::translate(translate, position);
 
+	invOrient = glm::conjugate(orientation);
+
+	// Update camera vectors
+	forward = invOrient * glm::vec3(0.0f, 0.0f, 1.0f);
+	up = invOrient * glm::vec3(0.0f, 1.0f, 0.0f);
+	right = glm::normalize(glm::cross(forward, up));
+
 	//printf("Pitch: %f, Yaw: %f\n", pitch, yaw);
 
 	//printf("%f, %f, %f\n", position.x, position.y, position.z);
 
-	view = rotate * translate;
+	invModel = rotate * translate;
 }

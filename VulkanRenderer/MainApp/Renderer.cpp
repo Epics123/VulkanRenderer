@@ -44,10 +44,10 @@ void Renderer::cleanupInstance()
 
 Renderer::Renderer(Window* appWindow)
 {
-	//modelPath = "MainApp/resources/vulkan/models/teapot/teapot.obj";
 	modelPath = "MainApp/resources/vulkan/models/teapot/downScaledPot.obj";
+	//modelPath = "MainApp/resources/vulkan/models/debug/defCube.obj";
+	//modelPath = "MainApp/resources/vulkan/models/debug/tri.obj";
 	//modelPath = "MainApp/resources/vulkan/models/room/room.obj";
-	//texturePath = "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png";
 	texturePath = "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png";
 	//texturePath = "MainApp/resources/vulkan/textures/room/viking_room.png";
 
@@ -119,7 +119,7 @@ void Renderer::init()
 	createSyncObjects();
 
 	mainCamera = Camera();
-	mainCamera.updateView(0.0f);
+	mainCamera.updateModel(0.0f);
 }
 
 void Renderer::createVulkanInstance()
@@ -433,7 +433,8 @@ void Renderer::createGraphicsPipeline()
 	//fragShaderStageInfo.module = fragShaderModule;
 	//fragShaderStageInfo.pName = "main";
 
-	//VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
+	//VkVertexInputBindingDescription bindingDescription = Vertex::getBindingDescription();
+	//std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions = Vertex::getAttributeDescriptions();
 
 	//VkVertexInputBindingDescription bindingDescription = Vertex::getBindingDescription();
 	//std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions = Vertex::getAttributeDescriptions();
@@ -1076,11 +1077,11 @@ void Renderer::updateUniformBuffer(uint32_t currentImage, float dt)
 
 	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
-	mainCamera.updateView(dt);
+	mainCamera.updateModel(dt);
 
 	UniformBufferObject ubo{};
-	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	ubo.view = mainCamera.view;//glm::lookAt(mainCamera.position, mainCamera.position + mainCamera.forward, mainCamera.up);
+	ubo.model = glm::mat4(1.0f);//glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	ubo.view = mainCamera.invModel;//glm::lookAt(mainCamera.position, mainCamera.position + mainCamera.forward, mainCamera.up);
 	ubo.proj = glm::perspective(glm::radians(mainCamera.fov), swapChainImageExtent.width / (float)swapChainImageExtent.height, 0.1f, 500.0f);
 	ubo.proj[1][1] *= -1;
 	ubo.mvp = ubo.proj * ubo.view * ubo.model;
@@ -1174,11 +1175,17 @@ void Renderer::loadModel()
 		for (const tinyobj::index_t index : shapeIter._Ptr->mesh.indices)	// I would like to not be using foreach but good lord the types
 		{
 			Vertex vertex{};
-
+			
 			vertex.pos = {
 				attributes.vertices[3 * index.vertex_index + 0],
 				attributes.vertices[3 * index.vertex_index + 1],
 				attributes.vertices[3 * index.vertex_index + 2]
+			};
+
+			vertex.vertexNormal = {
+				attributes.normals[3 * index.normal_index + 0],
+				attributes.normals[3 * index.normal_index + 1],
+				attributes.normals[3 * index.normal_index + 2]
 			};
 
 			vertex.texCoord = {

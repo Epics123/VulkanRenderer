@@ -20,7 +20,7 @@ struct Camera
 	glm::vec3 worldUp = glm::vec3(0.0f, 0.0f, 1.0f);
 
 	//glm::mat4 transform;
-	glm::mat4 view;
+	glm::mat4 invModel;
 
 	float yaw = 90.0f;
 	float pitch = 250.0f;
@@ -31,13 +31,14 @@ struct Camera
 	float zoomScale = 1.0f;
 
 	float sensitivity = 0.5f;
+	float smoothing = 0.00001f;
 
 	void updatePositon(int key, float speed);
 	void updateCameraRotation(float pitch, float yaw, float roll);
 	void updateFOV(double yOffset);
 	void zoomCamera(double yOffset);
 
-	void updateView(float dt);
+	void updateModel(float dt);
 };
 
 
