@@ -34,6 +34,8 @@ private:
 	VkPipeline pipeline;
 	VkDevice device;
 
+	VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL;
+
 	VkRenderPass renderPass;
 	VkPipelineLayout pipelineLayout;
 	VkDescriptorSetLayout descriptorSetLayout;

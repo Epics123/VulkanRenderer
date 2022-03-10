@@ -292,6 +292,17 @@ Camera& Renderer::getActiveCamera()
 	return mainCamera;
 }
 
+Pipeline Renderer::getActivePipeline()
+{
+	return gPipeline;
+}
+
+void Renderer::setRenderMode(RenderMode mode)
+{
+	renderMode = mode;
+	printf("%i\n", (int)renderMode);
+}
+
 void Renderer::framebufferResizeCallback(GLFWwindow* window, int width, int height)
 {
 	Renderer* app = reinterpret_cast<Renderer*>(glfwGetWindowUserPointer(window));
@@ -371,6 +382,7 @@ void Renderer::createLogicalDevice()
 	// Specify device features
 	VkPhysicalDeviceFeatures deviceFeatures{};
 	deviceFeatures.samplerAnisotropy = VK_TRUE;
+	deviceFeatures.fillModeNonSolid = VK_TRUE;
 
 	// Create logical device info
 	VkDeviceCreateInfo createInfo{};
@@ -420,6 +432,17 @@ void Renderer::createGraphicsPipeline()
 
 	gPipeline = Pipeline(device);
 	gPipeline.createDefaultPipeline(vertShaderModule, fragShaderModule, &renderPass, &pipelineLayout, &descriptorSetLayout, &swapChainImageExtent);
+
+	//std::vector<char> wireframeVertShaderCode = readBinaryFile("MainApp/resources/vulkan/shaders/vert.spv");
+	//std::vector<char> wireframeFragShaderCode = readBinaryFile("MainApp/resources/vulkan/shaders/frag.spv");
+
+	//VkShaderModule wireframeVertShaderModule = createShaderModule(wireframeVertShaderCode);
+	//VkShaderModule wireframeFragShaderModule = createShaderModule(wireframeFragShaderCode);
+
+	wireframePipeline = Pipeline(device);
+	//wireframePipeline.createDefaultPipeline(wireframeVertShaderModule, wireframeFragShaderModule, &renderPass, &pipelineLayout, &descriptorSetLayout, &swapChainImageExtent);
+	wireframePipeline.setPolygonMode(VK_POLYGON_MODE_LINE);
+	wireframePipeline.createDefaultPipeline(vertShaderModule, fragShaderModule, &renderPass, &pipelineLayout, &descriptorSetLayout, &swapChainImageExtent);
 
 	//VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
 	//vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -573,6 +596,8 @@ void Renderer::createGraphicsPipeline()
 
 	vkDestroyShaderModule(device, fragShaderModule, nullptr);
 	vkDestroyShaderModule(device, vertShaderModule, nullptr);
+	//vkDestroyShaderModule(device, wireframeVertShaderModule, nullptr);
+	//vkDestroyShaderModule(device, wireframeFragShaderModule, nullptr);
 }
 
 void Renderer::createRenderPass()
@@ -721,7 +746,19 @@ void Renderer::createCommandBuffers()
 
 		vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 		//vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
-		gPipeline.bindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS);
+
+		switch (renderMode)
+		{
+		case DEFAULT_LIT:
+			gPipeline.bindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS);
+			vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, gPipeline.getPipelineLayout(), 0, 1, &descriptorSets[i], 0, nullptr);
+			break;
+		case WIREFRAME:
+			wireframePipeline.bindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS);
+			vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, wireframePipeline.getPipelineLayout(), 0, 1, &descriptorSets[i], 0, nullptr);
+			break;
+		}
+		
 
 		VkBuffer vertexbuffers[] = { vertexBuffer.buffer };
 		VkDeviceSize offsets[] = { 0 };
@@ -730,7 +767,7 @@ void Renderer::createCommandBuffers()
 		vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT32);
 
 		//vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[i], 0, nullptr);
-		vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, gPipeline.getPipelineLayout(), 0, 1, &descriptorSets[i], 0, nullptr);
+		
 
 		vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 		vkCmdEndRenderPass(commandBuffers[i]);
@@ -1105,6 +1142,7 @@ void Renderer::cleanupSwapChain()
 	//vkDestroyPipeline(device, graphicsPipeline, nullptr);
 	//vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 	gPipeline.destroyPipeline();
+	wireframePipeline.destroyPipeline();
 	vkDestroyRenderPass(device, renderPass, nullptr);
 
 	for (int i = 0; i < swapChainImageViews.size(); i++)
@@ -1322,6 +1360,7 @@ bool Renderer::hasStencilComponent(VkFormat format)
 void Renderer::drawFrame(float dt)
 {
 	vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
+
 
 	uint32_t imageIndex;
 	VkResult res = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);

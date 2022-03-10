@@ -35,6 +35,12 @@ struct SwapChainSupportDetails
 	std::vector<VkPresentModeKHR> presentModes;
 };
 
+enum RenderMode
+{
+	DEFAULT_LIT,
+	WIREFRAME
+};
+
 class Renderer
 {
 public:
@@ -147,6 +153,10 @@ public:
 
 	Camera& getActiveCamera();
 
+	Pipeline getActivePipeline();
+
+	void setRenderMode(RenderMode mode);
+
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 	static std::vector<char> readBinaryFile(const std::string& filename);
@@ -193,6 +203,9 @@ private:
 	std::vector<VkDescriptorSet> descriptorSets;
 
 	Pipeline gPipeline;
+	Pipeline wireframePipeline;
+
+	RenderMode renderMode = DEFAULT_LIT;
 
 	std::vector<VkSemaphore> imageAvailableSemaphores;
 	std::vector<VkSemaphore> renderFinishedSemaphores;

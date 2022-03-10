@@ -108,6 +108,17 @@ void Application::processInput(GLFWwindow* window)
 		vulkanRenderer->getActiveCamera().updatePositon(GLFW_KEY_E, cameraSpeed);
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 		vulkanRenderer->getActiveCamera().updatePositon(GLFW_KEY_Q, cameraSpeed);
+	
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+	{
+		vulkanRenderer->setRenderMode(DEFAULT_LIT);
+		vulkanRenderer->recreateSwapChain();
+	}
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+	{
+		vulkanRenderer->setRenderMode(WIREFRAME);
+		vulkanRenderer->recreateSwapChain();
+	}
 
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE)
 		firstMouse = true;
