@@ -97,6 +97,7 @@
     <ClInclude Include="MainApp\Camera.h" />
     <ClInclude Include="MainApp\CommandBuffer.h" />
     <ClInclude Include="MainApp\Image.h" />
+    <ClInclude Include="MainApp\Light.h" />
     <ClInclude Include="MainApp\Renderer.h" />
     <ClInclude Include="MainApp\TextureSampler.h" />
     <ClInclude Include="MainApp\VertexBuffer.h" />
@@ -107,6 +108,7 @@
     <ClCompile Include="MainApp\Camera.cpp" />
     <ClCompile Include="MainApp\CommandBuffer.cpp" />
     <ClCompile Include="MainApp\Image.cpp" />
+    <ClCompile Include="MainApp\Light.cpp" />
     <ClCompile Include="MainApp\Main.cpp" />
     <ClCompile Include="MainApp\Renderer.cpp" />
     <ClCompile Include="MainApp\TextureSampler.cpp" />
