@@ -120,6 +120,8 @@
   <ItemGroup>
     <None Include="MainApp\resources\vulkan\shaders\Test.frag" />
     <None Include="MainApp\resources\vulkan\shaders\Test.vert" />
+    <None Include="Wireframe.frag" />
+    <None Include="Wireframe.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -62,7 +62,6 @@ void Camera::updateModel(float dt)
 	glm::quat qRoll = glm::angleAxis(glm::radians(roll), glm::vec3(0, 0, 1));
 
 	glm::quat cameraOrientation = qPitch * qYaw;
-	//orientation = glm::normalize(cameraOrientation);
 	orientation = glm::normalize(glm::slerp(orientation, cameraOrientation, 1 - powf(smoothing, dt)));
 	glm::mat4 rotate = glm::mat4_cast(orientation);
 
@@ -75,10 +74,6 @@ void Camera::updateModel(float dt)
 	forward = invOrient * glm::vec3(0.0f, 0.0f, 1.0f);
 	up = invOrient * glm::vec3(0.0f, 1.0f, 0.0f);
 	right = glm::normalize(glm::cross(forward, up));
-
-	//printf("Pitch: %f, Yaw: %f\n", pitch, yaw);
-
-	//printf("%f, %f, %f\n", position.x, position.y, position.z);
 
 	invModel = rotate * translate;
 }

@@ -43,5 +43,11 @@
     <None Include="MainApp\resources\vulkan\shaders\Test.vert">
       <Filter>resources\vulkan\shaders</Filter>
     </None>
+    <None Include="Wireframe.vert">
+      <Filter>resources\vulkan\shaders</Filter>
+    </None>
+    <None Include="Wireframe.frag">
+      <Filter>resources\vulkan\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
