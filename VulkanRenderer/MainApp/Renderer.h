@@ -186,7 +186,8 @@ private:
 	VkDebugUtilsMessengerEXT debugMessenger;
 
 	// Swap Chain
-	VkSwapchainKHR swapChain;
+	VkSwapchainKHR swapChain = VK_NULL_HANDLE;
+	VkSwapchainKHR oldSwapChain = VK_NULL_HANDLE;
 	VkFormat swapChainImageFormat;
 	VkExtent2D swapChainImageExtent;
 	std::vector<VkImage> swapChainImages;

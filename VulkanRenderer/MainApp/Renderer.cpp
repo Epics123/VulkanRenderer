@@ -182,6 +182,8 @@ void Renderer::createVulkanInstance()
 
 void Renderer::createSwapChain()
 {
+	if(swapChain)
+		oldSwapChain = swapChain;
 	// Select swap chain settings
 	SwapChainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice);
 	VkSurfaceFormatKHR surfaceFormat = chooseSwapChainFormat(swapChainSupport.formats);
@@ -224,10 +226,11 @@ void Renderer::createSwapChain()
 	createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	createInfo.presentMode = presentMode;
 	createInfo.clipped = VK_TRUE;
-	createInfo.oldSwapchain = VK_NULL_HANDLE;
+	createInfo.oldSwapchain = oldSwapChain;//VK_NULL_HANDLE;
 
 	// create swap chain
-	if (vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain) != VK_SUCCESS)
+	VkResult result = vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain);
+	if (result != VK_SUCCESS)
 		throw std::runtime_error("Failed to create swap chain!");
 
 	vkGetSwapchainImagesKHR(device, swapChain, &imageCount, nullptr);
@@ -956,10 +959,10 @@ void Renderer::createDescriptorSets()
 void Renderer::updateUniformBuffer(uint32_t currentImage, float dt)
 {
 	// Temp timer code
-	static auto startTime = std::chrono::high_resolution_clock::now();
-	auto currentTime = std::chrono::high_resolution_clock::now();
+	//static auto startTime = std::chrono::high_resolution_clock::now();
+	//auto currentTime = std::chrono::high_resolution_clock::now();
 
-	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+	//float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
 	mainCamera.updateModel(dt);
 
