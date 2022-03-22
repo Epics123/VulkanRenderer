@@ -96,6 +96,7 @@ void Renderer::init()
 	createImageViews();
 	createRenderPass();
 	createDescriptorSetLayout();
+	compileShaders();
 	createGraphicsPipeline();
 
 	createCommandPool();
@@ -182,8 +183,6 @@ void Renderer::createVulkanInstance()
 
 void Renderer::createSwapChain()
 {
-	if(swapChain)
-		oldSwapChain = swapChain;
 	// Select swap chain settings
 	SwapChainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice);
 	VkSurfaceFormatKHR surfaceFormat = chooseSwapChainFormat(swapChainSupport.formats);
@@ -226,7 +225,7 @@ void Renderer::createSwapChain()
 	createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	createInfo.presentMode = presentMode;
 	createInfo.clipped = VK_TRUE;
-	createInfo.oldSwapchain = oldSwapChain;//VK_NULL_HANDLE;
+	createInfo.oldSwapchain = oldSwapChain == nullptr ? VK_NULL_HANDLE : oldSwapChain = swapChain;
 
 	// create swap chain
 	VkResult result = vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain);
@@ -304,6 +303,12 @@ void Renderer::setRenderMode(RenderMode mode)
 {
 	renderMode = mode;
 	printf("%i\n", (int)renderMode);
+}
+
+void Renderer::compileShaders()
+{
+	// TODO: Shift this to the actual proper API call
+	system("CompileShaders.bat");
 }
 
 void Renderer::framebufferResizeCallback(GLFWwindow* window, int width, int height)
@@ -424,9 +429,6 @@ void Renderer::createSurface()
 
 void Renderer::createGraphicsPipeline()
 {
-	// TODO: Shift this to the actual proper API call
-	system("CompileShaders.bat");
-
 	std::vector<char> vertShaderCode = readBinaryFile("MainApp/resources/vulkan/shaders/TestVert.spv");
 	std::vector<char> fragShaderCode = readBinaryFile("MainApp/resources/vulkan/shaders/TestFrag.spv");
 

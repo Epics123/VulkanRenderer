@@ -149,37 +149,14 @@ void Application::keyCallback(GLFWwindow* window, int key, int scancode, int act
 		printf("E Key Pressed! \n");*/
 	if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+
+	if (key == GLFW_KEY_T && action == GLFW_PRESS)
+		Renderer::compileShaders();
 }
 
 void Application::cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 {
-	//printf("%f, %f\n", (float)xpos, (float)ypos);
-
-	if (moveCamera)
-	{
-		/*float xOffset;
-		float yOffset;
-
-		if (firstMouse)
-		{
-			xOffset = 0.0f;
-			yOffset = 0.0f;
-			firstMouse = false;
-		}
-
-		xOffset = (float)xpos - lastMouseX;
-		yOffset = lastMouseY - (float)ypos;
-		lastMouseX = (float)xpos;
-		lastMouseY = (float)ypos;
-
-		float sensitivity = 0.1f;
-		xOffset *= sensitivity;
-		yOffset *= sensitivity;*/
-
-		//printf("%f, %f\n", xOffset, yOffset);
-		//Renderer::rendererInstance->getActiveCamera().updateCameraRotation(0.0f, -10.0f, 0.0f);
-		//Renderer::rendererInstance->getActiveCamera().updateCameraRotation(xOffset, yOffset, 0.0f);
-	}
+	
 }
 
 void Application::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)

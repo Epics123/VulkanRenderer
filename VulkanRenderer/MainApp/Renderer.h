@@ -157,6 +157,8 @@ public:
 
 	void setRenderMode(RenderMode mode);
 
+	static void compileShaders();
+
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 	static std::vector<char> readBinaryFile(const std::string& filename);
