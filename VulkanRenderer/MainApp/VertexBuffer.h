@@ -8,9 +8,12 @@
 #include <glfw3.h>
 #include <stdexcept>
 
+#include "VertexAttributes.h"
+
 struct Vertex
 {
 	static const int VERTEX_ATTRIB_COUNT = 4;
+	static const int WIREFRAME_VERT_ATTRIB_COUNT = 1;
 
 	glm::vec3 pos;
 	glm::vec3 color;
@@ -52,6 +55,17 @@ struct Vertex
 
 		return attributeDescriptions;
 	}
+
+	static std::array<VkVertexInputAttributeDescription, WIREFRAME_VERT_ATTRIB_COUNT> getWireframeAttributeDescriptions()
+	{
+		std::array<VkVertexInputAttributeDescription, WIREFRAME_VERT_ATTRIB_COUNT> attributeDescriptions{};
+		attributeDescriptions[0].binding = 0;
+		attributeDescriptions[0].location = 0;
+		attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+		attributeDescriptions[0].offset = offsetof(Vertex, pos);
+
+		return attributeDescriptions;
+	}
 };
 
 struct UniformBufferObject
@@ -68,20 +82,6 @@ typedef std::vector<uint32_t> IndexSTDVector;
 
 typedef std::vector<Vertex>::iterator VertexIter;
 typedef std::vector<uint32_t>::iterator IndexIter;
-
-//const std::vector<Vertex> verticies = 
-//{
-//	{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-//	{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-//	{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-//	{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
-//};
-//
-//const std::vector<uint32_t> indices = 
-//{
-//	0, 1, 2, 2, 3, 0
-//};
-
 
 struct Buffer
 {

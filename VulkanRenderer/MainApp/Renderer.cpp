@@ -183,6 +183,9 @@ void Renderer::createVulkanInstance()
 
 void Renderer::createSwapChain()
 {
+	if(swapChain)
+		oldSwapChain = swapChain;
+
 	// Select swap chain settings
 	SwapChainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice);
 	VkSurfaceFormatKHR surfaceFormat = chooseSwapChainFormat(swapChainSupport.formats);
@@ -225,7 +228,7 @@ void Renderer::createSwapChain()
 	createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	createInfo.presentMode = presentMode;
 	createInfo.clipped = VK_TRUE;
-	createInfo.oldSwapchain = oldSwapChain == nullptr ? VK_NULL_HANDLE : oldSwapChain = swapChain;
+	createInfo.oldSwapchain = oldSwapChain; //== nullptr ? VK_NULL_HANDLE : oldSwapChain = swapChain;
 
 	// create swap chain
 	VkResult result = vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain);
@@ -339,27 +342,6 @@ void Renderer::createImageViews()
 	swapChainImageViews.resize(swapChainImages.size());
 	for (int i = 0; i < swapChainImages.size(); i++)
 	{
-		//VkImageViewCreateInfo createInfo{};
-		//createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		//createInfo.image = swapChainImages[i];
-		//createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D; // treat images as a 2D texture, can also use 1D, 3D, and cube maps
-		//createInfo.format = swapChainImageFormat;
-
-		//// Swizzle color channels (default for now)
-		//createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-		//createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-		//createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-		//createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-
-		//createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT; // Color targets
-		//createInfo.subresourceRange.baseMipLevel = 0;  // No mipmaps
-		//createInfo.subresourceRange.levelCount = 1;
-		//createInfo.subresourceRange.baseArrayLayer = 0;
-		//createInfo.subresourceRange.layerCount = 1;
-
-		//if(vkCreateImageView(device, &createInfo, nullptr, &swapChainImageViews[i]) != VK_SUCCESS)
-		//	throw std::runtime_error("Failed to create image views!");
-
 		swapChainImageViews[i] = createImageView(swapChainImages[i], swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
 	}
 }
@@ -446,6 +428,7 @@ void Renderer::createGraphicsPipeline()
 
 	wireframePipeline = Pipeline(device);
 	wireframePipeline.setPolygonMode(VK_POLYGON_MODE_LINE);
+	//wireframePipeline.setVertexAttributeCount(1);
 	wireframePipeline.createDefaultPipeline(wireframeVertShaderModule, wireframeFragShaderModule, &renderPass, &pipelineLayout, &descriptorSetLayout, &swapChainImageExtent);
 	//wireframePipeline.createDefaultPipeline(vertShaderModule, fragShaderModule, &renderPass, &pipelineLayout, &descriptorSetLayout, &swapChainImageExtent);
 

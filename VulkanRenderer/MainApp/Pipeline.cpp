@@ -4,13 +4,16 @@
 #include <array>
 
 Pipeline::Pipeline()
+	:maxVertexAttributes(4)
 {
-	
+	vertexAttributeDescriptions.resize(maxVertexAttributes);
 }
 
 Pipeline::Pipeline(VkDevice device)
+	: maxVertexAttributes(4)
 {
 	this->device = device;
+	vertexAttributeDescriptions.resize(maxVertexAttributes);
 }
 
 void Pipeline::createDefaultPipeline(VkShaderModule vertShaderModule, VkShaderModule fragShaderModule, VkRenderPass* pass, 
@@ -36,15 +39,26 @@ void Pipeline::createDefaultPipeline(VkShaderModule vertShaderModule, VkShaderMo
 
 	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
+	// TODO: make this more flexible to support any # of attribute descriptions
 	bindingDescription = Vertex::getBindingDescription();
 	std::array<VkVertexInputAttributeDescription, 4> attributeDescriptions = Vertex::getAttributeDescriptions();
+	std::array<VkVertexInputAttributeDescription, 1> wireframeAttributeDescriptions = Vertex::getWireframeAttributeDescriptions();
 
 	vertexInputInfo = VkPipelineVertexInputStateCreateInfo{};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 	vertexInputInfo.vertexBindingDescriptionCount = 1;
 	vertexInputInfo.pVertexBindingDescriptions = &bindingDescription; // Optional
-	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
-	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data(); // Optional
+
+	if (polygonMode == VK_POLYGON_MODE_LINE)
+	{
+		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(wireframeAttributeDescriptions.size());
+		vertexInputInfo.pVertexAttributeDescriptions = wireframeAttributeDescriptions.data(); // Optional
+	}
+	else
+	{
+		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+		vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data(); // Optional
+	}
 
 	inputAssembly = VkPipelineInputAssemblyStateCreateInfo{};
 	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -193,4 +207,9 @@ void Pipeline::destroyPipeline()
 void Pipeline::setPolygonMode(VkPolygonMode mode)
 {
 	polygonMode = mode;
+}
+
+void Pipeline::setVertexAttributeCount(uint32_t count)
+{
+	vertexAttributeDescriptions.resize(count);
 }

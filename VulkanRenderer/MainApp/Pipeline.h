@@ -6,6 +6,7 @@
 
 #include <glfw3.h>
 #include <glfw3native.h>
+#include <vector>
 
 class Pipeline
 {
@@ -29,6 +30,7 @@ public:
 	void destroyPipeline();
 
 	void setPolygonMode(VkPolygonMode mode);
+	void setVertexAttributeCount(uint32_t count);
 
 private:
 	VkPipeline pipeline;
@@ -44,7 +46,9 @@ private:
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo;
 	VkPipelineShaderStageCreateInfo fragShaderStageInfo;
 
+	uint32_t maxVertexAttributes;
 	VkVertexInputBindingDescription bindingDescription;
+	std::vector<VkVertexInputAttributeDescription> vertexAttributeDescriptions;
 
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo;
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly;
