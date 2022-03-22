@@ -20,6 +20,7 @@
     <ClInclude Include="MainApp\Pipeline.h" />
     <ClInclude Include="MainApp\Renderer.h" />
     <ClInclude Include="MainApp\TextureSampler.h" />
+    <ClInclude Include="MainApp\VertexAttributes.h" />
     <ClInclude Include="MainApp\VertexBuffer.h" />
     <ClInclude Include="MainApp\Window.h" />
   </ItemGroup>
@@ -33,6 +34,7 @@
     <ClCompile Include="MainApp\Pipeline.cpp" />
     <ClCompile Include="MainApp\Renderer.cpp" />
     <ClCompile Include="MainApp\TextureSampler.cpp" />
+    <ClCompile Include="MainApp\VertexAttributes.cpp" />
     <ClCompile Include="MainApp\VertexBuffer.cpp" />
     <ClCompile Include="MainApp\Window.cpp" />
   </ItemGroup>
@@ -43,10 +45,10 @@
     <None Include="MainApp\resources\vulkan\shaders\Test.vert">
       <Filter>resources\vulkan\shaders</Filter>
     </None>
-    <None Include="Wireframe.vert">
+    <None Include="MainApp\resources\vulkan\shaders\Wireframe.frag">
       <Filter>resources\vulkan\shaders</Filter>
     </None>
-    <None Include="Wireframe.frag">
+    <None Include="MainApp\resources\vulkan\shaders\Wireframe.vert">
       <Filter>resources\vulkan\shaders</Filter>
     </None>
   </ItemGroup>

@@ -5,6 +5,7 @@ VULKAN_SDK = os.getenv("VULKAN_SDK")
 IncludeDir = {}
 IncludeDir["GLFW"] = "%{wks.location}/%{prj.name}/Libraries/glfw/include"
 IncludeDir["glm"] = "%{wks.location}/%{prj.name}/Libraries/glm"
+IncludeDir["ImGui"] = "%{wks.location}/%{prj.name}/Libraries/ImGui"
 IncludeDir["ObjLoader"] = "%{wks.location}/%{prj.name}/Libraries/ObjLoader"
 IncludeDir["ImgLoader"] = "%{wks.location}/%{prj.name}/Libraries/ImgLoader"
 IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"

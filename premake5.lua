@@ -32,6 +32,7 @@ project "VulkanRenderer"
 		"%{IncludeDir.VulkanSDK}",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.ObjLoader}",
 		"%{IncludeDir.ImgLoader}"
 	}
