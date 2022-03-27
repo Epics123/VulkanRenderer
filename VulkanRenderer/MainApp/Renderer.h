@@ -151,9 +151,21 @@ public:
 
 	void deviceWaitIdle();
 
-	Camera& getActiveCamera();
+	Camera& getActiveCamera() { return mainCamera; }
 
-	Pipeline getActivePipeline();
+	Pipeline getActivePipeline() { return gPipeline; }
+
+	VkRenderPass getRenderPass() { return renderPass; }
+
+	VkInstance getVulkanInstance() { return instance; }
+
+	VkPhysicalDevice getPhysicalDevice() { return physicalDevice; }
+
+	VkDevice getDevice() { return device; }
+
+	VkQueue getGraphicsQueue() { return graphicsQueue; }
+	
+	VkDescriptorPool getDescriptorPool() { return descriptorPool; }
 
 	void setRenderMode(RenderMode mode);
 

@@ -292,16 +292,6 @@ void Renderer::deviceWaitIdle()
 	vkDeviceWaitIdle(device);
 }
 
-Camera& Renderer::getActiveCamera()
-{
-	return mainCamera;
-}
-
-Pipeline Renderer::getActivePipeline()
-{
-	return gPipeline;
-}
-
 void Renderer::setRenderMode(RenderMode mode)
 {
 	renderMode = mode;

@@ -1,9 +1,6 @@
 #pragma once
 
-#define GLFW_INCLUDE_VULKAN
-
 #include <iostream>
-#include "imgui.h"
 #include "Renderer.h"
 #include "Window.h"
 
@@ -23,6 +20,10 @@ private:
 	void cleanup();
 
 	void processInput(GLFWwindow* window);
+
+	void InitImGui();
+
+	void UpdateImGUI();
 
 	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 

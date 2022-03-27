@@ -1,10 +1,16 @@
 #include "Application.h"
 
+#include "imgui.h"
+//#include "imgui_impl_glfw.h"
+//#include "imgui_impl_vulkan.h"
+
+#define GLFW_INCLUDE_VULKAN
+#include <glfw3.h>
+
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
 
 Application::Application()
 {
@@ -52,6 +58,7 @@ void Application::run()
 {
 	window->initWindow(keyCallback, cursorPosCallback, mouseButtonCallback, scrollCallback,framebufferResizeCallback, this);
 	vulkanRenderer = Renderer::initInstance(window);
+	InitImGui();
 	update();
 	cleanup();
 }
@@ -73,6 +80,7 @@ void Application::update()
 		glfwPollEvents();
 		processInput(window->getWindow());
 
+		UpdateImGUI();
 		vulkanRenderer->drawFrame(dt);
 	}
 
@@ -141,6 +149,39 @@ void Application::processInput(GLFWwindow* window)
 
 		vulkanRenderer->getActiveCamera().updateCameraRotation(mouseOffsetX, -mouseOffsetY, 0.0f);
 	}
+}
+
+void Application::InitImGui()
+{
+	//ImGui::CreateContext();
+	/*ImGui::StyleColorsDark();
+
+	ImGui_ImplGlfw_InitForVulkan(window->getWindow(), true);
+
+	ImGui_ImplVulkan_InitInfo init_info = {};
+	init_info.Instance = vulkanRenderer->getVulkanInstance();
+	init_info.PhysicalDevice = vulkanRenderer->getPhysicalDevice();
+	init_info.Device = vulkanRenderer->getDevice();
+	init_info.Queue = vulkanRenderer->getGraphicsQueue();
+	init_info.DescriptorPool = vulkanRenderer->getDescriptorPool();
+	init_info.MinImageCount = 3;
+	init_info.ImageCount = 3;
+	init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+
+	ImGui_ImplVulkan_Init(&init_info, vulkanRenderer->getRenderPass());
+
+
+	ImGuiIO& io = ImGui::GetIO();
+	io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
+	io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;*/
+
+	//TEMP: Should make own key codes
+	//io.KeyMap[ImGuiKey_]
+}
+
+void Application::UpdateImGUI()
+{
+
 }
 
 void Application::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
