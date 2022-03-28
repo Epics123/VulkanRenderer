@@ -1,5 +1,6 @@
 #include "Pipeline.h"
 #include "VertexBuffer.h"
+#include "Light.h"
 
 #include <array>
 
@@ -40,14 +41,15 @@ void Pipeline::createDefaultPipeline(VkShaderModule vertShaderModule, VkShaderMo
 	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
 	// TODO: make this more flexible to support any # of attribute descriptions
-	bindingDescription = Vertex::getBindingDescription();
-	std::array<VkVertexInputAttributeDescription, 4> attributeDescriptions = Vertex::getAttributeDescriptions();
+	bindingDescription.push_back(Vertex::getBindingDescription());
+	bindingDescription.push_back(Light::getBindingDescription());
+	std::array<VkVertexInputAttributeDescription, Vertex::VERTEX_ATTRIB_COUNT> attributeDescriptions = Vertex::getAttributeDescriptions();
 	std::array<VkVertexInputAttributeDescription, 1> wireframeAttributeDescriptions = Vertex::getWireframeAttributeDescriptions();
 
 	vertexInputInfo = VkPipelineVertexInputStateCreateInfo{};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 	vertexInputInfo.vertexBindingDescriptionCount = 1;
-	vertexInputInfo.pVertexBindingDescriptions = &bindingDescription; // Optional
+	vertexInputInfo.pVertexBindingDescriptions = bindingDescription.data(); // Optional
 
 	if (polygonMode == VK_POLYGON_MODE_LINE)
 	{

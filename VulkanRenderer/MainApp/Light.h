@@ -13,9 +13,9 @@ struct Light
 {
 	static const int LIGHT_ATTRIB_COUNT = 3;
 	
-	glm::vec3 pos;
-	glm::vec4 diffuse;
-	float intensity;
+	glm::vec3 pos = glm::vec3(10.0, 2.0, 2.0);
+	glm::vec4 diffuse = glm::vec4(1.0, 1.0, 1.0, 1.0);
+	float intensity = 1.0;
 
 	static VkVertexInputBindingDescription getBindingDescription()
 	{

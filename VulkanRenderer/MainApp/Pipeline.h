@@ -47,7 +47,7 @@ private:
 	VkPipelineShaderStageCreateInfo fragShaderStageInfo;
 
 	uint32_t maxVertexAttributes;
-	VkVertexInputBindingDescription bindingDescription;
+	std::vector<VkVertexInputBindingDescription> bindingDescription;
 	std::vector<VkVertexInputAttributeDescription> vertexAttributeDescriptions;
 
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo;
