@@ -23,6 +23,8 @@ project "VulkanRenderer"
 	{
 		"%{prj.name}/MainApp/**.h",
 		"%{prj.name}/MainApp/**.cpp",
+		"%{prj.name}/Libraries/ImGui/**.h",
+		"%{prj.name}/Libraries/ImGui/**.cpp",
 		"%{prj.name}/MainApp/resources/**.vert",
 		"%{prj.name}/MainApp/resources/**.frag",
 	}

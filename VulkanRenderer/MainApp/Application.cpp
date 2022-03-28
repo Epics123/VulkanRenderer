@@ -1,9 +1,5 @@
 #include "Application.h"
 
-#include "imgui.h"
-//#include "imgui_impl_glfw.h"
-//#include "imgui_impl_vulkan.h"
-
 #define GLFW_INCLUDE_VULKAN
 #include <glfw3.h>
 
@@ -11,6 +7,7 @@
 #define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
 
 Application::Application()
 {
@@ -153,7 +150,7 @@ void Application::processInput(GLFWwindow* window)
 
 void Application::InitImGui()
 {
-	//ImGui::CreateContext();
+	ImGui::CreateContext();
 	/*ImGui::StyleColorsDark();
 
 	ImGui_ImplGlfw_InitForVulkan(window->getWindow(), true);

@@ -1,55 +1,158 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="resources">
-      <UniqueIdentifier>{202B5BA7-8C95-0F1E-D5D3-C0C3417DED72}</UniqueIdentifier>
+    <Filter Include="Libraries">
+      <UniqueIdentifier>{0259E1F6-6EC3-956D-B701-471323AB73C2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="resources\vulkan">
-      <UniqueIdentifier>{C088AB47-AC81-CA99-D5B3-AF1EC10BAAA5}</UniqueIdentifier>
+    <Filter Include="Libraries\ImGui">
+      <UniqueIdentifier>{AC07BDE7-1893-2AAC-21A4-ADA08DAE86AC}</UniqueIdentifier>
     </Filter>
-    <Filter Include="resources\vulkan\shaders">
-      <UniqueIdentifier>{B905342A-A52A-83AA-CE75-683ABAF981C8}</UniqueIdentifier>
+    <Filter Include="MainApp">
+      <UniqueIdentifier>{6BCAF114-D7A9-70B0-E0C1-FB864C20D711}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MainApp\resources">
+      <UniqueIdentifier>{B551250E-2168-23A4-6ADF-AEC5D634F42B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MainApp\resources\vulkan">
+      <UniqueIdentifier>{B5D51F2F-A1FA-6EAF-CA45-543FB6C96DCD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MainApp\resources\vulkan\shaders">
+      <UniqueIdentifier>{AE774CB2-9AC8-37F4-C32C-26B6AFDCCA5D}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MainApp\Application.h" />
-    <ClInclude Include="MainApp\Camera.h" />
-    <ClInclude Include="MainApp\CommandBuffer.h" />
-    <ClInclude Include="MainApp\Image.h" />
-    <ClInclude Include="MainApp\Light.h" />
-    <ClInclude Include="MainApp\Pipeline.h" />
-    <ClInclude Include="MainApp\Renderer.h" />
-    <ClInclude Include="MainApp\TextureSampler.h" />
-    <ClInclude Include="MainApp\VertexAttributes.h" />
-    <ClInclude Include="MainApp\VertexBuffer.h" />
-    <ClInclude Include="MainApp\Window.h" />
+    <ClInclude Include="Libraries\ImGui\imconfig.h">
+      <Filter>Libraries\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\ImGui\imgui.h">
+      <Filter>Libraries\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\ImGui\imgui_impl_glfw.h">
+      <Filter>Libraries\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\ImGui\imgui_impl_sdl.h">
+      <Filter>Libraries\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\ImGui\imgui_impl_vulkan.h">
+      <Filter>Libraries\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\ImGui\imgui_internal.h">
+      <Filter>Libraries\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\ImGui\imstb_rectpack.h">
+      <Filter>Libraries\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\ImGui\imstb_textedit.h">
+      <Filter>Libraries\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\ImGui\imstb_truetype.h">
+      <Filter>Libraries\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\Application.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\Camera.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\CommandBuffer.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\Image.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\Light.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\Pipeline.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\Renderer.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\TextureSampler.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\VertexAttributes.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\VertexBuffer.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\Window.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MainApp\Application.cpp" />
-    <ClCompile Include="MainApp\Camera.cpp" />
-    <ClCompile Include="MainApp\CommandBuffer.cpp" />
-    <ClCompile Include="MainApp\Image.cpp" />
-    <ClCompile Include="MainApp\Light.cpp" />
-    <ClCompile Include="MainApp\Main.cpp" />
-    <ClCompile Include="MainApp\Pipeline.cpp" />
-    <ClCompile Include="MainApp\Renderer.cpp" />
-    <ClCompile Include="MainApp\TextureSampler.cpp" />
-    <ClCompile Include="MainApp\VertexAttributes.cpp" />
-    <ClCompile Include="MainApp\VertexBuffer.cpp" />
-    <ClCompile Include="MainApp\Window.cpp" />
+    <ClCompile Include="Libraries\ImGui\imgui.cpp">
+      <Filter>Libraries\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\ImGui\imgui_demo.cpp">
+      <Filter>Libraries\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\ImGui\imgui_draw.cpp">
+      <Filter>Libraries\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\ImGui\imgui_impl_glfw.cpp">
+      <Filter>Libraries\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\ImGui\imgui_impl_vulkan.cpp">
+      <Filter>Libraries\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\ImGui\imgui_tables.cpp">
+      <Filter>Libraries\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\ImGui\imgui_widgets.cpp">
+      <Filter>Libraries\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\Application.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\Camera.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\CommandBuffer.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\Image.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\Light.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\Main.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\Pipeline.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\Renderer.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\TextureSampler.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\VertexAttributes.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\VertexBuffer.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\Window.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="MainApp\resources\vulkan\shaders\Test.frag">
-      <Filter>resources\vulkan\shaders</Filter>
+      <Filter>MainApp\resources\vulkan\shaders</Filter>
     </None>
     <None Include="MainApp\resources\vulkan\shaders\Test.vert">
-      <Filter>resources\vulkan\shaders</Filter>
+      <Filter>MainApp\resources\vulkan\shaders</Filter>
     </None>
     <None Include="MainApp\resources\vulkan\shaders\Wireframe.frag">
-      <Filter>resources\vulkan\shaders</Filter>
+      <Filter>MainApp\resources\vulkan\shaders</Filter>
     </None>
     <None Include="MainApp\resources\vulkan\shaders\Wireframe.vert">
-      <Filter>resources\vulkan\shaders</Filter>
+      <Filter>MainApp\resources\vulkan\shaders</Filter>
     </None>
   </ItemGroup>
 </Project>
