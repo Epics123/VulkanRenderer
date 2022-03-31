@@ -295,7 +295,6 @@ void Renderer::deviceWaitIdle()
 void Renderer::setRenderMode(RenderMode mode)
 {
 	renderMode = mode;
-	printf("%i\n", (int)renderMode);
 }
 
 void Renderer::compileShaders()
@@ -534,6 +533,7 @@ void Renderer::createCommandPool()
 void Renderer::createCommandBuffers()
 {
 	commandBuffers.resize(swapChainFramebuffers.size());
+	wireframeCommandBuffers.resize(swapChainFramebuffers.size());
 
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -573,9 +573,11 @@ void Renderer::createCommandBuffers()
 		renderPassInfo.pClearValues = clearValues.data();
 
 		vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-		//vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
-		switch (renderMode)
+		gPipeline.bindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS);
+		vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, gPipeline.getPipelineLayout(), 0, 1, &descriptorSets[i], 0, nullptr);
+
+		/*switch (renderMode)
 		{
 		case DEFAULT_LIT:
 			gPipeline.bindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS);
@@ -585,7 +587,7 @@ void Renderer::createCommandBuffers()
 			wireframePipeline.bindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS);
 			vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, wireframePipeline.getPipelineLayout(), 0, 1, &descriptorSets[i], 0, nullptr);
 			break;
-		}
+		}*/
 		
 
 		VkBuffer vertexbuffers[] = { vertexBuffer.buffer };
@@ -596,11 +598,71 @@ void Renderer::createCommandBuffers()
 
 		//vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[i], 0, nullptr);
 		
-
 		vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 		vkCmdEndRenderPass(commandBuffers[i]);
 
 		if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to record command buffer!");
+		}
+	}
+
+	wireframeCommandBuffers.resize(swapChainFramebuffers.size());
+
+	VkCommandBufferAllocateInfo wireframeAllocInfo{};
+	wireframeAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	wireframeAllocInfo.commandPool = commandPool;
+	wireframeAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	wireframeAllocInfo.commandBufferCount = (uint32_t)wireframeCommandBuffers.size();
+
+	if (vkAllocateCommandBuffers(device, &wireframeAllocInfo, wireframeCommandBuffers.data()) != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to allocate command buffers!");
+	}
+
+	for (size_t i = 0; i < wireframeCommandBuffers.size(); i++)
+	{
+		VkCommandBufferBeginInfo beginInfo{};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		beginInfo.flags = 0; // Optional
+		beginInfo.pInheritanceInfo = nullptr; // Optional
+
+		if (vkBeginCommandBuffer(wireframeCommandBuffers[i], &beginInfo) != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to begin recording command buffer!");
+		}
+
+		VkRenderPassBeginInfo renderPassInfo{};
+		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		renderPassInfo.renderPass = renderPass;
+		renderPassInfo.framebuffer = swapChainFramebuffers[i];
+		renderPassInfo.renderArea.offset = { 0, 0 };
+		renderPassInfo.renderArea.extent = swapChainImageExtent;
+
+		std::array<VkClearValue, 2> clearValues{};
+		clearValues[0].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
+		clearValues[1].depthStencil = { 1.0f, 0 };
+
+		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+		renderPassInfo.pClearValues = clearValues.data();
+
+		vkCmdBeginRenderPass(wireframeCommandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+		wireframePipeline.bindPipeline(wireframeCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS);
+		vkCmdBindDescriptorSets(wireframeCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, wireframePipeline.getPipelineLayout(), 0, 1, &descriptorSets[i], 0, nullptr);
+
+		VkBuffer vertexbuffers[] = { vertexBuffer.buffer };
+		VkDeviceSize offsets[] = { 0 };
+		vkCmdBindVertexBuffers(wireframeCommandBuffers[i], 0, 1, vertexbuffers, offsets);
+
+		vkCmdBindIndexBuffer(wireframeCommandBuffers[i], indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT32);
+
+		//vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[i], 0, nullptr);
+
+		vkCmdDrawIndexed(wireframeCommandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+		vkCmdEndRenderPass(wireframeCommandBuffers[i]);
+
+		if (vkEndCommandBuffer(wireframeCommandBuffers[i]) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Failed to record command buffer!");
 		}
@@ -866,15 +928,15 @@ void Renderer::createDescriptorPool()
 {
 	std::array<VkDescriptorPoolSize, 2> poolSizes{};
 	poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	poolSizes[0].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+	poolSizes[0].descriptorCount = static_cast<uint32_t>(swapChainImages.size()) * 1000;
 	poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	poolSizes[1].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+	poolSizes[1].descriptorCount = static_cast<uint32_t>(swapChainImages.size()) * 1000;
 
 	VkDescriptorPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 	poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
 	poolInfo.pPoolSizes = poolSizes.data();
-	poolInfo.maxSets = static_cast<uint32_t>(swapChainImages.size());
+	poolInfo.maxSets = 1000 * static_cast<uint32_t>(swapChainImages.size());
 
 	VkResult result = vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool);
 	if (result != VK_SUCCESS)
@@ -990,7 +1052,7 @@ void Renderer::cleanupSwapChain()
 }
 
 void Renderer::recreateSwapChain()
-{
+{	
 	// Check if window is minimized
 	int width = 0, height = 0;
 	window->getFrameBufferSize(&width, &height);
@@ -1215,8 +1277,17 @@ void Renderer::drawFrame(float dt)
 	submitInfo.pWaitSemaphores = waitSemaphores;
 	submitInfo.pWaitDstStageMask = waitStages;
 	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &commandBuffers[imageIndex];
 
+	switch (renderMode)
+	{
+	case DEFAULT_LIT:
+		submitInfo.pCommandBuffers = &commandBuffers[imageIndex];
+		break;
+	case WIREFRAME:
+		submitInfo.pCommandBuffers = &wireframeCommandBuffers[imageIndex];
+		break;
+	}
+	
 	VkSemaphore signalSemaphores[] = { renderFinishedSemaphores[currentFrame] };
 	submitInfo.signalSemaphoreCount = 1;
 	submitInfo.pSignalSemaphores = signalSemaphores;

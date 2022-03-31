@@ -165,7 +165,11 @@ public:
 
 	VkQueue getGraphicsQueue() { return graphicsQueue; }
 	
-	VkDescriptorPool getDescriptorPool() { return descriptorPool; }
+	VkDescriptorPool* getDescriptorPool() { return &descriptorPool; }
+
+	std::vector<VkCommandBuffer> getCommandBuffers() { return commandBuffers; }
+
+	VkCommandPool getCommandPool() { return commandPool; }
 
 	void setRenderMode(RenderMode mode);
 
@@ -215,6 +219,7 @@ private:
 	VkPipeline graphicsPipeline;
 	VkCommandPool commandPool;
 	std::vector<VkCommandBuffer> commandBuffers;
+	std::vector<VkCommandBuffer> wireframeCommandBuffers;
 	std::vector<VkDescriptorSet> descriptorSets;
 
 	Pipeline gPipeline;

@@ -1,5 +1,9 @@
 #include "Application.h"
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_vulkan.h"
+
 #define GLFW_INCLUDE_VULKAN
 #include <glfw3.h>
 
@@ -55,7 +59,7 @@ void Application::run()
 {
 	window->initWindow(keyCallback, cursorPosCallback, mouseButtonCallback, scrollCallback,framebufferResizeCallback, this);
 	vulkanRenderer = Renderer::initInstance(window);
-	InitImGui();
+	//InitImGui();
 	update();
 	cleanup();
 }
@@ -77,7 +81,7 @@ void Application::update()
 		glfwPollEvents();
 		processInput(window->getWindow());
 
-		UpdateImGUI();
+		//UpdateImGUI();
 		vulkanRenderer->drawFrame(dt);
 	}
 
@@ -91,6 +95,9 @@ void Application::cleanup()
 
 	//glfwDestroyWindow(window);
 	window->cleanupWindow();
+
+	//ImGui_ImplVulkan_Shutdown();
+	//ImGui::DestroyContext();
 	glfwTerminate();
 
 	// Call renderer cleanup
@@ -117,12 +124,12 @@ void Application::processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
 	{
 		vulkanRenderer->setRenderMode(DEFAULT_LIT);
-		vulkanRenderer->recreateSwapChain();
+		//vulkanRenderer->recreateSwapChain();
 	}
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
 	{
 		vulkanRenderer->setRenderMode(WIREFRAME);
-		vulkanRenderer->recreateSwapChain();
+		//vulkanRenderer->recreateSwapChain();
 	}
 
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE)
@@ -151,7 +158,7 @@ void Application::processInput(GLFWwindow* window)
 void Application::InitImGui()
 {
 	ImGui::CreateContext();
-	/*ImGui::StyleColorsDark();
+	ImGui::StyleColorsDark();
 
 	ImGui_ImplGlfw_InitForVulkan(window->getWindow(), true);
 
@@ -160,7 +167,7 @@ void Application::InitImGui()
 	init_info.PhysicalDevice = vulkanRenderer->getPhysicalDevice();
 	init_info.Device = vulkanRenderer->getDevice();
 	init_info.Queue = vulkanRenderer->getGraphicsQueue();
-	init_info.DescriptorPool = vulkanRenderer->getDescriptorPool();
+	init_info.DescriptorPool = *vulkanRenderer->getDescriptorPool();
 	init_info.MinImageCount = 3;
 	init_info.ImageCount = 3;
 	init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
@@ -170,7 +177,32 @@ void Application::InitImGui()
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
-	io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;*/
+	io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+
+	// Upload Fonts
+	{
+		// Use any command queue
+		VkCommandPool command_pool = vulkanRenderer->getCommandPool();
+		VkCommandBuffer command_buffer = vulkanRenderer->getCommandBuffers()[0];
+
+		VkResult err = vkResetCommandPool(vulkanRenderer->getDevice(), command_pool, 0);
+		VkCommandBufferBeginInfo begin_info = {};
+		begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		begin_info.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+		err = vkBeginCommandBuffer(command_buffer, &begin_info);
+
+		ImGui_ImplVulkan_CreateFontsTexture(command_buffer);
+
+		VkSubmitInfo end_info = {};
+		end_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		end_info.commandBufferCount = 1;
+		end_info.pCommandBuffers = &command_buffer;
+		err = vkEndCommandBuffer(command_buffer);
+		err = vkQueueSubmit(vulkanRenderer->getGraphicsQueue(), 1, &end_info, VK_NULL_HANDLE);
+
+		err = vkDeviceWaitIdle(vulkanRenderer->getDevice());
+		ImGui_ImplVulkan_DestroyFontUploadObjects();
+	}
 
 	//TEMP: Should make own key codes
 	//io.KeyMap[ImGuiKey_]
@@ -178,7 +210,43 @@ void Application::InitImGui()
 
 void Application::UpdateImGUI()
 {
+	bool show_demo_window = true;
+	bool show_another_window = false;
+	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+	ImGui_ImplVulkan_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+
+	// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+	if (show_demo_window)
+		ImGui::ShowDemoWindow(&show_demo_window);
+
+	// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+	{
+		static float f = 0.0f;
+		static int counter = 0;
+
+		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+		ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+		ImGui::Checkbox("Another Window", &show_another_window);
+
+		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+		ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+			counter++;
+		ImGui::SameLine();
+		ImGui::Text("counter = %d", counter);
+
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::End();
+	}
+
+	ImGui::Render();
+	ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), vulkanRenderer->getCommandBuffers()[0], *vulkanRenderer->getActivePipeline().getPipeline());
 }
 
 void Application::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
