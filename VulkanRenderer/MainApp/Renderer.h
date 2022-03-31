@@ -107,6 +107,9 @@ public:
 
 	void createCommandBuffers();
 
+	void createCommandBuffer(std::vector<VkCommandBuffer>& buffers, VkCommandBufferAllocateInfo allocInfo, 
+							 Pipeline pipeline, std::vector<VkDescriptorSet>& desc);
+
 	void createSyncObjects();
 
 	void createDescriptorSetLayout();
@@ -220,6 +223,7 @@ private:
 	VkCommandPool commandPool;
 	std::vector<VkCommandBuffer> commandBuffers;
 	std::vector<VkCommandBuffer> wireframeCommandBuffers;
+	std::vector<VkCommandBuffer> imguiCommandBuffers;
 	std::vector<VkDescriptorSet> descriptorSets;
 
 	Pipeline gPipeline;

@@ -534,12 +534,15 @@ void Renderer::createCommandBuffers()
 {
 	commandBuffers.resize(swapChainFramebuffers.size());
 	wireframeCommandBuffers.resize(swapChainFramebuffers.size());
+	imguiCommandBuffers.resize(swapChainFramebuffers.size());
 
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.commandPool = commandPool;
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
+
+	//createCommandBuffer(commandBuffers, allocInfo, gPipeline, descriptorSets);
 
 	if (vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS)
 	{
@@ -577,26 +580,11 @@ void Renderer::createCommandBuffers()
 		gPipeline.bindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS);
 		vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, gPipeline.getPipelineLayout(), 0, 1, &descriptorSets[i], 0, nullptr);
 
-		/*switch (renderMode)
-		{
-		case DEFAULT_LIT:
-			gPipeline.bindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS);
-			vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, gPipeline.getPipelineLayout(), 0, 1, &descriptorSets[i], 0, nullptr);
-			break;
-		case WIREFRAME:
-			wireframePipeline.bindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS);
-			vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, wireframePipeline.getPipelineLayout(), 0, 1, &descriptorSets[i], 0, nullptr);
-			break;
-		}*/
-		
-
 		VkBuffer vertexbuffers[] = { vertexBuffer.buffer };
 		VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexbuffers, offsets);
 
 		vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT32);
-
-		//vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[i], 0, nullptr);
 		
 		vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 		vkCmdEndRenderPass(commandBuffers[i]);
@@ -607,13 +595,13 @@ void Renderer::createCommandBuffers()
 		}
 	}
 
-	wireframeCommandBuffers.resize(swapChainFramebuffers.size());
-
 	VkCommandBufferAllocateInfo wireframeAllocInfo{};
 	wireframeAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	wireframeAllocInfo.commandPool = commandPool;
 	wireframeAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	wireframeAllocInfo.commandBufferCount = (uint32_t)wireframeCommandBuffers.size();
+
+	//createCommandBuffer(wireframeCommandBuffers, wireframeAllocInfo, wireframePipeline, descriptorSets);
 
 	if (vkAllocateCommandBuffers(device, &wireframeAllocInfo, wireframeCommandBuffers.data()) != VK_SUCCESS)
 	{
@@ -657,12 +645,65 @@ void Renderer::createCommandBuffers()
 
 		vkCmdBindIndexBuffer(wireframeCommandBuffers[i], indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT32);
 
-		//vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[i], 0, nullptr);
-
 		vkCmdDrawIndexed(wireframeCommandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 		vkCmdEndRenderPass(wireframeCommandBuffers[i]);
 
 		if (vkEndCommandBuffer(wireframeCommandBuffers[i]) != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to record command buffer!");
+		}
+	}
+}
+
+void Renderer::createCommandBuffer(std::vector<VkCommandBuffer>& buffers, VkCommandBufferAllocateInfo allocInfo, 
+								   Pipeline pipeline, std::vector<VkDescriptorSet>& descSets)
+{
+	if (vkAllocateCommandBuffers(device, &allocInfo, buffers.data()) != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to allocate command buffers!");
+	}
+
+	for (size_t i = 0; i < buffers.size(); i++)
+	{
+		VkCommandBufferBeginInfo beginInfo{};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		beginInfo.flags = 0; // Optional
+		beginInfo.pInheritanceInfo = nullptr; // Optional
+
+		if (vkBeginCommandBuffer(buffers[i], &beginInfo) != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to begin recording command buffer!");
+		}
+
+		VkRenderPassBeginInfo renderPassInfo{};
+		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		renderPassInfo.renderPass = renderPass;
+		renderPassInfo.framebuffer = swapChainFramebuffers[i];
+		renderPassInfo.renderArea.offset = { 0, 0 };
+		renderPassInfo.renderArea.extent = swapChainImageExtent;
+
+		std::array<VkClearValue, 2> clearValues{};
+		clearValues[0].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
+		clearValues[1].depthStencil = { 1.0f, 0 };
+
+		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+		renderPassInfo.pClearValues = clearValues.data();
+
+		vkCmdBeginRenderPass(buffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+		gPipeline.bindPipeline(buffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS);
+		vkCmdBindDescriptorSets(buffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.getPipelineLayout(), 0, 1, &descSets[i], 0, nullptr);
+
+		VkBuffer vertexbuffers[] = { vertexBuffer.buffer };
+		VkDeviceSize offsets[] = { 0 };
+		vkCmdBindVertexBuffers(buffers[i], 0, 1, vertexbuffers, offsets);
+
+		vkCmdBindIndexBuffer(buffers[i], indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT32);
+
+		vkCmdDrawIndexed(buffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+		vkCmdEndRenderPass(buffers[i]);
+
+		if (vkEndCommandBuffer(buffers[i]) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Failed to record command buffer!");
 		}
