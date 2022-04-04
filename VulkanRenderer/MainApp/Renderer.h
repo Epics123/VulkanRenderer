@@ -101,6 +101,8 @@ public:
 
 	void createRenderPass();
 
+	void createImguiRenderPass();
+
 	void createFrameBuffers();
 
 	void createCommandPool();
@@ -160,6 +162,8 @@ public:
 
 	VkRenderPass getRenderPass() { return renderPass; }
 
+	VkRenderPass getImguiRenderPass() { return imguiRenderPass; }
+
 	VkInstance getVulkanInstance() { return instance; }
 
 	VkPhysicalDevice getPhysicalDevice() { return physicalDevice; }
@@ -216,6 +220,7 @@ private:
 	std::vector<VkFramebuffer> swapChainFramebuffers;
 
 	VkRenderPass renderPass;
+	VkRenderPass imguiRenderPass;
 	VkPipelineLayout pipelineLayout;
 	VkDescriptorSetLayout descriptorSetLayout;
 	VkDescriptorPool descriptorPool;

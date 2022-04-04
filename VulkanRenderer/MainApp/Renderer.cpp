@@ -17,6 +17,10 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_vulkan.h"
+
 Renderer* Renderer::rendererInstance = nullptr;
 
 Renderer* Renderer::initInstance(Window* window)
@@ -470,7 +474,7 @@ void Renderer::createRenderPass()
 	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
 	dependency.srcAccessMask = 0;
 	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
 	std::array<VkAttachmentDescription, 2> attachments = { colorAttachment, depthAttachment };
 	VkRenderPassCreateInfo renderPassInfo{};
@@ -483,6 +487,67 @@ void Renderer::createRenderPass()
 	renderPassInfo.pDependencies = &dependency;
 
 	if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to create render pass!");
+	}
+}
+
+void Renderer::createImguiRenderPass()
+{
+	VkAttachmentDescription imguiColorAttachment{};
+	imguiColorAttachment.format = swapChainImageFormat;
+	imguiColorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+	imguiColorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+	imguiColorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+	imguiColorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	imguiColorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	imguiColorAttachment.initialLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+	imguiColorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+	// Subpasses
+	VkAttachmentReference imguiColorAttachmentRef{};
+	imguiColorAttachmentRef.attachment = 0;
+	imguiColorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+	VkAttachmentDescription imguiDepthAttachment{};
+	imguiDepthAttachment.format = findDepthFormat();
+	imguiDepthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+	imguiDepthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	imguiDepthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	imguiDepthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	imguiDepthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	imguiDepthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	imguiDepthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+	VkAttachmentReference imguiDepthAttachmentRef{};
+	imguiDepthAttachmentRef.attachment = 0;
+	imguiDepthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+	VkSubpassDescription imguiSubpass{};
+	imguiSubpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+	imguiSubpass.colorAttachmentCount = 1;
+	imguiSubpass.pColorAttachments = &imguiColorAttachmentRef;
+	imguiSubpass.pDepthStencilAttachment = &imguiDepthAttachmentRef;
+
+	VkSubpassDependency imguiDependency{};
+	imguiDependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+	imguiDependency.dstSubpass = 0;
+	imguiDependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+	imguiDependency.srcAccessMask = 0;
+	imguiDependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+	imguiDependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+	std::array<VkAttachmentDescription, 2> imguiAttachments = { imguiColorAttachment, imguiDepthAttachment };
+	VkRenderPassCreateInfo imguiRenderPassInfo{};
+	imguiRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+	imguiRenderPassInfo.attachmentCount = static_cast<uint32_t>(imguiAttachments.size());
+	imguiRenderPassInfo.pAttachments = imguiAttachments.data();
+	imguiRenderPassInfo.subpassCount = 1;
+	imguiRenderPassInfo.pSubpasses = &imguiSubpass;
+	imguiRenderPassInfo.dependencyCount = 1;
+	imguiRenderPassInfo.pDependencies = &imguiDependency;
+
+	if (vkCreateRenderPass(device, &imguiRenderPassInfo, nullptr, &imguiRenderPass) != VK_SUCCESS)
 	{
 		throw std::runtime_error("Failed to create render pass!");
 	}
@@ -1290,8 +1355,44 @@ bool Renderer::hasStencilComponent(VkFormat format)
 
 void Renderer::drawFrame(float dt)
 {
-	vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
+	//bool show_demo_window = true;
+	//bool show_another_window = false;
+	//ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+	//ImGui_ImplVulkan_NewFrame();
+	//ImGui_ImplGlfw_NewFrame();
+	//ImGui::NewFrame();
+
+	//// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+	//if (show_demo_window)
+	//	ImGui::ShowDemoWindow(&show_demo_window);
+
+	//// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+	//{
+	//	static float f = 0.0f;
+	//	static int counter = 0;
+
+	//	ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+	//	ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+	//	ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+	//	ImGui::Checkbox("Another Window", &show_another_window);
+
+	//	ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+	//	ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+	//	if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+	//		counter++;
+	//	ImGui::SameLine();
+	//	ImGui::Text("counter = %d", counter);
+
+	//	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	//	ImGui::End();
+	//}
+
+	//ImGui::Render();
+
+	vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
 	uint32_t imageIndex;
 	VkResult res = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
@@ -1339,6 +1440,50 @@ void Renderer::drawFrame(float dt)
 	{
 		throw std::runtime_error("Failed to submit draw command buffer!");
 	}
+
+	/*vkDeviceWaitIdle(device);
+
+	{
+		vkResetCommandPool(device, commandPool, 0);
+		VkCommandBufferBeginInfo info{};
+		info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		info.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+		VkResult res = vkBeginCommandBuffer(commandBuffers[imageIndex], &info);
+	}
+	{
+		VkClearValue clearValue = { {0.0f, 0.0f, 0.0f, 1.0f} };
+		VkRenderPassBeginInfo info{};
+		info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		info.renderPass = imguiRenderPass;
+		info.framebuffer = swapChainFramebuffers[imageIndex];
+		info.renderArea.extent.width = swapChainImageExtent.width;
+		info.renderArea.extent.height = swapChainImageExtent.height;
+		info.clearValueCount = 1;
+		info.pClearValues = &clearValue;
+		vkCmdBeginRenderPass(commandBuffers[imageIndex], &info, VK_SUBPASS_CONTENTS_INLINE);
+	}
+
+	ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffers[imageIndex], *getActivePipeline().getPipeline());
+
+	vkCmdEndRenderPass(commandBuffers[imageIndex]);
+	{
+		VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		VkSubmitInfo info = {};
+		info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		info.waitSemaphoreCount = 1;
+		info.pWaitSemaphores = waitSemaphores;
+		info.pWaitDstStageMask = &wait_stage;
+		info.commandBufferCount = 1;
+		info.pCommandBuffers = &commandBuffers[imageIndex];
+		info.signalSemaphoreCount = 1;
+		info.pSignalSemaphores = signalSemaphores;
+
+		VkResult res = vkEndCommandBuffer(commandBuffers[imageIndex]);
+		vkResetFences(device, 1, &inFlightFences[currentFrame]);
+		res = vkQueueSubmit(graphicsQueue, 1, &info, inFlightFences[currentFrame]);
+	}
+
+	vkDeviceWaitIdle(device);*/
 
 	VkPresentInfoKHR presentInfo{};
 	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;

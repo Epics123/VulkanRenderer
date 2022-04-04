@@ -157,8 +157,14 @@ void Application::processInput(GLFWwindow* window)
 
 void Application::InitImGui()
 {
+	vulkanRenderer->createImguiRenderPass();
+
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
+
+	ImGuiIO& io = ImGui::GetIO();
+	io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
+	io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
 
 	ImGui_ImplGlfw_InitForVulkan(window->getWindow(), true);
 
@@ -172,12 +178,7 @@ void Application::InitImGui()
 	init_info.ImageCount = 3;
 	init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
-	ImGui_ImplVulkan_Init(&init_info, vulkanRenderer->getRenderPass());
-
-
-	ImGuiIO& io = ImGui::GetIO();
-	io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
-	io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+	ImGui_ImplVulkan_Init(&init_info, vulkanRenderer->getImguiRenderPass());
 
 	// Upload Fonts
 	{
