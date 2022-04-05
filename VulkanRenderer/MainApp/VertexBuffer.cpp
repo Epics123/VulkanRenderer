@@ -76,13 +76,11 @@ void Buffer::copyBuffer(VkDevice device, VkCommandPool commandPool, VkQueue grap
 void Buffer::destroyBuffer(VkDevice device)
 {
 	vkDestroyBuffer(device, buffer, nullptr);
-	//memset(&buffer, 0, sizeof(VkBuffer));
 }
 
 void Buffer::freeBufferMemory(VkDevice device)
 {
 	vkFreeMemory(device, bufferMemory, nullptr);
-	//memset(&bufferMemory, 0, sizeof(VkDeviceMemory));
 }
 
 uint32_t Buffer::findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties)

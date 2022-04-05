@@ -2,6 +2,7 @@
 #define RENDERER_H
 
 #define GLFW_INCLUDE_VULKAN
+//#define IMGUI_DEBUG;
 
 #include <glfw3.h>
 #include <glfw3native.h>
@@ -57,6 +58,8 @@ public:
 	void operator=(Renderer const&) = delete;
 
 	void init();
+
+	void imguiInit();
 
 	// Create Vulkan instance that will interact with the application
 	void createVulkanInstance();
@@ -145,6 +148,10 @@ public:
 
 	bool hasStencilComponent(VkFormat format);
 
+	VkCommandBuffer beginSingleTimeCommands();
+
+	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+
 	void drawFrame(float dt);
 
 	// Clean up application
@@ -175,6 +182,8 @@ public:
 	VkDescriptorPool* getDescriptorPool() { return &descriptorPool; }
 
 	std::vector<VkCommandBuffer> getCommandBuffers() { return commandBuffers; }
+
+	std::vector<VkCommandBuffer> getImguiCommandBuffers() { return imguiCommandBuffers; }
 
 	VkCommandPool getCommandPool() { return commandPool; }
 

@@ -125,6 +125,42 @@ void Renderer::init()
 
 	mainCamera = Camera();
 	mainCamera.updateModel(0.0f);
+
+	imguiInit();
+}
+
+void Renderer::imguiInit()
+{
+	createImguiRenderPass();
+
+	ImGui::CreateContext();
+	ImGui::StyleColorsDark();
+
+	ImGuiIO& io = ImGui::GetIO();
+	io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
+	io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+
+	ImGui_ImplGlfw_InitForVulkan(window->getWindow(), true);
+
+	ImGui_ImplVulkan_InitInfo init_info = {};
+	init_info.Instance = instance;
+	init_info.PhysicalDevice = physicalDevice;
+	init_info.Device = device;
+	init_info.Queue = graphicsQueue;
+	init_info.DescriptorPool = descriptorPool;
+	init_info.MinImageCount = 3;
+	init_info.ImageCount = 3;
+	init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+
+	ImGui_ImplVulkan_Init(&init_info, imguiRenderPass);
+
+	// Upload Fonts
+	VkCommandBuffer fontCmdBuffer = beginSingleTimeCommands();
+	ImGui_ImplVulkan_CreateFontsTexture(fontCmdBuffer);
+	endSingleTimeCommands(fontCmdBuffer);
+
+	//TEMP: Should make own key codes
+	//io.KeyMap[ImGuiKey_]
 }
 
 void Renderer::createVulkanInstance()
@@ -532,10 +568,10 @@ void Renderer::createImguiRenderPass()
 	VkSubpassDependency imguiDependency{};
 	imguiDependency.srcSubpass = VK_SUBPASS_EXTERNAL;
 	imguiDependency.dstSubpass = 0;
-	imguiDependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+	imguiDependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 	imguiDependency.srcAccessMask = 0;
-	imguiDependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-	imguiDependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+	imguiDependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	imguiDependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
 	std::array<VkAttachmentDescription, 2> imguiAttachments = { imguiColorAttachment, imguiDepthAttachment };
 	VkRenderPassCreateInfo imguiRenderPassInfo{};
@@ -714,6 +750,65 @@ void Renderer::createCommandBuffers()
 		vkCmdEndRenderPass(wireframeCommandBuffers[i]);
 
 		if (vkEndCommandBuffer(wireframeCommandBuffers[i]) != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to record command buffer!");
+		}
+	}
+
+	VkCommandBufferAllocateInfo imguiAllocInfo{};
+	imguiAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	imguiAllocInfo.commandPool = commandPool;
+	imguiAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	imguiAllocInfo.commandBufferCount = (uint32_t)imguiCommandBuffers.size();
+
+	//createCommandBuffer(commandBuffers, allocInfo, gPipeline, descriptorSets);
+
+	if (vkAllocateCommandBuffers(device, &imguiAllocInfo, imguiCommandBuffers.data()) != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to allocate command buffers!");
+	}
+
+	for (size_t i = 0; i < imguiCommandBuffers.size(); i++)
+	{
+		VkCommandBufferBeginInfo beginInfo{};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		beginInfo.flags = 0; // Optional
+		beginInfo.pInheritanceInfo = nullptr; // Optional
+
+		if (vkBeginCommandBuffer(imguiCommandBuffers[i], &beginInfo) != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to begin recording command buffer!");
+		}
+
+		VkRenderPassBeginInfo renderPassInfo{};
+		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		renderPassInfo.renderPass = renderPass;
+		renderPassInfo.framebuffer = swapChainFramebuffers[i];
+		renderPassInfo.renderArea.offset = { 0, 0 };
+		renderPassInfo.renderArea.extent = swapChainImageExtent;
+
+		std::array<VkClearValue, 2> clearValues{};
+		clearValues[0].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
+		clearValues[1].depthStencil = { 1.0f, 0 };
+
+		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+		renderPassInfo.pClearValues = clearValues.data();
+
+		vkCmdBeginRenderPass(imguiCommandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+		gPipeline.bindPipeline(imguiCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS);
+		vkCmdBindDescriptorSets(imguiCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, gPipeline.getPipelineLayout(), 0, 1, &descriptorSets[i], 0, nullptr);
+
+		VkBuffer vertexbuffers[] = { vertexBuffer.buffer };
+		VkDeviceSize offsets[] = { 0 };
+		vkCmdBindVertexBuffers(imguiCommandBuffers[i], 0, 1, vertexbuffers, offsets);
+
+		vkCmdBindIndexBuffer(imguiCommandBuffers[i], indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT32);
+
+		vkCmdDrawIndexed(imguiCommandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+		vkCmdEndRenderPass(imguiCommandBuffers[i]);
+
+		if (vkEndCommandBuffer(imguiCommandBuffers[i]) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Failed to record command buffer!");
 		}
@@ -1353,45 +1448,49 @@ bool Renderer::hasStencilComponent(VkFormat format)
 	return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
 }
 
+VkCommandBuffer Renderer::beginSingleTimeCommands()
+{
+	VkCommandBufferAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandPool = commandPool;
+	allocInfo.commandBufferCount = 1;
+
+	VkCommandBuffer commandBuffer;
+	VkResult res = vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer);
+
+	VkCommandBufferBeginInfo beginInfo{};
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+	res = vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+	return commandBuffer;
+}
+
+void Renderer::endSingleTimeCommands(VkCommandBuffer commandBuffer)
+{
+	vkEndCommandBuffer(commandBuffer);
+
+	VkSubmitInfo submitInfo{};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &commandBuffer;
+
+	vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+	vkQueueWaitIdle(graphicsQueue);
+
+	vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
+}
+
 void Renderer::drawFrame(float dt)
 {
-	//bool show_demo_window = true;
-	//bool show_another_window = false;
-	//ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
-	//ImGui_ImplVulkan_NewFrame();
-	//ImGui_ImplGlfw_NewFrame();
-	//ImGui::NewFrame();
-
-	//// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-	//if (show_demo_window)
-	//	ImGui::ShowDemoWindow(&show_demo_window);
-
-	//// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-	//{
-	//	static float f = 0.0f;
-	//	static int counter = 0;
-
-	//	ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-	//	ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-	//	ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-	//	ImGui::Checkbox("Another Window", &show_another_window);
-
-	//	ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-	//	ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-	//	if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-	//		counter++;
-	//	ImGui::SameLine();
-	//	ImGui::Text("counter = %d", counter);
-
-	//	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-	//	ImGui::End();
-	//}
-
-	//ImGui::Render();
-
+	ImGui_ImplVulkan_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+	ImGui::ShowDemoWindow();
+	ImGui::Render();
+	
 	vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
 	uint32_t imageIndex;
@@ -1440,50 +1539,17 @@ void Renderer::drawFrame(float dt)
 	{
 		throw std::runtime_error("Failed to submit draw command buffer!");
 	}
-
-	/*vkDeviceWaitIdle(device);
-
+#ifdef IMGUI_DEBUG
 	{
-		vkResetCommandPool(device, commandPool, 0);
+		res = vkResetCommandPool(device, commandPool, 0);
+		if (res != VK_SUCCESS)
+			throw std::runtime_error("Failed to reset command pool!");
 		VkCommandBufferBeginInfo info{};
-		info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 		info.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-		VkResult res = vkBeginCommandBuffer(commandBuffers[imageIndex], &info);
+		//res = vkBeginCommandBuffer()
 	}
-	{
-		VkClearValue clearValue = { {0.0f, 0.0f, 0.0f, 1.0f} };
-		VkRenderPassBeginInfo info{};
-		info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		info.renderPass = imguiRenderPass;
-		info.framebuffer = swapChainFramebuffers[imageIndex];
-		info.renderArea.extent.width = swapChainImageExtent.width;
-		info.renderArea.extent.height = swapChainImageExtent.height;
-		info.clearValueCount = 1;
-		info.pClearValues = &clearValue;
-		vkCmdBeginRenderPass(commandBuffers[imageIndex], &info, VK_SUBPASS_CONTENTS_INLINE);
-	}
-
-	ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffers[imageIndex], *getActivePipeline().getPipeline());
-
-	vkCmdEndRenderPass(commandBuffers[imageIndex]);
-	{
-		VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		VkSubmitInfo info = {};
-		info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-		info.waitSemaphoreCount = 1;
-		info.pWaitSemaphores = waitSemaphores;
-		info.pWaitDstStageMask = &wait_stage;
-		info.commandBufferCount = 1;
-		info.pCommandBuffers = &commandBuffers[imageIndex];
-		info.signalSemaphoreCount = 1;
-		info.pSignalSemaphores = signalSemaphores;
-
-		VkResult res = vkEndCommandBuffer(commandBuffers[imageIndex]);
-		vkResetFences(device, 1, &inFlightFences[currentFrame]);
-		res = vkQueueSubmit(graphicsQueue, 1, &info, inFlightFences[currentFrame]);
-	}
-
-	vkDeviceWaitIdle(device);*/
+#endif
 
 	VkPresentInfoKHR presentInfo{};
 	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -1514,12 +1580,18 @@ void Renderer::cleanup()
 {
 	cleanupSwapChain();
 
+	ImGui_ImplVulkan_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+
 	vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
 
 	vkDestroySampler(device, textureSampler, nullptr);
 	vkDestroyImageView(device, textureImageView, nullptr);
 	vkDestroyImage(device, textureImage, nullptr);
 	vkFreeMemory(device, textureImageMemory, nullptr);
+
+	vkDestroyRenderPass(device, imguiRenderPass, nullptr);
 
 	vertexBuffer.destroyBuffer(device);
 	vertexBuffer.freeBufferMemory(device);

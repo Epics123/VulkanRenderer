@@ -21,10 +21,6 @@ private:
 
 	void processInput(GLFWwindow* window);
 
-	void InitImGui();
-
-	void UpdateImGUI();
-
 	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 	static void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
@@ -36,11 +32,9 @@ private:
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 private:
-	// REFACTOR
 	Renderer*vulkanRenderer;
 	Window* window;
 
-	// PRE_REFACTOR
 	const char* name;
 	uint32_t width;
 	uint32_t height;
