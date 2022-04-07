@@ -1464,7 +1464,36 @@ void Renderer::drawFrame(float dt)
 	ImGui_ImplVulkan_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
-	ImGui::ShowDemoWindow();
+	//ImGui::ShowDemoWindow();
+
+	bool debugActive = true;
+	ImGui::Begin("Debug Info", &debugActive, ImGuiWindowFlags_MenuBar);
+
+	const float my_values[] = { 0.2f, 0.1f, 1.0f, 0.5f, 0.9f, 2.2f };
+	ImGui::PlotLines("Frame Times", my_values, IM_ARRAYSIZE(my_values));
+
+	ImGui::NewLine();
+
+	ImGui::Text("Current Render Mode:");
+	ImGui::SameLine();
+	switch (renderMode)
+	{
+	case DEFAULT_LIT:
+		ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.0f, 1.0f), "Default Lit");
+		break;
+	case WIREFRAME:
+		ImGui::TextColored(ImVec4(0.0f, 0.8f, 0.8f, 1.0f), "Wireframe");
+		break;
+	}
+
+	ImGui::NewLine();
+	float camPos[3] = { mainCamera.position.x, mainCamera.position.y, mainCamera.position.z };
+	ImGui::DragFloat3("Camera Position", camPos);
+
+	float camRot[3] = { mainCamera.pitch, mainCamera.yaw, mainCamera.roll };
+	ImGui::DragFloat3("Camera Rotation", camRot);
+
+	ImGui::End();
 	ImGui::Render();
 	
 	vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
