@@ -1469,8 +1469,10 @@ void Renderer::drawFrame(float dt)
 	bool debugActive = true;
 	ImGui::Begin("Debug Info", &debugActive, ImGuiWindowFlags_MenuBar);
 
-	const float my_values[] = { 0.2f, 0.1f, 1.0f, 0.5f, 0.9f, 2.2f };
-	ImGui::PlotLines("Frame Times", my_values, IM_ARRAYSIZE(my_values));
+	ImGui::Text("FPS: %f", currentFramereate);
+	ImGui::SameLine();
+	ImGui::Text("%f ms", currentFrametime);
+	ImGui::PlotLines("Frame Times", framerateAvgs.data(), (uint32_t)framerateAvgs.size());
 
 	ImGui::NewLine();
 

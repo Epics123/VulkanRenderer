@@ -200,6 +200,10 @@ public:
 		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
 		void* pUserData);
 
+	std::array<float, 100> framerateAvgs;
+	float currentFramereate;
+	float currentFrametime;
+
 private:
 	Renderer(Window* appWindow);
 
@@ -271,8 +275,6 @@ private:
 	VkImage depthImage;
 	VkDeviceMemory depthImageMemory;
 	VkImageView depthImageView;
-
-	std::vector<float> framerateAvgs;
 
 	const std::vector<const char*> validationLayers =
 	{
