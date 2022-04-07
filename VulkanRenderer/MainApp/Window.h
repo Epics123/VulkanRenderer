@@ -15,7 +15,7 @@ class Window
 {
 public:
 	Window() = delete;
-	Window(const char* name, uint32_t width, uint32_t height);
+	Window(const char* name, uint32_t width, uint32_t height, bool canResize = false);
 
 	void initWindow(GLFWkeyfun keyCallback, GLFWcursorposfun cursorPosCallback, GLFWmousebuttonfun mouseButtonCallback, GLFWscrollfun mouseScrollCallback, GLFWframebuffersizefun framebufferResizeCallback, void*user);
 	void cleanupWindow();
@@ -28,6 +28,8 @@ private:
 	const char* name;
 	uint32_t width;
 	uint32_t height;
+
+	bool resizeable;
 
 	GLFWwindow* window;
 };

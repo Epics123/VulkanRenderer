@@ -1,9 +1,10 @@
 #include "Window.h"
 
-Window::Window(const char* name, uint32_t width, uint32_t height) :
+Window::Window(const char* name, uint32_t width, uint32_t height, bool canResize) :
 	name(name),
 	width(width),
-	height(height)
+	height(height),
+	resizeable(canResize)
 {
 	window = nullptr;
 }
@@ -13,7 +14,7 @@ void Window::initWindow(GLFWkeyfun keyCallback, GLFWcursorposfun cursorPosCallba
 	// Init GLFW
 	glfwInit();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+	glfwWindowHint(GLFW_RESIZABLE, resizeable);
 
 	// Create Window
 	window = glfwCreateWindow(width, height, name, nullptr, nullptr);

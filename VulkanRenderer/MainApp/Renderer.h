@@ -2,7 +2,6 @@
 #define RENDERER_H
 
 #define GLFW_INCLUDE_VULKAN
-//#define IMGUI_DEBUG;
 
 #include <glfw3.h>
 #include <glfw3native.h>
@@ -227,6 +226,7 @@ private:
 	std::vector<VkImage> swapChainImages;
 	std::vector<VkImageView> swapChainImageViews;
 	std::vector<VkFramebuffer> swapChainFramebuffers;
+	std::vector<VkFramebuffer> imguiFramebuffers;
 
 	VkRenderPass renderPass;
 	VkRenderPass imguiRenderPass;
@@ -235,6 +235,7 @@ private:
 	VkDescriptorPool descriptorPool;
 	VkPipeline graphicsPipeline;
 	VkCommandPool commandPool;
+	VkCommandPool imguiCommandPool;
 	std::vector<VkCommandBuffer> commandBuffers;
 	std::vector<VkCommandBuffer> wireframeCommandBuffers;
 	std::vector<VkCommandBuffer> imguiCommandBuffers;
@@ -251,9 +252,12 @@ private:
 	std::vector<VkFence> imagesInFlight;
 	size_t currentFrame = 0;
 	bool framebufferResized = false;
+	bool canResizeWindow = false;
 
 	VertexSTDVector vertices;
 	IndexSTDVector indices;
+
+	VkClearValue clearValue = { {0.0f, 0.0f, 0.0f, 1.0f}};
 
 	VertexBuffer vertexBuffer;
 	IndexBuffer indexBuffer;
