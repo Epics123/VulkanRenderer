@@ -71,11 +71,7 @@ void Application::framebufferResizeCallback(GLFWwindow* window, int width, int h
 
 void Application::update()
 {
-	double prevTime = 0.0;
-	double curTime = 0.0;
-	double timeDif;
-	uint32_t counter = 0;
-	uint32_t framerateIndex = 0;
+	lastFrame = glfwGetTime();
 
 	while (!glfwWindowShouldClose(window->getWindow()))
 	{
@@ -83,27 +79,12 @@ void Application::update()
 		dt = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		curTime = glfwGetTime();
-		timeDif = curTime - prevTime;
-		counter++;
-		if (timeDif >= 1.0f / 30.0f)
-		{
-			if(framerateIndex >= vulkanRenderer->framerateAvgs.size())
-				framerateIndex = 0;
-
-			vulkanRenderer->framerateAvgs[framerateIndex] = (1.0f / timeDif) * counter;
-			vulkanRenderer->currentFramereate = vulkanRenderer->framerateAvgs[framerateIndex];
-			vulkanRenderer->currentFrametime = (timeDif / counter) * 1000;
-
-			framerateIndex++;
-			prevTime = curTime;
-			counter = 0;
-		}
-
 		glfwPollEvents();
 		processInput(window->getWindow());
 
 		vulkanRenderer->drawFrame(dt);
+
+		calculateFramerate();
 	}
 
 	vulkanRenderer->deviceWaitIdle();
@@ -171,6 +152,23 @@ void Application::processInput(GLFWwindow* window)
 		lastMouseY = (float)mouseY;
 
 		vulkanRenderer->getActiveCamera().updateCameraRotation(mouseOffsetX, -mouseOffsetY, 0.0f);
+	}
+}
+
+void Application::calculateFramerate()
+{
+	curTime = glfwGetTime();
+	timeDif = curTime - prevTime;
+	frameCounter++;
+	if (timeDif >= 1.0f / 30.0f)
+	{
+		vulkanRenderer->currentFramerate = (1.0f / (float)timeDif) * frameCounter;
+		vulkanRenderer->currentFrametime = (float)(timeDif / frameCounter) * 1000;
+
+
+		framerateIndex++;
+		prevTime = curTime;
+		frameCounter = 0;
 	}
 }
 

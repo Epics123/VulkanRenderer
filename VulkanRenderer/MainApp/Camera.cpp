@@ -74,6 +74,7 @@ void Camera::updateModel(float dt)
 	forward = invOrient * glm::vec3(0.0f, 0.0f, 1.0f);
 	up = invOrient * glm::vec3(0.0f, 1.0f, 0.0f);
 	right = glm::normalize(glm::cross(forward, up));
+	rotation = glm::vec3(pitch, yaw, roll);
 
 	invModel = rotate * translate;
 }

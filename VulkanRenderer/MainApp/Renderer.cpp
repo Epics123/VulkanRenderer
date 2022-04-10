@@ -20,6 +20,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_vulkan.h"
+#include "imgui_internal.h"
 
 Renderer* Renderer::rendererInstance = nullptr;
 
@@ -380,6 +381,63 @@ std::vector<char> Renderer::readBinaryFile(const std::string& filename)
 	file.close();
 
 	return buffer;
+}
+
+void Renderer::DrawVec3Control(const char* label, glm::vec3& values, float resetValue, float columnWidth)
+{
+	ImGui::PushID(label);
+
+	ImGui::Columns(2);
+
+	ImGui::SetColumnWidth(0, columnWidth);
+	ImGui::Text(label);
+	ImGui::NextColumn();
+
+	ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0});
+
+	float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+	ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.9f, 0.2f, 0.2f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
+	if(ImGui::Button("X", buttonSize))
+		values.x = resetValue;
+	ImGui::PopStyleColor(3);
+	
+	ImGui::SameLine();
+	ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::PopItemWidth();
+	ImGui::SameLine();
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.3f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.3f, 1.0f });
+	if (ImGui::Button("Y", buttonSize))
+		values.y = resetValue;
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine();
+	ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::PopItemWidth();
+	ImGui::SameLine();
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+	if (ImGui::Button("Z", buttonSize))
+		values.z = resetValue;
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine();
+	ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::PopItemWidth();
+
+	ImGui::PopStyleVar();
+
+	ImGui::Columns(1);
+	ImGui::PopID();
 }
 
 void Renderer::createImageViews()
@@ -1016,7 +1074,9 @@ VkPresentModeKHR Renderer::chooseSwapPresentMode(const std::vector<VkPresentMode
 	for (int i = 0; i < availablePresentModes.size(); i++)
 	{
 		VkPresentModeKHR currentPresentMode = availablePresentModes.at(i);
-		if (currentPresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
+		if (currentPresentMode == VK_PRESENT_MODE_FIFO_KHR)
+			return currentPresentMode;
+		else if (currentPresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
 			return currentPresentMode;
 	}
 
@@ -1469,10 +1529,9 @@ void Renderer::drawFrame(float dt)
 	bool debugActive = true;
 	ImGui::Begin("Debug Info", &debugActive, ImGuiWindowFlags_MenuBar);
 
-	ImGui::Text("FPS: %f", currentFramereate);
+	ImGui::Text("FPS: %f /", currentFramerate);
 	ImGui::SameLine();
 	ImGui::Text("%f ms", currentFrametime);
-	ImGui::PlotLines("Frame Times", framerateAvgs.data(), (uint32_t)framerateAvgs.size());
 
 	ImGui::NewLine();
 
@@ -1489,11 +1548,9 @@ void Renderer::drawFrame(float dt)
 	}
 
 	ImGui::NewLine();
-	float camPos[3] = { mainCamera.position.x, mainCamera.position.y, mainCamera.position.z };
-	ImGui::DragFloat3("Camera Position", camPos);
 
-	float camRot[3] = { mainCamera.pitch, mainCamera.yaw, mainCamera.roll };
-	ImGui::DragFloat3("Camera Rotation", camRot);
+	DrawVec3Control("Camera Position", mainCamera.position, 0.0f, 120.0f);
+	DrawVec3Control("Camera Rotation", mainCamera.rotation, 0.0f, 120.0f);
 
 	ImGui::End();
 	ImGui::Render();
@@ -1506,7 +1563,7 @@ void Renderer::drawFrame(float dt)
 	{
 		framebufferResized = false;
 		recreateSwapChain();
-		ImGui_ImplVulkan_SetMinImageCount(swapChainImages.size());
+		ImGui_ImplVulkan_SetMinImageCount((uint32_t)swapChainImages.size());
 		return;
 	}
 	else if (res != VK_SUCCESS && res != VK_SUBOPTIMAL_KHR)

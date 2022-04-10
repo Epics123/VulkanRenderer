@@ -194,14 +194,15 @@ public:
 
 	static std::vector<char> readBinaryFile(const std::string& filename);
 
+	static void DrawVec3Control(const char* label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f);
+
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 		VkDebugUtilsMessageTypeFlagsEXT messageType,
 		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
 		void* pUserData);
 
-	std::array<float, 100> framerateAvgs;
-	float currentFramereate;
+	float currentFramerate;
 	float currentFrametime;
 
 private:

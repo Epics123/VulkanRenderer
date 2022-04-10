@@ -21,6 +21,8 @@ private:
 
 	void processInput(GLFWwindow* window);
 
+	void calculateFramerate();
+
 	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 	static void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
@@ -51,6 +53,12 @@ private:
 	double mouseX, mouseY;
 	float mouseOffsetX, mouseOffsetY;
 	bool firstMouse;
+
+	double prevTime = 0.0;
+	double curTime = 0.0;
+	double timeDif;
+	uint32_t frameCounter = 0;
+	uint32_t framerateIndex = 0;
 	
 	static inline bool moveCamera = false;
 };
