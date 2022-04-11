@@ -20,20 +20,21 @@ void main() {
 
    // vec4 tmpLightPosition = vec4(10.0f, 0.0f, 0.0f, 1.0f);
 
-    vec4 lookDir = normalize(vLightPos - vPosition);
+    vec4 lookDir = vec4(normalize(vLightPos.xyz - vPosition.xyz), 0.0f);
     //vec4 lookDir = normalize(vLightPos - vPosition);
-    vec4 normal = normalize(vNormal);
+    vec4 normal = vec4(normalize(vNormal.xyz), 0.0f);
     vec4 diffAlbedo = vec4(0.9f, 0.8f, 0.7f, 1.0f);
     vec4 specAlbedo = vec4(0.7f, 0.8f, 0.9f, 1.0f);
     //vec4 diffCoef = max(dot(normal, lookDir), 0.0f) * diffAlbedo;
     vec4 ambient = vec4(0.05f, 0.05f, 0.06f, 0.0f);
-    vec4 view = normalize(-vPosition);
-    vec4 reflection = reflect(-lookDir, normal);
+    vec4 view = vec4(normalize(-vPosition.xyz), 0.0f);
+    vec4 reflection = vec4(reflect(-lookDir.xyz, normal.xyz), 0.0f);
 
     vec4 diffCoef = max(dot(normal, lookDir), 0.0f) * diffAlbedo;// * vIntensity;
     vec4 specCoef = pow(max(dot(reflection, view), 0.0f), 4) * specAlbedo;
 
     outColor = texture(texSampler, fragTexCoord);
+    //outColor = vec4(normal.xyz, 1.0f);
     outColor *= (diffCoef + specCoef) + ambient;
 
 

@@ -40,14 +40,18 @@ void main() {
     lightModel[0] = vec4(1.0f, 0.0f, 0.0f, 0.0f);
     lightModel[1] = vec4(0.0f, 1.0f, 0.0f, 0.0f);
     lightModel[2] = vec4(0.0f, 0.0f, 1.0f, 0.0f);
-    lightModel[3] = vec4(10.0f, 10.0f, 2.0f, 1.0f);
+    lightModel[3] = vec4(10.0f, 10.0f, -2.0f, 1.0f);
     //vec4 tmpLightPosition = vec4(10.0f, 0.0f, 0.0f, 1.0f);
+   // lightModel = transpose(lightModel);
 
     mat4 mv = ubo.model * ubo.view;
     vPosition = mv * vec4(aPosition, 1.0f);
+    //vPosition = ubo.mvp * vec4(aPosition, 1.0f);
     gl_Position = ubo.proj * vPosition;
-    vNormal = transpose(mv) * vec4(aNormal, 0.0f);
+    vNormal = vec4((transpose(ubo.model) * vec4(aNormal, 0.0f)).xyz, 0.0f);
+    //vNormal = vec4((mv * vec4(aNormal, 0.0f)).xyz, 0.0f);
     //vNormal = mv * vec4(aNormal, 0.0f);
     //vLightPos = ubo.mvp * vec4(aLightPos, 1.0f);
     vLightPos = lightModel * ubo.view * vec4(aLightPos, 1.0f);
+    //vLightPos = ubo.view * vec4(aLightPos, 1.0f);
 }
