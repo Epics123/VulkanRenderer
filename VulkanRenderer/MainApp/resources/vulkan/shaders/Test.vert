@@ -29,6 +29,7 @@ layout(location = 3) out vec4 vPosition;
 layout(location = 4) out vec4 vLightPos;
 layout(location = 5) out vec4 vDiffuse;
 layout(location = 6) out float vIntensity;
+layout(location = 7) out vec4 vCameraPos;
 
 mat4 lightModel;
 
@@ -40,7 +41,7 @@ void main() {
     lightModel[0] = vec4(1.0f, 0.0f, 0.0f, 0.0f);
     lightModel[1] = vec4(0.0f, 1.0f, 0.0f, 0.0f);
     lightModel[2] = vec4(0.0f, 0.0f, 1.0f, 0.0f);
-    lightModel[3] = vec4(10.0f, 10.0f, -2.0f, 1.0f);
+    lightModel[3] = vec4(aLightPos.xyz, 1.0f);
     //vec4 tmpLightPosition = vec4(10.0f, 0.0f, 0.0f, 1.0f);
    // lightModel = transpose(lightModel);
 
@@ -54,4 +55,6 @@ void main() {
     //vLightPos = ubo.mvp * vec4(aLightPos, 1.0f);
     vLightPos = lightModel * ubo.view * vec4(aLightPos, 1.0f);
     //vLightPos = ubo.view * vec4(aLightPos, 1.0f);
+
+    vCameraPos = vec4(inverse(ubo.view)[3].xyz, 1.0f);
 }
