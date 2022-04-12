@@ -96,6 +96,7 @@ struct UniformBufferObject
 struct LightUniformBufferObject 
 {
 	glm::mat4 model;
+	Light pointLights[1];
 };
 
 
