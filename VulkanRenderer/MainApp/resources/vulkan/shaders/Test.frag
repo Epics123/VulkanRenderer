@@ -25,8 +25,8 @@ void main() {
     vec4 lookDir = vec4(normalize(vCameraPos.xyz - vPosition.xyz), 0.0f);
     //vec4 lookDir = normalize(vLightPos - vPosition);
     vec4 normal = vec4(normalize(vNormal.xyz), 0.0f);
-    vec4 diffAlbedo = vec4(0.9f, 0.8f, 0.7f, 1.0f);
-    vec4 specAlbedo = vec4(0.7f, 0.8f, 0.9f, 1.0f);
+    vec4 diffAlbedo = vec4(0.9f, 0.8f, 0.7f, 0.0f);
+    vec4 specAlbedo = vec4(0.7f, 0.8f, 0.9f, 0.0f);
     //vec4 diffCoef = max(dot(normal, lookDir), 0.0f) * diffAlbedo;
     vec4 ambient = vec4(0.05f, 0.05f, 0.06f, 0.0f);
     vec4 view = vec4(normalize(-vPosition.xyz), 0.0f);
@@ -37,7 +37,7 @@ void main() {
 
     outColor = texture(texSampler, fragTexCoord);
     //outColor = vec4(normal.xyz, 1.0f);
-    outColor *= (diffCoef + specCoef);// + ambient;
+    outColor.rgb *= (diffCoef + specCoef);// + ambient;
     //outColor *= (specCoef);// + ambient;
 
 

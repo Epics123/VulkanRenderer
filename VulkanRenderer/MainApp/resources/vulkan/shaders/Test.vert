@@ -16,7 +16,7 @@ layout(location = 1) in vec3 aColor;
 layout(location = 2) in vec2 aTexCoord;
 layout(location = 3) in vec3 aNormal;
 
-// Lighting attributes
+// Lighting attributes -> should be uniforms
 layout(location = 4) in vec3 aLightPos;
 layout(location = 5) in vec4 aDiffuse;
 layout(location = 6) in float aIntensity;
