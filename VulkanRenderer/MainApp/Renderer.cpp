@@ -1147,10 +1147,12 @@ void Renderer::createDescriptorSetLayout()
 void Renderer::createUniformBuffers()
 {
 	uniformBuffers.resize(swapChainImages.size());
+	lightUniformBuffers.resize(swapChainImages.size());
 
 	for (size_t i = 0; i < swapChainImages.size(); i++)
 	{
-		uniformBuffers[i].createUniformBuffer(device, physicalDevice, commandPool, graphicsQueue);
+		uniformBuffers[i].createUniformBuffer(device, physicalDevice, commandPool, graphicsQueue, sizeof(UniformBufferObject));
+		lightUniformBuffers[i].createUniformBuffer(device, physicalDevice, commandPool, graphicsQueue, sizeof(LightUniformBufferObject));
 	}
 }
 
@@ -1225,12 +1227,6 @@ void Renderer::createDescriptorSets()
 
 void Renderer::updateUniformBuffer(uint32_t currentImage, float dt)
 {
-	// Temp timer code
-	//static auto startTime = std::chrono::high_resolution_clock::now();
-	//auto currentTime = std::chrono::high_resolution_clock::now();
-
-	//float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
 	mainCamera.updateModel(dt);
 
 	UniformBufferObject ubo{};
@@ -1244,6 +1240,14 @@ void Renderer::updateUniformBuffer(uint32_t currentImage, float dt)
 	vkMapMemory(device, uniformBuffers[currentImage].bufferMemory, 0, sizeof(ubo), 0, &data);
 	memcpy(data, &ubo, sizeof(ubo));
 	vkUnmapMemory(device, uniformBuffers[currentImage].bufferMemory);
+
+	LightUniformBufferObject lightUbo{};
+	lightUbo.model = glm::mat4(1.0f);
+
+	void* lightData;
+	vkMapMemory(device, lightUniformBuffers[currentImage].bufferMemory, 0, sizeof(lightUbo), 0, &lightData);
+	memcpy(lightData, &lightUbo, sizeof(lightUbo));
+	vkUnmapMemory(device, lightUniformBuffers[currentImage].bufferMemory);
 }
 
 void Renderer::cleanupSwapChain()

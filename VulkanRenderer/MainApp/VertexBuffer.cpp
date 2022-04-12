@@ -125,9 +125,9 @@ VkResult IndexBuffer::createIndexBuffer(VkDevice device, IndexSTDVector indicies
 	return result;
 }
 
-VkResult UniformBuffer::createUniformBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue)
+VkResult UniformBuffer::createUniformBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue, VkDeviceSize bufferSize)
 {
-	VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+	//VkDeviceSize bufferSize = sizeof(UniformBufferObject);
 
 	VkResult result = createBuffer(device, physicalDevice, bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, 
 									VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 

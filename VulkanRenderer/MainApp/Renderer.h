@@ -267,6 +267,7 @@ private:
 	VertexBuffer vertexBuffer;
 	IndexBuffer indexBuffer;
 	std::vector<UniformBuffer> uniformBuffers;
+	std::vector<UniformBuffer> lightUniformBuffers;
 
 	VkImage textureImage;
 	VkDeviceMemory textureImageMemory;

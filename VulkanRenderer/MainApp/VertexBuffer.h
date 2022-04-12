@@ -93,6 +93,11 @@ struct UniformBufferObject
 	glm::mat4 mvp;
 };
 
+struct LightUniformBufferObject 
+{
+	glm::mat4 model;
+};
+
 
 typedef std::vector<Vertex> VertexSTDVector;
 typedef std::vector<uint32_t> IndexSTDVector;
@@ -127,5 +132,5 @@ struct IndexBuffer : Buffer
 
 struct UniformBuffer : Buffer
 {
-	VkResult createUniformBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue);
+	VkResult createUniformBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue, VkDeviceSize bufferSize);
 };
