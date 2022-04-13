@@ -1134,7 +1134,7 @@ void Renderer::createDescriptorSetLayout()
 
 	VkDescriptorSetLayoutBinding lightLayoutBinding{};
 	lightLayoutBinding.binding = 2;
-	lightLayoutBinding.descriptorCount = 1;
+	lightLayoutBinding.descriptorCount = 1;	// TODO: maybe the count of the lights?
 	lightLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	lightLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 	lightLayoutBinding.pImmutableSamplers = nullptr;
@@ -1265,9 +1265,9 @@ void Renderer::updateUniformBuffer(uint32_t currentImage, float dt)
 
 	LightUniformBufferObject lightUbo{};	// TODO: get light position data from vertex buffer
 	lightUbo.model = glm::mat4(1.0f);
-	lightUbo.model[3].x = 0.0f;
-	lightUbo.model[3].y = 0.0f;
-	lightUbo.model[3].z = 2.0f;
+	lightUbo.model[3].x = -2.0f;
+	lightUbo.model[3].y = -2.0f;
+	lightUbo.model[3].z = -2.0f;
 
 	void* lightData;
 	vkMapMemory(device, lightUniformBuffers[currentImage].bufferMemory, 0, sizeof(lightUbo), 0, &lightData);
