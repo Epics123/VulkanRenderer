@@ -37,7 +37,8 @@ void main() {
 
     outColor = texture(texSampler, fragTexCoord);
     //outColor = vec4(normal.xyz, 1.0f);
-    outColor.rgb *= (diffCoef + specCoef);// + ambient;
+    //outColor.rgb *= (diffCoef + specCoef);// + ambient;
+    outColor = vec4((outColor * (diffCoef + specCoef)).rgb, outColor.a);
     //outColor *= (specCoef);// + ambient;
 
 

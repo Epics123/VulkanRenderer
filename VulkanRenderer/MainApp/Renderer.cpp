@@ -1241,8 +1241,11 @@ void Renderer::updateUniformBuffer(uint32_t currentImage, float dt)
 	memcpy(data, &ubo, sizeof(ubo));
 	vkUnmapMemory(device, uniformBuffers[currentImage].bufferMemory);
 
-	LightUniformBufferObject lightUbo{};
+	LightUniformBufferObject lightUbo{};	// TODO: get light position data from vertex buffer
 	lightUbo.model = glm::mat4(1.0f);
+	lightUbo.model[3].x = 0.0f;
+	lightUbo.model[3].y = 0.0f;
+	lightUbo.model[3].z = 2.0f;
 
 	void* lightData;
 	vkMapMemory(device, lightUniformBuffers[currentImage].bufferMemory, 0, sizeof(lightUbo), 0, &lightData);
