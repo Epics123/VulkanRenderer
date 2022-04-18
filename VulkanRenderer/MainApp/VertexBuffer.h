@@ -97,6 +97,7 @@ struct LightUniformBufferObject
 {
 	glm::mat4 model;
 	Light pointLights[1];
+	glm::vec3 cameraPos;
 };
 
 
