@@ -4,6 +4,7 @@
 layout(binding = 0) uniform UniformBufferObject
 {
     mat4 model;
+    mat4 normalModel;
     mat4 view;
     mat4 proj;
     mat4 mvp;
@@ -36,5 +37,5 @@ void main() {
     mat4 mv = ubo.model * ubo.view;
     vPosition = mv * vec4(aPosition, 1.0f);
     gl_Position = ubo.proj * vPosition;
-    vNormal = vec4((transpose(ubo.model) * vec4(aNormal, 0.0f)).xyz, 0.0f);
+    vNormal = vec4((ubo.normalModel * vec4(aNormal, 0.0f)).xyz, 0.0f);
 }
