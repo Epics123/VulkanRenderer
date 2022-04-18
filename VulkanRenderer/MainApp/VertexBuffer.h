@@ -13,14 +13,14 @@
 
 struct Vertex
 {
-	static const int VERTEX_ATTRIB_COUNT = 4 + Light::LIGHT_ATTRIB_COUNT;
+	static const int VERTEX_ATTRIB_COUNT = 4;// +Light::LIGHT_ATTRIB_COUNT;
 	static const int WIREFRAME_VERT_ATTRIB_COUNT = 1;
 
 	glm::vec3 pos;
 	glm::vec3 color;
 	glm::vec2 texCoord;
 	glm::vec3 vertexNormal;
-	Light light;
+	//Light light;
 
 	static VkVertexInputBindingDescription getBindingDescription()
 	{
@@ -55,7 +55,7 @@ struct Vertex
 		attributeDescriptions[3].format = VK_FORMAT_R32G32B32_SFLOAT;
 		attributeDescriptions[3].offset = offsetof(Vertex, vertexNormal);
 
-		attributeDescriptions[4].binding = 0;
+		/*attributeDescriptions[4].binding = 0;
 		attributeDescriptions[4].location = 4;
 		attributeDescriptions[4].format = VK_FORMAT_R32G32B32_SFLOAT;
 		attributeDescriptions[4].offset = offsetof(Light, pos);
@@ -68,7 +68,7 @@ struct Vertex
 		attributeDescriptions[6].binding = 0;
 		attributeDescriptions[6].location = 6;
 		attributeDescriptions[6].format = VK_FORMAT_R32_SFLOAT;
-		attributeDescriptions[6].offset = offsetof(Light, intensity);
+		attributeDescriptions[6].offset = offsetof(Light, intensity);*/
 
 		return attributeDescriptions;
 	}
@@ -92,6 +92,7 @@ struct UniformBufferObject
 	glm::mat4 view;
 	glm::mat4 proj;
 	glm::mat4 mvp;
+	glm::mat4 mv;
 };
 
 struct LightUniformBufferObject 
@@ -99,6 +100,8 @@ struct LightUniformBufferObject
 	glm::mat4 model;
 	Light pointLights[1];
 	glm::vec3 cameraPos;
+	glm::vec3 ambientColor = glm::vec3(0.05f, 0.05f, 0.06f);
+	float ambientIntensity = 1.0f;
 };
 
 

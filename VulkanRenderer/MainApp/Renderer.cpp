@@ -1258,6 +1258,7 @@ void Renderer::updateUniformBuffer(uint32_t currentImage, float dt)
 	ubo.proj[1][1] *= -1;
 	ubo.mvp = ubo.proj * ubo.view * ubo.model;
 	ubo.normalModel = glm::transpose(glm::inverse(ubo.model));
+	ubo.mv = ubo.view * ubo.model;
 
 	void* data;
 	vkMapMemory(device, uniformBuffers[currentImage].bufferMemory, 0, sizeof(ubo), 0, &data);
