@@ -1271,6 +1271,8 @@ void Renderer::updateUniformBuffer(uint32_t currentImage, float dt)
 	lightUbo.model[3].y = -2.0f;
 	lightUbo.model[3].z = -2.0f;
 	lightUbo.cameraPos = mainCamera.position;
+	lightUbo.ambientColor = glm::vec3(1.0f);
+	lightUbo.ambientIntensity = 1.0f;
 
 	void* lightData;
 	vkMapMemory(device, lightUniformBuffers[currentImage].bufferMemory, 0, sizeof(lightUbo), 0, &lightData);

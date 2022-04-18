@@ -100,8 +100,8 @@ struct LightUniformBufferObject
 	glm::mat4 model;
 	Light pointLights[1];
 	glm::vec3 cameraPos;
-	glm::vec3 ambientColor = glm::vec3(0.05f, 0.05f, 0.06f);
-	float ambientIntensity = 1.0f;
+	glm::vec3 ambientColor;// = glm::vec3(0.05f, 0.05f, 0.06f);
+	float ambientIntensity;// = 1.0f;
 };
 
 
