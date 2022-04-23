@@ -2,9 +2,11 @@
 layout(binding = 0) uniform UniformBufferObject
 {
     mat4 model;
+    mat4 normalModel;
     mat4 view;
     mat4 proj;
     mat4 mvp;
+    mat4 mv;
 }ubo;
 
 layout(location = 0) in vec3 aPosition;
