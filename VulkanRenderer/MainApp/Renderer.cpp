@@ -1262,6 +1262,8 @@ void Renderer::updateUniformBuffer(uint32_t currentImage, float dt)
 	ubo.proj = glm::perspective(glm::radians(mainCamera.fov), swapChainImageExtent.width / (float)swapChainImageExtent.height, 0.1f, 500.0f);
 	ubo.proj[1][1] *= -1;
 	ubo.mvp = ubo.proj * ubo.view * ubo.model;
+	ubo.normalModel = glm::transpose(glm::inverse(ubo.model));
+	ubo.mv = ubo.view * ubo.model;
 
 	void* data;
 	vkMapMemory(device, uniformBuffers[currentImage].bufferMemory, 0, sizeof(ubo), 0, &data);
@@ -1273,6 +1275,9 @@ void Renderer::updateUniformBuffer(uint32_t currentImage, float dt)
 	lightUbo.model[3].x = -2.0f;
 	lightUbo.model[3].y = -2.0f;
 	lightUbo.model[3].z = -2.0f;
+	lightUbo.cameraPos = mainCamera.position;
+	lightUbo.ambientColor = glm::vec3(1.0f);
+	lightUbo.ambientIntensity = 1.0f;
 
 	void* lightData;
 	vkMapMemory(device, lightUniformBuffers[currentImage].bufferMemory, 0, sizeof(lightUbo), 0, &lightData);
