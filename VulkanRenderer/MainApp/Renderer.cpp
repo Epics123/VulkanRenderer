@@ -115,6 +115,8 @@ void Renderer::init()
 
 	loadModel();
 
+	//prepareInstanceData();
+
 	vertexBuffer.createVertexBuffer(device, vertices, physicalDevice, commandPool, graphicsQueue);
 	indexBuffer.createIndexBuffer(device, indices, physicalDevice, commandPool, graphicsQueue);
 	createUniformBuffers();
@@ -217,8 +219,10 @@ void Renderer::createVulkanInstance()
 	createInfo.enabledExtensionCount = static_cast<uint32_t>(glfwExtensions.size());
 	createInfo.ppEnabledExtensionNames = glfwExtensions.data();
 
+	VkResult res = vkCreateInstance(&createInfo, nullptr, &instance);
+
 	// Create Vulkan instance
-	if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
+	if (res != VK_SUCCESS)
 	{
 		throw std::runtime_error("Failed to create instance!");
 	}
@@ -760,7 +764,8 @@ void Renderer::createCommandBuffers()
 
 		vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT32);
 		
-		vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+		//vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+		vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), INSTANCE_COUNT, 0, 0, 0);
 		vkCmdEndRenderPass(commandBuffers[i]);
 
 		if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS)
@@ -1342,6 +1347,73 @@ void Renderer::recreateSwapChain()
 	imagesInFlight.resize(swapChainImages.size(), VK_NULL_HANDLE);
 }
 
+void Renderer::prepareInstanceData()
+{
+	std::vector<InstanceData> instanceData;
+	instanceData.resize(INSTANCE_COUNT);
+
+	instanceData[0].pos = glm::vec3(0.0f, 0.0f, 0.0f);
+	instanceData[0].rot = glm::vec3(0.0f, 0.0f, 0.0f);
+	instanceData[0].pos = glm::vec3(1.0f, 1.0f, 1.0f);
+
+	instanceData[1].pos = glm::vec3(0.0f, 4.0f, 0.0f);
+	instanceData[1].rot = glm::vec3(0.0f, 0.0f, 0.0f);
+	instanceData[1].pos = glm::vec3(1.0f, 1.0f, 1.0f);
+
+	instanceBuffer.size = instanceData.size() * sizeof(InstanceData);
+
+	struct
+	{
+		VkDeviceMemory memory = VK_NULL_HANDLE;
+		VkBuffer buffer = VK_NULL_HANDLE;
+	} stagingBuffer;
+
+	VkBufferCreateInfo bufferInfo{};
+
+	VkResult res;
+
+	res = VertexBuffer::createBuffer(device, physicalDevice, instanceBuffer.size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+								stagingBuffer.buffer, stagingBuffer.memory, bufferInfo);
+
+	res = VertexBuffer::createBuffer(device, physicalDevice, instanceBuffer.size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+		instanceBuffer.buffer, instanceBuffer.memory, bufferInfo);
+	
+	VkCommandBuffer copyCmd = beginSingleTimeCommands();
+
+	VkBufferCopy copyRegion = {};
+	copyRegion.size = instanceBuffer.size;
+	vkCmdCopyBuffer(copyCmd, stagingBuffer.buffer, instanceBuffer.buffer, 1, &copyRegion);
+
+	res = vkEndCommandBuffer(copyCmd);
+	VkSubmitInfo submitInfo = {};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &copyCmd;
+
+	// Create fence to ensure that the command buffer has finished executing
+	VkFenceCreateInfo fenceCreateInfo = {};
+	fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	fenceCreateInfo.flags = 0;
+	VkFence fence;
+	vkCreateFence(device, &fenceCreateInfo, nullptr, &fence);
+
+	// Submit to the queue
+	vkQueueSubmit(graphicsQueue, 1, &submitInfo, fence);
+	// Wait for the fence to signal that command buffer has finished executing
+	vkWaitForFences(device, 1, &fence, VK_TRUE, UINT64_MAX);
+
+	vkDestroyFence(device, fence, nullptr);
+	vkFreeCommandBuffers(device, commandPool, 1, &copyCmd);
+
+	instanceBuffer.descriptor.range = instanceBuffer.size;
+	instanceBuffer.descriptor.buffer = instanceBuffer.buffer;
+	instanceBuffer.descriptor.offset = 0;
+
+	// Destroy staging resources
+	vkDestroyBuffer(device, stagingBuffer.buffer, nullptr);
+	vkFreeMemory(device, stagingBuffer.memory, nullptr);
+}
+
 void Renderer::loadModel()
 {
 	// Attribute struct, holds vertices, weights, normals, texcoords, etc
@@ -1550,39 +1622,7 @@ void Renderer::drawFrame(float dt)
 {
 	VkResult res;
 
-	ImGui_ImplVulkan_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	ImGui::NewFrame();
-	//ImGui::ShowDemoWindow();
-
-	bool debugActive = true;
-	ImGui::Begin("Debug Info", &debugActive, ImGuiWindowFlags_MenuBar);
-
-	ImGui::Text("FPS: %f /", currentFramerate);
-	ImGui::SameLine();
-	ImGui::Text("%f ms", currentFrametime);
-
-	ImGui::NewLine();
-
-	ImGui::Text("Current Render Mode:");
-	ImGui::SameLine();
-	switch (renderMode)
-	{
-	case DEFAULT_LIT:
-		ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.0f, 1.0f), "Default Lit");
-		break;
-	case WIREFRAME:
-		ImGui::TextColored(ImVec4(0.0f, 0.8f, 0.8f, 1.0f), "Wireframe");
-		break;
-	}
-
-	ImGui::NewLine();
-
-	DrawVec3Control("Camera Position", mainCamera.position, 0.0f, 120.0f);
-	DrawVec3Control("Camera Rotation", mainCamera.rotation, 0.0f, 120.0f);
-
-	ImGui::End();
-	ImGui::Render();
+	drawImGui();
 	
 	vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
@@ -1686,9 +1726,48 @@ void Renderer::drawFrame(float dt)
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
+void Renderer::drawImGui()
+{
+	ImGui_ImplVulkan_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+	//ImGui::ShowDemoWindow();
+
+	bool debugActive = true;
+	ImGui::Begin("Debug Info", &debugActive, ImGuiWindowFlags_MenuBar);
+
+	ImGui::Text("FPS: %f /", currentFramerate);
+	ImGui::SameLine();
+	ImGui::Text("%f ms", currentFrametime);
+
+	ImGui::NewLine();
+
+	ImGui::Text("Current Render Mode:");
+	ImGui::SameLine();
+	switch (renderMode)
+	{
+	case DEFAULT_LIT:
+		ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.0f, 1.0f), "Default Lit");
+		break;
+	case WIREFRAME:
+		ImGui::TextColored(ImVec4(0.0f, 0.8f, 0.8f, 1.0f), "Wireframe");
+		break;
+	}
+
+	ImGui::NewLine();
+
+	DrawVec3Control("Camera Position", mainCamera.position, 0.0f, 120.0f);
+	DrawVec3Control("Camera Rotation", mainCamera.rotation, 0.0f, 120.0f);
+
+	ImGui::End();
+	ImGui::Render();
+}
+
 void Renderer::cleanup()
 {
 	cleanupSwapChain();
+
+	
 
 	ImGui_ImplVulkan_Shutdown();
 	ImGui_ImplGlfw_Shutdown();

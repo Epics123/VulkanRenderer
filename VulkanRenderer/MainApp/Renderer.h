@@ -130,6 +130,8 @@ public:
 
 	void recreateSwapChain();
 
+	void prepareInstanceData();
+
 	// Load the model
 	void loadModel();
 
@@ -152,6 +154,8 @@ public:
 	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 
 	void drawFrame(float dt);
+
+	void drawImGui();
 
 	// Clean up application
 	void cleanup();
@@ -205,7 +209,25 @@ public:
 	float currentFramerate;
 	float currentFrametime;
 
+	const int INSTANCE_COUNT = 2;
+
 private:
+	
+	struct InstanceData
+	{
+		glm::vec3 pos;
+		glm::vec3 rot;
+		glm::vec3 scale;
+	};
+
+	struct InstanceBuffer
+	{
+		VkBuffer buffer = VK_NULL_HANDLE;
+		VkDeviceMemory memory = VK_NULL_HANDLE;
+		size_t size = 0;
+		VkDescriptorBufferInfo descriptor;
+	} instanceBuffer;
+
 	Renderer(Window* appWindow);
 
 	Window* window;
