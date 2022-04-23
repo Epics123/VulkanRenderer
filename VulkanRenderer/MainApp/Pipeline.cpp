@@ -42,7 +42,7 @@ void Pipeline::createDefaultPipeline(VkShaderModule vertShaderModule, VkShaderMo
 
 	// TODO: make this more flexible to support any # of attribute descriptions
 	bindingDescription.push_back(Vertex::getBindingDescription());
-	bindingDescription.push_back(Light::getBindingDescription());
+	//bindingDescription.push_back(Light::getBindingDescription());
 	std::array<VkVertexInputAttributeDescription, Vertex::VERTEX_ATTRIB_COUNT> attributeDescriptions = Vertex::getAttributeDescriptions();
 	std::array<VkVertexInputAttributeDescription, 1> wireframeAttributeDescriptions = Vertex::getWireframeAttributeDescriptions();
 

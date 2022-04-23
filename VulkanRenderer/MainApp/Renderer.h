@@ -60,6 +60,8 @@ public:
 
 	void imguiInit();
 
+	void initScene();
+
 	// Create Vulkan instance that will interact with the application
 	void createVulkanInstance();
 
@@ -124,7 +126,7 @@ public:
 
 	void createDescriptorSets();
 
-	void updateUniformBuffer(uint32_t currentImage, float dt);
+	void updateUniformBuffer(uint32_t currentImage, float dt, uint32_t objIndex);
 
 	void cleanupSwapChain();
 
@@ -200,6 +202,8 @@ public:
 
 	static void DrawVec3Control(const char* label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f);
 
+	static void DrawFloatControl(const char* label, float& value, float resetValue = 1.0f, float columnWidth = 100.0f);
+
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 		VkDebugUtilsMessageTypeFlagsEXT messageType,
@@ -228,6 +232,12 @@ private:
 		VkDescriptorBufferInfo descriptor;
 	} instanceBuffer;
 
+	// Data for a renderable object, should expand to have mesh and material references 
+	struct RenderObject
+	{
+		glm::mat4 transformMatrix;
+	};
+
 	Renderer(Window* appWindow);
 
 	Window* window;
@@ -236,6 +246,9 @@ private:
 
 	std::string modelPath;
 	std::string texturePath;
+
+	std::vector<RenderObject> objects;
+	Light light;
 
 	VkInstance instance;
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE; // GPU

@@ -130,6 +130,8 @@ void Renderer::init()
 	mainCamera.updateModel(0.0f);
 
 	imguiInit();
+
+	initScene();
 }
 
 void Renderer::imguiInit()
@@ -180,6 +182,18 @@ void Renderer::imguiInit()
 
 	//TEMP: Should make own key codes
 	//io.KeyMap[ImGuiKey_]
+}
+
+void Renderer::initScene()
+{
+	RenderObject teapot1;
+	teapot1.transformMatrix = glm::mat4(1.0f);
+
+	RenderObject teapot2;
+	teapot2.transformMatrix = glm::translate(glm::mat4{1.0f}, glm::vec3(4.0f, 0.0f, 0.0f));
+
+	objects.push_back(teapot1);
+	objects.push_back(teapot2);
 }
 
 void Renderer::createVulkanInstance()
@@ -441,6 +455,39 @@ void Renderer::DrawVec3Control(const char* label, glm::vec3& values, float reset
 	ImGui::PopStyleVar();
 
 	ImGui::Columns(1);
+	ImGui::PopID();
+}
+
+void Renderer::DrawFloatControl(const char* label, float& value, float resetValue, float columnWidth)
+{
+	ImGui::PushID(label);
+
+	ImGui::Columns(2);
+	ImGui::SetColumnWidth(0, columnWidth);
+	ImGui::Text(label);
+	ImGui::NextColumn();
+
+	ImGui::PushMultiItemsWidths(1, ImGui::CalcItemWidth());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+
+	float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+	ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+	if (ImGui::Button("", buttonSize))
+		value = resetValue;
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine();
+	ImGui::DragFloat("##", &value, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::PopItemWidth();
+
+	ImGui::PopItemWidth();
+	ImGui::PopStyleVar();
+
+	ImGui::Columns(2);
 	ImGui::PopID();
 }
 
@@ -764,8 +811,8 @@ void Renderer::createCommandBuffers()
 
 		vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT32);
 		
-		//vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
-		vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), INSTANCE_COUNT, 0, 0, 0);
+		vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+		//vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), INSTANCE_COUNT, 0, 0, 0);
 		vkCmdEndRenderPass(commandBuffers[i]);
 
 		if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS)
@@ -1252,13 +1299,13 @@ void Renderer::createDescriptorSets()
 	}
 }
 
-void Renderer::updateUniformBuffer(uint32_t currentImage, float dt)
+void Renderer::updateUniformBuffer(uint32_t currentImage, float dt, uint32_t objIndex)
 {
 	mainCamera.updateModel(dt);
 
 	UniformBufferObject ubo{};
-	ubo.model = glm::mat4(1.0f);//glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	ubo.view = mainCamera.invModel;//glm::lookAt(mainCamera.position, mainCamera.position + mainCamera.forward, mainCamera.up);
+	ubo.model = objects[objIndex].transformMatrix;//glm::mat4(1.0f);
+	ubo.view = mainCamera.invModel;
 	ubo.proj = glm::perspective(glm::radians(mainCamera.fov), swapChainImageExtent.width / (float)swapChainImageExtent.height, 0.1f, 500.0f);
 	ubo.proj[1][1] *= -1;
 	ubo.mvp = ubo.proj * ubo.view * ubo.model;
@@ -1270,14 +1317,18 @@ void Renderer::updateUniformBuffer(uint32_t currentImage, float dt)
 	memcpy(data, &ubo, sizeof(ubo));
 	vkUnmapMemory(device, uniformBuffers[currentImage].bufferMemory);
 
+	light.updateModel();
+
 	LightUniformBufferObject lightUbo{};	// TODO: get light position data from vertex buffer
-	lightUbo.model = glm::mat4(1.0f);
-	lightUbo.model[3].x = -2.0f;
-	lightUbo.model[3].y = -2.0f;
-	lightUbo.model[3].z = -2.0f;
+	lightUbo.pointLights[0] = light;
+	lightUbo.model = light.model;//glm::mat4(1.0f);
+	//lightUbo.model[3].x = -2.0f;
+	//lightUbo.model[3].y = -2.0f;
+	//lightUbo.model[3].z = -2.0f;
 	lightUbo.cameraPos = mainCamera.position;
-	lightUbo.ambientColor = glm::vec3(1.0f);
-	lightUbo.ambientIntensity = 1.0f;
+	lightUbo.ambientColor = light.diffuse;//glm::vec3(1.0f);
+	lightUbo.ambientIntensity = light.intensity;//1.0f;
+	//printf("%f\n", light.intensity);
 
 	void* lightData;
 	vkMapMemory(device, lightUniformBuffers[currentImage].bufferMemory, 0, sizeof(lightUbo), 0, &lightData);
@@ -1646,8 +1697,6 @@ void Renderer::drawFrame(float dt)
 	if (imagesInFlight[imageIndex] != VK_NULL_HANDLE)
 		vkWaitForFences(device, 1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
 
-	updateUniformBuffer(imageIndex, dt);
-
 	{
 		VkCommandBufferBeginInfo info{};
 		info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -1670,6 +1719,14 @@ void Renderer::drawFrame(float dt)
 	ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), imguiCommandBuffers[imageIndex]);
 	vkCmdEndRenderPass(imguiCommandBuffers[imageIndex]);
 	res = vkEndCommandBuffer(imguiCommandBuffers[imageIndex]);
+
+	/*for (uint32_t i = 0; i < objects.size(); i++)
+	{
+		updateUniformBuffer(imageIndex, dt, i);
+	}*/
+
+	updateUniformBuffer(imageIndex, dt, 0);
+		
 
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -1764,6 +1821,15 @@ void Renderer::drawImGui()
 	DrawVec3Control("Camera Position", mainCamera.position, 0.0f, 120.0f);
 	DrawVec3Control("Camera Rotation", mainCamera.rotation, 0.0f, 120.0f);
 
+	ImGui::NewLine();
+	DrawVec3Control("Light Position", light.pos, 0.0f, 120.0f);
+
+	float col[4] = {light.diffuse.r, light.diffuse.g, light.diffuse.b, light.diffuse.a};
+	//ImGui::ColorPicker4("Light Color", col);
+	ImGui::ColorEdit4("Light Color", col);
+	light.diffuse = glm::vec4(col[0], col[1], col[2], col[3]);
+	DrawFloatControl("Light Intensity", light.intensity, 1.0f, 120.0f);
+
 	ImGui::End();
 	ImGui::Render();
 }
@@ -1771,8 +1837,6 @@ void Renderer::drawImGui()
 void Renderer::cleanup()
 {
 	cleanupSwapChain();
-
-	
 
 	ImGui_ImplVulkan_Shutdown();
 	ImGui_ImplGlfw_Shutdown();

@@ -55,21 +55,6 @@ struct Vertex
 		attributeDescriptions[3].format = VK_FORMAT_R32G32B32_SFLOAT;
 		attributeDescriptions[3].offset = offsetof(Vertex, vertexNormal);
 
-		/*attributeDescriptions[4].binding = 0;
-		attributeDescriptions[4].location = 4;
-		attributeDescriptions[4].format = VK_FORMAT_R32G32B32_SFLOAT;
-		attributeDescriptions[4].offset = offsetof(Light, pos);
-
-		attributeDescriptions[5].binding = 0;
-		attributeDescriptions[5].location = 5;
-		attributeDescriptions[5].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-		attributeDescriptions[5].offset = offsetof(Light, diffuse);
-
-		attributeDescriptions[6].binding = 0;
-		attributeDescriptions[6].location = 6;
-		attributeDescriptions[6].format = VK_FORMAT_R32_SFLOAT;
-		attributeDescriptions[6].offset = offsetof(Light, intensity);*/
-
 		return attributeDescriptions;
 	}
 
