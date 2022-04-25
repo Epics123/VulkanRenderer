@@ -1824,11 +1824,27 @@ void Renderer::drawImGui()
 	ImGui::NewLine();
 	DrawVec3Control("Light Position", light.pos, 0.0f, 120.0f);
 
+	ImGui::PushID("Light Color");
+
+	ImGui::Columns(2);
+
+	ImGui::SetColumnWidth(0, 120.0f);
+	ImGui::Text("Light Color");
+	ImGui::NextColumn();
+
+	ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+
 	float col[4] = {light.diffuse.r, light.diffuse.g, light.diffuse.b, light.diffuse.a};
-	//ImGui::ColorPicker4("Light Color", col);
-	ImGui::ColorEdit4("Light Color", col);
+	ImGui::ColorEdit4("##Light Color", col, ImGuiColorEditFlags_NoInputs);
 	light.diffuse = glm::vec4(col[0], col[1], col[2], col[3]);
-	DrawFloatControl("Light Intensity", light.intensity, 1.0f, 120.0f);
+
+	ImGui::PopStyleVar();
+
+	ImGui::Columns(1);
+	ImGui::PopID();
+
+	//DrawFloatControl("Light Intensity", light.intensity, 1.0f, 120.0f);
 
 	ImGui::End();
 	ImGui::Render();
