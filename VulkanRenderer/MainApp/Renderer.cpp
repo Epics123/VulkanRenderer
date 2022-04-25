@@ -803,7 +803,6 @@ void Renderer::createCommandBuffers()
 		vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 		gPipeline.bindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS);
-		vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, gPipeline.getPipelineLayout(), 0, 1, &descriptorSets[i], 0, nullptr);
 
 		VkBuffer vertexbuffers[] = { vertexBuffer.buffer };
 		VkDeviceSize offsets[] = { 0 };
@@ -811,7 +810,15 @@ void Renderer::createCommandBuffers()
 
 		vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT32);
 		
+		/*for (size_t j = 0; j < objects.size(); j++)
+		{
+			vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, gPipeline.getPipelineLayout(), 0, 1, &descriptorSets[i], 0, nullptr);
+			vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+		}*/
+
+		vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, gPipeline.getPipelineLayout(), 0, 1, &descriptorSets[i], 0, nullptr);
 		vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+
 		//vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), INSTANCE_COUNT, 0, 0, 0);
 		vkCmdEndRenderPass(commandBuffers[i]);
 
