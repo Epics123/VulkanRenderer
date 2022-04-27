@@ -1327,9 +1327,9 @@ void Renderer::updateUniformBuffer(uint32_t currentImage, float dt, uint32_t obj
 	light.updateModel();
 
 	LightUniformBufferObject lightUbo{};	// TODO: get light position data from vertex buffer
-	lightUbo.model = light.model;//glm::mat4(1.0f);
 	lightUbo.pointLights[0] = light;
-	lightUbo.cameraPos = glm::vec3(0.0f, 0.0f, 1.0f);//mainCamera.position;
+	lightUbo.model = light.model;
+	lightUbo.cameraPos = mainCamera.position;
 	lightUbo.ambientColor = light.diffuse;//glm::vec3(1.0f);
 	lightUbo.ambientIntensity = light.intensity;//1.0f;
 	printf("%f, %f, %f\n", lightUbo.cameraPos.x, lightUbo.cameraPos.y, lightUbo.cameraPos.z);

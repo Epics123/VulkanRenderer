@@ -11,10 +11,10 @@ layout(binding = 1) uniform sampler2D texSampler;
 layout(binding = 2) uniform LightBuffer
 {
     mat4 model;
-    Light pointLights[1];
     vec3 cameraPos;
     vec3 ambientColor;
     float ambientIntensity;
+    Light pointLights[1];
 }lbo;
 
 layout(location = 0) in vec3 fragColor;
@@ -46,5 +46,6 @@ void main() {
     //outColor = vec4(outColor.rgb * (spec.rgb), outColor.a);
     vec4 ks = vec4(diffuse.rgb + spec, 0.0f);
     outColor = ks * texColor + tmpAmbient;
+    //outColor.xyz = lbo.cameraPos;
     outColor.a = 1.0f;
 }

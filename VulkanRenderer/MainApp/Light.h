@@ -11,46 +11,15 @@
 
 struct Light
 {
-	static const int LIGHT_ATTRIB_COUNT = 3;
-	
-	glm::vec3 pos = glm::vec3(-2.0, -2.0, -2.0);
-	glm::vec4 diffuse = glm::vec4(1.0, 1.0, 1.0, 1.0);
-	float intensity = 1.0;
+	alignas(16)glm::vec3 pos = glm::vec3(-2.0, -2.0, -2.0);
+	alignas(16)glm::vec4 diffuse = glm::vec4(1.0, 1.0, 1.0, 1.0);
+	alignas(4)float intensity = 1.0;
 
-	glm::mat4 model;
+	alignas(16)glm::mat4 model;
+
+	alignas(4)static const int LIGHT_ATTRIB_COUNT = 3;
 
 	void updateModel();
-
-	//static VkVertexInputBindingDescription getBindingDescription()
-	//{
-	//	VkVertexInputBindingDescription bindingDesc{};
-	//	bindingDesc.binding = 0;
-	//	bindingDesc.stride = sizeof(Light);
-	//	bindingDesc.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-
-	//	return bindingDesc;
-	//}
-
-	//static std::array<VkVertexInputAttributeDescription, LIGHT_ATTRIB_COUNT> getAttributeDescriptions()
-	//{
-	//	std::array<VkVertexInputAttributeDescription, LIGHT_ATTRIB_COUNT> attributeDescriptions{};
-	//	attributeDescriptions[0].binding = 0;
-	//	attributeDescriptions[0].location = 0;
-	//	attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-	//	attributeDescriptions[0].offset = offsetof(Light, pos);
-
-	//	attributeDescriptions[1].binding = 0;
-	//	attributeDescriptions[1].location = 1;
-	//	attributeDescriptions[1].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-	//	attributeDescriptions[1].offset = offsetof(Light, diffuse);
-
-	//	attributeDescriptions[2].binding = 0;
-	//	attributeDescriptions[2].location = 2;
-	//	attributeDescriptions[2].format = VK_FORMAT_R32_SFLOAT;
-	//	attributeDescriptions[2].offset = offsetof(Light, intensity);
-
-	//	return attributeDescriptions;
-	//}
 };
 
 #endif // !LIGHT_H
