@@ -1,6 +1,7 @@
 #version 450
 
 struct Light {
+mat4 model;
 vec3 pos;
 vec4 diffuse;
 float intensity;
