@@ -1327,15 +1327,12 @@ void Renderer::updateUniformBuffer(uint32_t currentImage, float dt, uint32_t obj
 	light.updateModel();
 
 	LightUniformBufferObject lightUbo{};	// TODO: get light position data from vertex buffer
-	lightUbo.pointLights[0] = light;
 	lightUbo.model = light.model;//glm::mat4(1.0f);
-	//lightUbo.model[3].x = -2.0f;
-	//lightUbo.model[3].y = -2.0f;
-	//lightUbo.model[3].z = -2.0f;
-	lightUbo.cameraPos = mainCamera.position;
+	lightUbo.pointLights[0] = light;
+	lightUbo.cameraPos = glm::vec3(0.0f, 0.0f, 1.0f);//mainCamera.position;
 	lightUbo.ambientColor = light.diffuse;//glm::vec3(1.0f);
 	lightUbo.ambientIntensity = light.intensity;//1.0f;
-	//printf("%f\n", light.intensity);
+	printf("%f, %f, %f\n", lightUbo.cameraPos.x, lightUbo.cameraPos.y, lightUbo.cameraPos.z);
 
 	void* lightData;
 	vkMapMemory(device, lightUniformBuffers[currentImage].bufferMemory, 0, sizeof(lightUbo), 0, &lightData);
@@ -1825,33 +1822,51 @@ void Renderer::drawImGui()
 
 	ImGui::NewLine();
 
-	DrawVec3Control("Camera Position", mainCamera.position, 0.0f, 120.0f);
-	DrawVec3Control("Camera Rotation", mainCamera.rotation, 0.0f, 120.0f);
+	if (ImGui::CollapsingHeader("Scene"))
+	{
+		if (ImGui::TreeNode("Camera"))
+		{
+			DrawVec3Control("Camera Position", mainCamera.position, 0.0f, 120.0f);
+			DrawVec3Control("Camera Rotation", mainCamera.rotation, 0.0f, 120.0f);
 
-	ImGui::NewLine();
-	DrawVec3Control("Light Position", light.pos, 0.0f, 120.0f);
+			ImGui::TreePop();
+		}
 
-	ImGui::PushID("Light Color");
+		if (ImGui::TreeNode("Teapot"))
+		{
+			ImGui::Text("TeapotInfo");
+			ImGui::TreePop();
+		}
 
-	ImGui::Columns(2);
+		if (ImGui::TreeNode("Light"))
+		{
+			DrawVec3Control("Light Position", light.pos, 0.0f, 120.0f);
 
-	ImGui::SetColumnWidth(0, 120.0f);
-	ImGui::Text("Light Color");
-	ImGui::NextColumn();
+			ImGui::PushID("Light Color");
 
-	ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+			ImGui::Columns(2);
 
-	float col[4] = {light.diffuse.r, light.diffuse.g, light.diffuse.b, light.diffuse.a};
-	ImGui::ColorEdit4("##Light Color", col, ImGuiColorEditFlags_NoInputs);
-	light.diffuse = glm::vec4(col[0], col[1], col[2], col[3]);
+			ImGui::SetColumnWidth(0, 120.0f);
+			ImGui::Text("Light Color");
+			ImGui::NextColumn();
 
-	ImGui::PopStyleVar();
+			ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
 
-	ImGui::Columns(1);
-	ImGui::PopID();
+			float col[4] = { light.diffuse.r, light.diffuse.g, light.diffuse.b, light.diffuse.a };
+			ImGui::ColorEdit4("##Light Color", col, ImGuiColorEditFlags_NoInputs);
+			light.diffuse = glm::vec4(col[0], col[1], col[2], col[3]);
 
-	//DrawFloatControl("Light Intensity", light.intensity, 1.0f, 120.0f);
+			ImGui::PopStyleVar();
+
+			ImGui::Columns(1);
+			ImGui::PopID();
+
+			DrawFloatControl("Light Intensity", light.intensity, 1.0f, 120.0f);
+
+			ImGui::TreePop();
+		}
+	}
 
 	ImGui::End();
 	ImGui::Render();

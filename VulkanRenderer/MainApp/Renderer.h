@@ -236,6 +236,9 @@ private:
 	struct RenderObject
 	{
 		glm::mat4 transformMatrix;
+		glm::vec3 position;
+		glm::vec3 rotation;
+		glm::vec3 scale;
 	};
 
 	Renderer(Window* appWindow);
