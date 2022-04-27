@@ -16,8 +16,6 @@ struct Light
 	alignas(16)glm::vec4 diffuse = glm::vec4(1.0, 1.0, 1.0, 1.0);
 	alignas(4)float intensity = 1.0;
 
-	alignas(4)static const int LIGHT_ATTRIB_COUNT = 3;
-
 	void updateModel();
 };
 

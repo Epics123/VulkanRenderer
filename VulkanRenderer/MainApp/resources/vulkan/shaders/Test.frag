@@ -1,7 +1,6 @@
 #version 450
 
 struct Light {
-mat4 model;
 vec3 pos;
 vec4 diffuse;
 float intensity;
@@ -35,18 +34,22 @@ void main() {
     Light curLight = lbo.pointLights[0];
     vec4 fragNormal = vec4(normalize(vNormal.xyz), 0.0f);
 
+    vec4 ambient = vec4(lbo.ambientIntensity * lbo.ambientColor, 1.0f);
+
     vec4 lightDir = vec4(normalize(curLight.pos - vPosition), 0.0f);
     vec4 viewDir = vec4(normalize(lbo.cameraPos - vPosition), 0.0f);
     vec4 reflectDir = vec4(reflect(-lightDir, fragNormal).xyz, 0.0f);
 
     vec4 diffuse = max(dot(lightDir, vNormal), 0.0f) * curLight.diffuse;
-    vec3 spec = pow(max(dot(reflectDir, viewDir), 0.0f), 128) * tmpSpecularStrength * tmpSpecAlbedo;
+    //vec3 spec = pow(max(dot(reflectDir, viewDir), 0.0f), 128) * tmpSpecularStrength * tmpSpecAlbedo;
+    vec3 spec = pow(max(dot(reflectDir, viewDir), 0.0f), 128) * 0.5 * lbo.pointLights[0].diffuse.xyz;
 
     vec4 texColor = texture(texSampler, fragTexCoord);
     //outColor = vec4(outColor.rgb * ((diffuse).rgb + spec.rgb + tmpAmbient), outColor.a);
     //outColor = vec4(outColor.rgb * (spec.rgb), outColor.a);
     vec4 ks = vec4(diffuse.rgb + spec, 0.0f);
     outColor = ks * texColor + tmpAmbient;
-    //outColor.xyz = lbo.cameraPos;
+
+    outColor.xyz = (ambient.xyz + diffuse.xyz + spec) * texColor.xyz;
     outColor.a = 1.0f;
 }
