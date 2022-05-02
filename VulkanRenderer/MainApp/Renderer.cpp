@@ -1327,12 +1327,13 @@ void Renderer::updateUniformBuffer(uint32_t currentImage, float dt, uint32_t obj
 	light.updateModel();
 
 	LightUniformBufferObject lightUbo{};	// TODO: get light position data from vertex buffer
-	lightUbo.pointLights[0] = light;
+	//lightUbo.pointLights[0] = light;
 	lightUbo.model = light.model;
 	lightUbo.cameraPos = mainCamera.position;
 	lightUbo.ambientColor = light.diffuse;//glm::vec3(1.0f);
 	lightUbo.ambientIntensity = light.intensity;//1.0f;
-	printf("%f, %f, %f\n", lightUbo.cameraPos.x, lightUbo.cameraPos.y, lightUbo.cameraPos.z);
+	lightUbo.pointLights = light;
+	printf("%f, %f, %f\n", lightUbo.pointLights.pos.x, lightUbo.pointLights.pos.y, lightUbo.pointLights.pos.z);
 
 	void* lightData;
 	vkMapMemory(device, lightUniformBuffers[currentImage].bufferMemory, 0, sizeof(lightUbo), 0, &lightData);

@@ -87,7 +87,8 @@ struct LightUniformBufferObject
 	alignas(16)glm::vec3 ambientColor;// = glm::vec3(0.05f, 0.05f, 0.06f);
 	alignas(4)float ambientIntensity;// = 1.0f;
 	// TODO: fix light struct alignment
-	alignas(64)Light pointLights[1];	// Multiply alignment by index?
+	//alignas(64)Light pointLights[1];	// Multiply alignment by index?
+	alignas(64)Light pointLights;	// Multiply alignment by index?
 };
 
 

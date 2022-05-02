@@ -14,7 +14,7 @@ struct Light
 	alignas(16)glm::mat4 model;
 	alignas(16)glm::vec3 pos = glm::vec3(-2.0, -2.0, -2.0);
 	alignas(16)glm::vec4 diffuse = glm::vec4(1.0, 1.0, 1.0, 1.0);
-	alignas(4)float intensity = 1.0;
+	alignas(4)float intensity = 0.1;
 
 	void updateModel();
 };
