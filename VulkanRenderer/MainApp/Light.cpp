@@ -3,5 +3,7 @@
 
 void Light::updateModel()
 {
-	model = glm::translate(glm::mat4(1.0f), pos);
+	glm::vec3 p = glm::vec3(pos.x, pos.y, pos.z);
+	model = glm::translate(glm::mat4(1.0f), p);
+	pos = glm::vec4(p, 0.0f);
 }

@@ -82,13 +82,14 @@ struct UniformBufferObject
 
 struct LightUniformBufferObject 
 {
-	alignas(16)glm::mat4 model;
-	alignas(16)glm::vec3 cameraPos;
-	alignas(16)glm::vec3 ambientColor;// = glm::vec3(0.05f, 0.05f, 0.06f);
-	alignas(4)float ambientIntensity;// = 1.0f;
+	glm::mat4 model;
+	glm::vec4 cameraPos;
+	glm::vec4 lightColor;
+	glm::vec4 lightPos = glm::vec4(-2.0f, -2.0f, -2.0f, 0.0f);
+	alignas(16)float ambientIntensity;// = 1.0f;
 	// TODO: fix light struct alignment
 	//alignas(64)Light pointLights[1];	// Multiply alignment by index?
-	alignas(64)Light pointLights;	// Multiply alignment by index?
+	//alignas(64)Light pointLights;	// Multiply alignment by index?
 };
 
 

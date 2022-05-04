@@ -458,6 +458,63 @@ void Renderer::DrawVec3Control(const char* label, glm::vec3& values, float reset
 	ImGui::PopID();
 }
 
+void Renderer::DrawVec3Control(const char* label, glm::vec4& values, float resetValue, float columnWidth)
+{
+	ImGui::PushID(label);
+
+	ImGui::Columns(2);
+
+	ImGui::SetColumnWidth(0, columnWidth);
+	ImGui::Text(label);
+	ImGui::NextColumn();
+
+	ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+
+	float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+	ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+	if (ImGui::Button("X", buttonSize))
+		values.x = resetValue;
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine();
+	ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::PopItemWidth();
+	ImGui::SameLine();
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.3f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.3f, 1.0f });
+	if (ImGui::Button("Y", buttonSize))
+		values.y = resetValue;
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine();
+	ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::PopItemWidth();
+	ImGui::SameLine();
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+	if (ImGui::Button("Z", buttonSize))
+		values.z = resetValue;
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine();
+	ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::PopItemWidth();
+
+	ImGui::PopStyleVar();
+
+	ImGui::Columns(1);
+	ImGui::PopID();
+}
+
 void Renderer::DrawFloatControl(const char* label, float& value, float resetValue, float columnWidth)
 {
 	ImGui::PushID(label);
@@ -1329,11 +1386,12 @@ void Renderer::updateUniformBuffer(uint32_t currentImage, float dt, uint32_t obj
 	LightUniformBufferObject lightUbo{};	// TODO: get light position data from vertex buffer
 	//lightUbo.pointLights[0] = light;
 	lightUbo.model = light.model;
-	lightUbo.cameraPos = mainCamera.position;
-	lightUbo.ambientColor = light.diffuse;//glm::vec3(1.0f);
+	lightUbo.cameraPos = glm::vec4(mainCamera.position, 0.0f);
+	lightUbo.lightColor = light.color;
+	lightUbo.lightPos = light.pos;
 	lightUbo.ambientIntensity = light.intensity;//1.0f;
-	lightUbo.pointLights = light;
-	printf("%f, %f, %f\n", lightUbo.pointLights.pos.x, lightUbo.pointLights.pos.y, lightUbo.pointLights.pos.z);
+	//lightUbo.pointLights = light;
+	//printf("%f, %f, %f\n", lightUbo.pointLights.pos.x, lightUbo.pointLights.pos.y, lightUbo.pointLights.pos.z);
 
 	void* lightData;
 	vkMapMemory(device, lightUniformBuffers[currentImage].bufferMemory, 0, sizeof(lightUbo), 0, &lightData);
@@ -1854,16 +1912,16 @@ void Renderer::drawImGui()
 			ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
 			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
 
-			float col[4] = { light.diffuse.r, light.diffuse.g, light.diffuse.b, light.diffuse.a };
+			float col[4] = { light.color.r, light.color.g, light.color.b, light.color.a };
 			ImGui::ColorEdit4("##Light Color", col, ImGuiColorEditFlags_NoInputs);
-			light.diffuse = glm::vec4(col[0], col[1], col[2], col[3]);
+			light.color = glm::vec4(col[0], col[1], col[2], col[3]);
 
 			ImGui::PopStyleVar();
 
 			ImGui::Columns(1);
 			ImGui::PopID();
 
-			DrawFloatControl("Light Intensity", light.intensity, 1.0f, 120.0f);
+			DrawFloatControl("Light Intensity", light.intensity, 0.2f, 120.0f);
 
 			ImGui::TreePop();
 		}

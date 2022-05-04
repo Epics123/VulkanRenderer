@@ -202,6 +202,8 @@ public:
 
 	static void DrawVec3Control(const char* label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f);
 
+	static void DrawVec3Control(const char* label, glm::vec4& values, float resetValue = 0.0f, float columnWidth = 100.0f);
+
 	static void DrawFloatControl(const char* label, float& value, float resetValue = 1.0f, float columnWidth = 100.0f);
 
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(

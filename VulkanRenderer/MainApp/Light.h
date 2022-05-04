@@ -11,10 +11,10 @@
 
 struct Light
 {
-	alignas(16)glm::mat4 model;
-	alignas(16)glm::vec3 pos = glm::vec3(-2.0, -2.0, -2.0);
-	alignas(16)glm::vec4 diffuse = glm::vec4(1.0, 1.0, 1.0, 1.0);
-	alignas(4)float intensity = 0.1;
+	glm::mat4 model;
+	glm::vec4 pos = glm::vec4(-2.0f, -2.0f, -2.0f, 0.0f);
+	glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	float intensity = 0.1f;
 
 	void updateModel();
 };

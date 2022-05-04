@@ -12,11 +12,12 @@ layout(binding = 1) uniform sampler2D texSampler;
 layout(binding = 2) uniform LightBuffer
 {
     mat4 model;
-    vec3 cameraPos;
-    vec3 ambientColor;
+    vec4 cameraPos;
+    vec4 lightColor;
+    vec4 lightPos;
     float ambientIntensity;
     //Light pointLights[1];
-    Light pointLights;
+    //Light pointLights;
 }lbo;
 
 layout(location = 0) in vec3 fragColor;
@@ -28,24 +29,21 @@ layout(location = 3) in vec3 vPosition;
 layout(location = 0) out vec4 outColor;
 
 void main() {
-    // Temp ambient cause it being dumb
-    vec4 tmpAmbient = vec4(0.005f, 0.005f, 0.01f, 0.0f);
-    float tmpSpecularStrength = 14.0f;
-    vec3 tmpSpecAlbedo = vec3(1.0f, 0.0f, 0.0f);
-
     //Light curLight = lbo.pointLights[0];
-    Light curLight = lbo.pointLights;
+    //Light curLight = lbo.pointLights;
     vec4 fragNormal = vec4(normalize(vNormal.xyz), 0.0f);
 
-    vec4 ambient = vec4(lbo.ambientIntensity * lbo.ambientColor, 1.0f);
+    vec4 ambient = vec4(lbo.ambientIntensity * lbo.lightColor.xyz, 1.0f);
 
-    vec4 lightDir = vec4(normalize(curLight.pos - vPosition), 0.0f);
-    vec4 viewDir = vec4(normalize(lbo.cameraPos - vPosition), 0.0f);
+    //vec4 lightDir = vec4(normalize(curLight.pos - vPosition), 0.0f);
+    vec4 lightDir = vec4(normalize(lbo.lightPos.xyz - vPosition), 0.0f);
+    vec4 viewDir = vec4(normalize(lbo.cameraPos.xyz - vPosition), 0.0f);
     vec4 reflectDir = vec4(reflect(-lightDir, fragNormal).xyz, 0.0f);
 
-    vec4 diffuse = max(dot(lightDir, vNormal), 0.0f) * curLight.diffuse;
+    //vec4 diffuse = curLight.diffuse * max(dot(normalize(lightDir), vNormal), 0.0f);
+    vec4 diffuse = lbo.lightColor * max(dot(lightDir, vNormal), 0.0f);
     //vec3 spec = pow(max(dot(reflectDir, viewDir), 0.0f), 128) * tmpSpecularStrength * tmpSpecAlbedo;
-    vec3 spec = pow(max(dot(reflectDir, viewDir), 0.0f), 32) * 0.5 * lbo.ambientColor;
+    vec3 spec = pow(max(dot(reflectDir, viewDir), 0.0f), 32) * 0.5 * lbo.lightColor.xyz;
 
     vec4 texColor = texture(texSampler, fragTexCoord);
     //outColor = vec4(outColor.rgb * ((diffuse).rgb + spec.rgb + tmpAmbient), outColor.a);
@@ -56,8 +54,4 @@ void main() {
 
     outColor.xyz = (ambient.xyz + diffuse.xyz + spec) * texColor.xyz;
     outColor.a = 1.0f;
-
-    //outColor = vec4(curLight.pos, 1.0);
-    //outColor = vec4(lightDir.xyz, 1.0);
-    //outColor = vec4(diffuse.xyz, 1.0);
 }
