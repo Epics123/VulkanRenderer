@@ -90,6 +90,7 @@ struct LightUniformBufferObject
 	// TODO: fix light struct alignment
 	//alignas(64)Light pointLights[1];	// Multiply alignment by index?
 	//alignas(64)Light pointLights;	// Multiply alignment by index?
+	// TODO: Add count variable for multiple lights
 };
 
 
