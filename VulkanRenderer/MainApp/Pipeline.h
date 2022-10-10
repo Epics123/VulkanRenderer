@@ -8,16 +8,47 @@
 #include <glfw3native.h>
 #include <vector>
 
+#include "Device.h"
+
+struct PipelineConfigInfo
+{
+	PipelineConfigInfo(const PipelineConfigInfo&) = delete;
+	PipelineConfigInfo& operator=(const PipelineConfigInfo&) = delete;
+
+	VkPipelineViewportStateCreateInfo viewportInfo;
+	VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
+	VkPipelineRasterizationStateCreateInfo rasterizationInfo;
+	VkPipelineMultisampleStateCreateInfo multisampleInfo;
+	VkPipelineColorBlendAttachmentState colorBlendAttachment;
+	VkPipelineColorBlendStateCreateInfo colorBlendInfo;
+	VkPipelineDepthStencilStateCreateInfo depthStencilInfo;
+	std::vector<VkDynamicState> dynamicStateEnables;
+	VkPipelineDynamicStateCreateInfo dynamicStateInfo;
+	VkPipelineLayout pipelineLayout = nullptr;
+	VkRenderPass renderPass = nullptr;
+	uint32_t subpass = 0;
+};
+
 class Pipeline
 {
 public:
-	Pipeline();
+	Pipeline() = delete;
 
-	Pipeline(VkDevice device);
+	//Pipeline(VkDevice device);
+	Pipeline(Device& device, const std::string& vertFilePath, const std::string& fragFilePath, const PipelineConfigInfo& configInfo);
 
-	void createDefaultPipeline(VkShaderModule vertShaderModule, VkShaderModule fragShaderModule, 
-								VkRenderPass* renderPass, VkPipelineLayout* pipelineLayout, 
-								VkDescriptorSetLayout* descriptorSetLayout, VkExtent2D* swapChainExtent);
+	~Pipeline();
+
+	Pipeline(const Pipeline&) = delete;
+	Pipeline& operator=(const Pipeline&) = delete;
+
+	void createGraphicsPipeline(const PipelineConfigInfo& configInfo);
+
+	void createShaderModule(const std::vector<char>& code,  VkShaderModule* shaderModule);
+
+	void createDefaultPipeline(VkShaderModule vertShaderModule, VkShaderModule fragShaderModule, VkRenderPass* renderPass, VkPipelineLayout* pipelineLayout, VkDescriptorSetLayout* descriptorSetLayout, VkExtent2D* swapChainExtent);
+
+	static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
 
 	VkPipeline* getPipeline() { return &pipeline; }
 
@@ -26,6 +57,7 @@ public:
 	VkGraphicsPipelineCreateInfo* getPipelineCreateInfo() { return &pipelineInfo; }
 
 	void bindPipeline(VkCommandBuffer commandBuffer, VkPipelineBindPoint pipelineBindPoint);
+	void bind(VkCommandBuffer commandBuffer);
 
 	void destroyPipeline();
 
@@ -33,10 +65,21 @@ public:
 	void setVertexAttributeCount(uint32_t count);
 
 private:
+	static std::vector<char> readFile(const std::string& filename);
+
+private:
 	VkPipeline pipeline;
-	VkDevice device;
+	VkDevice device_old;
 
 	VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL;
+
+	// rework
+	Device& device;
+	VkPipeline graphicsPipeline;
+
+	VkShaderModule vertShaderModule;
+	VkShaderModule fragShaderModule;
+	//
 
 	VkRenderPass renderPass;
 	VkPipelineLayout pipelineLayout;

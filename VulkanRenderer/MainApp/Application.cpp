@@ -52,12 +52,12 @@ Application::Application(const char* appName, uint32_t appWidth, uint32_t appHei
 
 	firstMouse = true;
 
-	window = new Window(name, width, height);
+	window = new Window(name, width, height, true);
 }
 
 void Application::run()
 {
-	window->initWindow(keyCallback, cursorPosCallback, mouseButtonCallback, scrollCallback,framebufferResizeCallback, this);
+	window->initWindow(keyCallback, cursorPosCallback, mouseButtonCallback, scrollCallback, framebufferResizeCallback, this);
 	vulkanRenderer = Renderer::initInstance(window);
 	update();
 	cleanup();
@@ -65,13 +65,15 @@ void Application::run()
 
 void Application::framebufferResizeCallback(GLFWwindow* window, int width, int height)
 {
-	Application* app = reinterpret_cast<Application*>(glfwGetWindowUserPointer(window));
-	app->framebufferResized = true;
+	Window* appWindow = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+	appWindow->setFrameBufferResized(true);
+	appWindow->setWidth(width);
+	appWindow->setHeight(height);
 }
 
 void Application::update()
 {
-	lastFrame = glfwGetTime();
+	lastFrame = (float)glfwGetTime();
 
 	while (!glfwWindowShouldClose(window->getWindow()))
 	{
@@ -94,14 +96,16 @@ void Application::cleanup()
 {
 	Renderer::cleanupInstance();
 
-	window->cleanupWindow();
+	//window->cleanupWindow();
 
 	//ImGui_ImplVulkan_Shutdown();
 	//ImGui::DestroyContext();
 	glfwTerminate();
 
 	// Call renderer cleanup
-	delete window;
+	window = nullptr;
+	//if(window)
+	//	delete window;
 }
 
 void Application::processInput(GLFWwindow* window)

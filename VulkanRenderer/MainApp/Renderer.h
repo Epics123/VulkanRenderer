@@ -9,31 +9,37 @@
 #include <cstdlib>
 #include <vector>
 #include <optional>
+#include <cassert>
+#include <memory>
 
 #include "VertexBuffer.h"
 #include "Image.h"
 #include "TextureSampler.h"
 #include "Window.h"
 #include "Camera.h"
-#include "Pipeline.h"
+#include "Mesh.h"
+#include "SwapChain.h"
+#include "Model.h"
+#include "GameObject.h"
+#include "RenderSystem.h"
 
-struct QueueFamilyIndices
-{
-	std::optional<uint32_t> graphicsFamily;
-	std::optional<uint32_t> presentFamily;
-
-	bool isComplete()
-	{
-		return graphicsFamily.has_value() && presentFamily.has_value();
-	}
-};
-
-struct SwapChainSupportDetails
-{
-	VkSurfaceCapabilitiesKHR capabilities;
-	std::vector<VkSurfaceFormatKHR> formats;
-	std::vector<VkPresentModeKHR> presentModes;
-};
+//struct QueueFamilyIndices
+//{
+//	std::optional<uint32_t> graphicsFamily;
+//	std::optional<uint32_t> presentFamily;
+//
+//	bool isComplete()
+//	{
+//		return graphicsFamily.has_value() && presentFamily.has_value();
+//	}
+//};
+//
+//struct SwapChainSupportDetails
+//{
+//	VkSurfaceCapabilitiesKHR capabilities;
+//	std::vector<VkSurfaceFormatKHR> formats;
+//	std::vector<VkPresentModeKHR> presentModes;
+//};
 
 enum RenderMode
 {
@@ -62,91 +68,42 @@ public:
 
 	void initScene();
 
-	// Create Vulkan instance that will interact with the application
-	void createVulkanInstance();
-
-	// Create the swap chain
-	void createSwapChain();
-
-	// Check if requested validation layers are available
-	bool checkValidationLayerSupport();
-
-	// Get required GLFW Extensions
-	std::vector<const char*> getRequiredExtensions();
-
-	// Select compatible GPU to use
-	void selectPhysicalDevice();
-
-	// Check if device is supported
-	bool isDeviceSuitable(VkPhysicalDevice device);
-
-	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
-
-	// Find graphics queue family
-	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
-
-	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
-
-	VkSurfaceFormatKHR chooseSwapChainFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
-
-	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
-
-	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
-
 	VkShaderModule createShaderModule(const std::vector<char>& code);
 
-	void createImageViews();
-
-	void createLogicalDevice();
-
-	void createSurface();
-
-	void createGraphicsPipeline();
-
 	void createRenderPass();
-
 	void createImguiRenderPass();
-
 	void createFrameBuffers();
 
 	void createCommandPool();
-
 	void createCommandBuffers();
-
-	void createCommandBuffer(std::vector<VkCommandBuffer>& buffers, VkCommandBufferAllocateInfo allocInfo, 
-							 Pipeline pipeline, std::vector<VkDescriptorSet>& desc);
+	void freeCommandBuffers();
+	void createCommandBuffer(std::vector<VkCommandBuffer>& buffers, VkCommandBufferAllocateInfo allocInfo, Pipeline pipeline, std::vector<VkDescriptorSet>& desc);
+	void recordCommandBuffer(int imageIndex);
 
 	void createSyncObjects();
-
 	void createDescriptorSetLayout();
-
 	void createUniformBuffers();
-
 	void createDescriptorPool();
-
 	void createDescriptorSets();
 
 	void updateUniformBuffer(uint32_t currentImage, float dt, uint32_t objIndex);
 
 	void cleanupSwapChain();
-
 	void recreateSwapChain();
+	VkRenderPass getSwapChainRenderPass() const { return mSwapChain->getRenderPass(); }
 
 	void prepareInstanceData();
 
 	// Load the model
-	void loadModel();
+	void loadGameObjects();
+
+	void uploadMeshData(Mesh& mesh);
 
 	void createTextureImage();
-
 	void createTextureImageView();
-
 	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
-
 	void createDepthResources();
-
 	VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
-
 	VkFormat findDepthFormat();
 
 	bool hasStencilComponent(VkFormat format);
@@ -155,24 +112,29 @@ public:
 
 	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 
+	// Frame Drawing
+	VkCommandBuffer beginFrame();
 	void drawFrame(float dt);
+	void endFrame();
+	void beginSwapChainRenderPass(VkCommandBuffer commandBuffer);
+	void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
+
+	bool isFrameInProgress() const { return frameStarted; }
+
+	int getFrameIndex() const
+	{
+		assert(frameStarted && "Cannot get frame index while frame is not in progress");
+		return currentFrameIndex;
+	}
 
 	void drawImGui();
 
 	// Clean up application
 	void cleanup();
 
-	void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
-
-	void setupDebugMessenger();
-
 	void deviceWaitIdle();
 
 	Camera& getActiveCamera() { return mainCamera; }
-
-	Pipeline getActivePipeline() { return gPipeline; }
-
-	VkRenderPass getRenderPass() { return renderPass; }
 
 	VkRenderPass getImguiRenderPass() { return imguiRenderPass; }
 
@@ -187,8 +149,13 @@ public:
 	VkDescriptorPool* getDescriptorPool() { return &descriptorPool; }
 
 	std::vector<VkCommandBuffer> getCommandBuffers() { return commandBuffers; }
-
 	std::vector<VkCommandBuffer> getImguiCommandBuffers() { return imguiCommandBuffers; }
+
+	VkCommandBuffer getCurrentCommandBuffer() const 
+	{ 
+		assert(frameStarted && "Cannot get command buffer while frame is not in progress");
+		return commandBuffers[currentFrameIndex]; 
+	}
 
 	VkCommandPool getCommandPool() { return commandPool; }
 
@@ -196,21 +163,11 @@ public:
 
 	static void compileShaders();
 
-	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
-
 	static std::vector<char> readBinaryFile(const std::string& filename);
 
 	static void DrawVec3Control(const char* label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f);
-
 	static void DrawVec3Control(const char* label, glm::vec4& values, float resetValue = 0.0f, float columnWidth = 100.0f);
-
 	static void DrawFloatControl(const char* label, float& value, float resetValue = 1.0f, float columnWidth = 100.0f);
-
-	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
-		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-		VkDebugUtilsMessageTypeFlagsEXT messageType,
-		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-		void* pUserData);
 
 	float currentFramerate;
 	float currentFrametime;
@@ -245,7 +202,7 @@ private:
 
 	Renderer(Window* appWindow);
 
-	Window* window;
+	std::unique_ptr<Window> window;
 
 	Camera mainCamera;
 
@@ -275,7 +232,7 @@ private:
 
 	VkRenderPass renderPass;
 	VkRenderPass imguiRenderPass;
-	VkPipelineLayout pipelineLayout;
+	
 	VkDescriptorSetLayout descriptorSetLayout;
 	VkDescriptorPool descriptorPool;
 	VkPipeline graphicsPipeline;
@@ -286,8 +243,15 @@ private:
 	std::vector<VkCommandBuffer> imguiCommandBuffers;
 	std::vector<VkDescriptorSet> descriptorSets;
 
-	Pipeline gPipeline;
-	Pipeline wireframePipeline;
+	//Pipeline gPipeline;
+	//Pipeline wireframePipeline;
+	
+	// Rework //
+	Device mDevice{*window};
+	std::unique_ptr <SwapChain> mSwapChain;
+	std::vector<GameObject> gameObjects;
+	RenderSystem renderSystem {mDevice};
+	////////////
 
 	RenderMode renderMode = DEFAULT_LIT;
 
@@ -299,10 +263,14 @@ private:
 	bool framebufferResized = false;
 	bool canResizeWindow = false;
 
+	uint32_t currentImageIndex;
+	int currentFrameIndex = 0;
+	bool frameStarted = false;
+
 	VertexSTDVector vertices;
 	IndexSTDVector indices;
 
-	VkClearValue clearValue = { {0.0f, 0.0f, 0.0f, 1.0f}};
+	VkClearColorValue clearColor = { {0.01f, 0.01f, 0.01f, 1.0f} };
 
 	VertexBuffer vertexBuffer;
 	IndexBuffer indexBuffer;
@@ -317,6 +285,8 @@ private:
 	VkImage depthImage;
 	VkDeviceMemory depthImageMemory;
 	VkImageView depthImageView;
+
+	Mesh teapotMesh;
 
 	const std::vector<const char*> validationLayers =
 	{

@@ -57,16 +57,34 @@
     <ClInclude Include="MainApp\CommandBuffer.h">
       <Filter>MainApp</Filter>
     </ClInclude>
+    <ClInclude Include="MainApp\Device.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\GameObject.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
     <ClInclude Include="MainApp\Image.h">
       <Filter>MainApp</Filter>
     </ClInclude>
     <ClInclude Include="MainApp\Light.h">
       <Filter>MainApp</Filter>
     </ClInclude>
+    <ClInclude Include="MainApp\Mesh.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\Model.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
     <ClInclude Include="MainApp\Pipeline.h">
       <Filter>MainApp</Filter>
     </ClInclude>
+    <ClInclude Include="MainApp\RenderSystem.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
     <ClInclude Include="MainApp\Renderer.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\SwapChain.h">
       <Filter>MainApp</Filter>
     </ClInclude>
     <ClInclude Include="MainApp\TextureSampler.h">
@@ -113,6 +131,12 @@
     <ClCompile Include="MainApp\CommandBuffer.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
+    <ClCompile Include="MainApp\Device.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\GameObject.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
     <ClCompile Include="MainApp\Image.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
@@ -122,10 +146,22 @@
     <ClCompile Include="MainApp\Main.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
+    <ClCompile Include="MainApp\Mesh.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\Model.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
     <ClCompile Include="MainApp\Pipeline.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
+    <ClCompile Include="MainApp\RenderSystem.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
     <ClCompile Include="MainApp\Renderer.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\SwapChain.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
     <ClCompile Include="MainApp\TextureSampler.cpp">

@@ -8,6 +8,8 @@
 //#define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
 //#include <glm/glm.hpp>
 
+#define GLFW_INCLUDE_VULKAN
+
 #include <glfw3.h>
 #include <glfw3native.h>
 
@@ -24,12 +26,24 @@ public:
 
 	GLFWwindow* getWindow() { return window; };
 
+	void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
+
+	VkExtent2D getExtent() { return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)}; }
+
+	bool wasWindowResized() { return framebufferResized; }
+	void resetWindowResizedFlag() { framebufferResized = false; }
+	void setFrameBufferResized(bool resized) { framebufferResized = resized; }
+
+	void setWidth(uint32_t newWidth) { width = newWidth; }
+	void setHeight(uint32_t newHeight) { width = newHeight; }
+
 private:
 	const char* name;
 	uint32_t width;
 	uint32_t height;
 
 	bool resizeable;
+	bool framebufferResized = false;
 
 	GLFWwindow* window;
 };

@@ -10,6 +10,7 @@
 
 #include "VertexAttributes.h"
 #include "Light.h"
+#include "Model.h"
 
 struct Vertex
 {

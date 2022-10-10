@@ -24,7 +24,7 @@ void Window::initWindow(GLFWkeyfun keyCallback, GLFWcursorposfun cursorPosCallba
 	glfwSetMouseButtonCallback(window, mouseButtonCallback);
 	glfwSetScrollCallback(window, mouseScrollCallback);
 
-	glfwSetWindowUserPointer(window, user);
+	glfwSetWindowUserPointer(window, this);
 	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 }
 
@@ -36,4 +36,10 @@ void Window::cleanupWindow()
 void Window::getFrameBufferSize(int* width, int* height)
 {
 	glfwGetFramebufferSize(window, width, height);
+}
+
+void Window::createWindowSurface(VkInstance instance, VkSurfaceKHR* surface)
+{
+	if (glfwCreateWindowSurface(instance, window, nullptr, surface) != VK_SUCCESS)
+		throw std::runtime_error("Failed to create window surface!");
 }
