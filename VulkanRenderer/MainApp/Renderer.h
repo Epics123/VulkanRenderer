@@ -96,6 +96,8 @@ public:
 
 	// Load the model
 	void loadGameObjects();
+	// temporary helper function, creates a 1x1x1 cube centered at offset
+	std::unique_ptr<Model> createCubeModel(Device& device, glm::vec3 offset);
 
 	void uploadMeshData(Mesh& mesh);
 

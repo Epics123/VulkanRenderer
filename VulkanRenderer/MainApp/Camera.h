@@ -8,9 +8,18 @@
 
 struct Camera
 {
+	void updatePositon(int key, float speed);
+	void updateCameraRotation(float pitch, float yaw, float roll);
+	void updateFOV(double yOffset);
+	void zoomCamera(double yOffset);
+
+	void updateModel(float dt);
+
+	void setPerspectiveProjection(float fov, float aspectRatio, float near, float far);
+
 	glm::vec3 position = glm::vec3(3.0f, 0.0f, 0.0f);
-	glm::vec3 rotation;
-	glm::quat orientation;
+	glm::vec3 rotation{};
+	glm::quat orientation{};
 	glm::quat invOrient = glm::conjugate(orientation);
 
 	glm::vec3 forward = orientation * glm::vec3(1.0f, 0.0f, 0.0f);
@@ -21,6 +30,8 @@ struct Camera
 
 	//glm::mat4 transform;
 	glm::mat4 invModel;
+	glm::mat4 view;
+	glm::mat4 proj;
 
 	float yaw = 90.0f;
 	float pitch = 250.0f;
@@ -32,13 +43,6 @@ struct Camera
 
 	float sensitivity = 0.5f;
 	float smoothing = 0.00001f;
-
-	void updatePositon(int key, float speed);
-	void updateCameraRotation(float pitch, float yaw, float roll);
-	void updateFOV(double yOffset);
-	void zoomCamera(double yOffset);
-
-	void updateModel(float dt);
 };
 
 

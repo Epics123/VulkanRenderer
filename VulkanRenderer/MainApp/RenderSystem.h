@@ -3,14 +3,14 @@
 #include "Device.h"
 #include "Pipeline.h"
 #include "GameObject.h"
+#include "Camera.h"
 
 #include <vector>
 #include <memory>
 
 struct SimplePushConstantData
 {
-	glm::mat2 transform{ 1.0f };
-	glm::vec2 offset;
+	glm::mat4 transform{ 1.0f };
 	alignas(16)glm::vec3 color;
 };
 
@@ -25,7 +25,7 @@ public:
 
 	void init(VkRenderPass renderPass);
 
-	void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects);
+	void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects, const Camera& camera);
 
 private:
 	void createPipelineLayout();

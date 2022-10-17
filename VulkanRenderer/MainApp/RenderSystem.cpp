@@ -16,16 +16,19 @@ void RenderSystem::init(VkRenderPass renderPass)
 	createPipeline(renderPass);
 }
 
-void RenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects)
+void RenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects, const Camera& camera)
 {
 	pipeline->bind(commandBuffer);
 
+	glm::mat4 viewProj = camera.proj * camera.view;
+
 	for (auto& obj : gameObjects)
 	{
+		obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + 0.01f, glm::two_pi<float>());
+
 		SimplePushConstantData push{};
-		push.offset = obj.transform2D.translation;
 		push.color = obj.color;
-		push.transform = obj.transform2D.mat2();
+		push.transform = obj.transform.getTransform();//viewProj * obj.transform.getTransform();
 
 		vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
 

@@ -2,22 +2,33 @@
 
 #include "Model.h"
 
+#include "glm/gtc/matrix_transform.hpp"
+#include <glm/gtc/quaternion.hpp>
+
 #include <memory>
 
-struct Transform2DComponent
+struct TransformComponent
 {
-	glm::vec2 translation{};
-	glm::vec2 scale{1.0f, 1.0f};
-	float rotation;
-	glm::mat2 mat2() 
+	glm::vec3 translation{};
+	glm::vec3 scale{1.0f, 1.0f, 1.0f};
+	glm::vec3 rotation{};
+	
+	glm::mat4 getTransform()
 	{
-		const float s = glm::sin(rotation);
-		const float c = glm::cos(rotation);
+		glm::mat4 transate = glm::translate(glm::mat4{1.0f}, translation);
 
-		glm::mat2 rotMatrix{{c, s}, {-s, c}};
+		glm::quat qPitch = glm::angleAxis(glm::radians(rotation.x), glm::vec3(1, 0, 0));
+		glm::quat qYaw = glm::angleAxis(glm::radians(rotation.z), glm::vec3(0, 0, 1));
+		glm::quat qRoll = glm::angleAxis(glm::radians(rotation.y), glm::vec3(0, 0, 1));
 
-		glm::mat2 scaleMat{{scale.x, 0.0f}, {0.0f, scale.y}};
-		return rotMatrix * scaleMat; 
+		glm::quat orientation = qPitch * qYaw * qRoll;
+		//orientation = glm::normalize(glm::slerp(orientation, cameraOrientation, 1 - powf(smoothing, dt)));
+		glm::mat4 rotate = glm::mat4_cast(orientation);
+
+		glm::mat4 scaleMat = glm::scale(transate, scale);
+
+		glm::mat4 transform = rotate * scaleMat * transate;//glm::scale(transform, scale) * rotate;
+		return transform;
 	}
 };
 
@@ -41,7 +52,7 @@ public:
 
 	std::shared_ptr<Model> model{};
 	glm::vec3 color{};
-	Transform2DComponent transform2D{};
+	TransformComponent transform{};
 
 private:
 	GameObject(id_t objId) : id{objId} {};

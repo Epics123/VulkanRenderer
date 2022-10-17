@@ -70,6 +70,10 @@ void Renderer::init()
 	recreateSwapChain();
 	renderSystem.init(getSwapChainRenderPass());
 	createCommandBuffers();
+
+	mainCamera = Camera();
+	mainCamera.updateModel(0.0f);
+	mainCamera.setPerspectiveProjection(glm::radians(mainCamera.fov), mSwapChain->extentAspectRatio(), 0.1f, 500.0f);
 	/*setupDebugMessenger();
 
 	createSurface();
@@ -1069,17 +1073,13 @@ void Renderer::prepareInstanceData()
 void Renderer::loadGameObjects()
 {
 	// Rework test
-	std::vector<Model::Vertex> vertices {{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}}, {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}}, {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}};
-	std::shared_ptr<Model> model = std::make_shared<Model>(mDevice, vertices);
-
-	GameObject triangle = GameObject::createGameObject();
-	triangle.model = model;
-	triangle.color = {0.1f, 0.8f, 0.1f};
-	triangle.transform2D.translation.x = 0.2f;
-	triangle.transform2D.scale = {2.0f, 0.5f};
-	triangle.transform2D.rotation = 0.25f * 2 * 3.14;
-
-	gameObjects.push_back(std::move(triangle));
+	std::shared_ptr<Model> model = createCubeModel(mDevice, {0.0f, 0.0f, 0.0f});
+	GameObject cube = GameObject::createGameObject();
+	cube.model = model;
+	cube.transform.translation = {0.0f, 0.0f, 0.5f};
+	cube.transform.rotation = {1.0f, 1.0f, 3.0f};
+	cube.transform.scale = {0.5f, 0.5f, 0.5f};
+	gameObjects.push_back(std::move(cube));
 	//
 
 
@@ -1129,6 +1129,67 @@ void Renderer::loadGameObjects()
 	//		indices.push_back((uint32_t)indices.size());
 	//	}
 	//}
+}
+
+// temporary helper function, creates a 1x1x1 cube centered at offset
+std::unique_ptr<Model> Renderer::createCubeModel(Device& device, glm::vec3 offset)
+{
+	std::vector<Model::Vertex> vertices{
+
+		// left face (white)
+		{{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
+		{{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
+		{{-.5f, -.5f, .5f}, {.9f, .9f, .9f}},
+		{{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
+		{{-.5f, .5f, -.5f}, {.9f, .9f, .9f}},
+		{{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
+
+		// right face (yellow)
+		{{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
+		{{.5f, .5f, .5f}, {.8f, .8f, .1f}},
+		{{.5f, -.5f, .5f}, {.8f, .8f, .1f}},
+		{{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
+		{{.5f, .5f, -.5f}, {.8f, .8f, .1f}},
+		{{.5f, .5f, .5f}, {.8f, .8f, .1f}},
+
+		// top face (orange, remember y axis points down)
+		{{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+		{{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+		{{-.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+		{{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+		{{.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+		{{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+
+		// bottom face (red)
+		{{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+		{{.5f, .5f, .5f}, {.8f, .1f, .1f}},
+		{{-.5f, .5f, .5f}, {.8f, .1f, .1f}},
+		{{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+		{{.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+		{{.5f, .5f, .5f}, {.8f, .1f, .1f}},
+
+		// nose face (blue)
+		{{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+		{{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+		{{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+		{{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+		{{.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+		{{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+
+		// tail face (green)
+		{{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+		{{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+		{{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+		{{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+		{{.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+		{{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+
+	};
+	for (auto& v : vertices)
+	{
+		v.position += offset;
+	}
+	return std::make_unique<Model>(device, vertices);
 }
 
 void Renderer::uploadMeshData(Mesh& mesh)
@@ -1329,7 +1390,8 @@ void Renderer::drawFrame(float dt)
 	if (VkCommandBuffer commandBuffer = beginFrame())
 	{
 		beginSwapChainRenderPass(commandBuffer);
-		renderSystem.renderGameObjects(commandBuffer, gameObjects);
+		mainCamera.updateModel(dt);
+		renderSystem.renderGameObjects(commandBuffer, gameObjects, mainCamera);
 		endSwapChainRenderPass(commandBuffer);
 		endFrame();
 	}
