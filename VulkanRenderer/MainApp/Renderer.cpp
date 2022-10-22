@@ -73,7 +73,7 @@ void Renderer::init()
 
 	mainCamera = Camera();
 	mainCamera.updateModel(0.0f);
-	mainCamera.setPerspectiveProjection(glm::radians(mainCamera.fov), mSwapChain->extentAspectRatio(), 0.1f, 500.0f);
+	mainCamera.setPerspectiveProjection(mainCamera.fov, mSwapChain->extentAspectRatio(), 0.1f, 500.0f);
 	/*setupDebugMessenger();
 
 	createSurface();
@@ -1076,10 +1076,17 @@ void Renderer::loadGameObjects()
 	std::shared_ptr<Model> model = createCubeModel(mDevice, {0.0f, 0.0f, 0.0f});
 	GameObject cube = GameObject::createGameObject();
 	cube.model = model;
-	cube.transform.translation = {0.0f, 0.0f, 0.5f};
+	cube.transform.translation = {0.0f, 0.0f, 0.0f};
 	cube.transform.rotation = {1.0f, 1.0f, 3.0f};
-	cube.transform.scale = {0.5f, 0.5f, 0.5f};
+	cube.transform.scale = {1.0f, 1.0f, 1.0f};
 	gameObjects.push_back(std::move(cube));
+
+	GameObject cube2 = GameObject::createGameObject();
+	cube2.model = model;
+	cube2.transform.translation = { 2.0f, 0.0f, 1.0f };
+	cube2.transform.rotation = { 0.0f, 0.0f, 0.0f };
+	cube2.transform.scale = { 1.0f, 1.0f, 1.0f };
+	gameObjects.push_back(std::move(cube2));
 	//
 
 

@@ -77,6 +77,7 @@ void Camera::updateModel(float dt)
 	rotation = glm::vec3(pitch, yaw, roll);
 
 	invModel = rotate * translate;
+	view = invModel;
 }
 
 void Camera::setPerspectiveProjection(float fov, float aspectRatio, float near, float far)

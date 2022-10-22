@@ -25,7 +25,7 @@ public:
 
 	void init(VkRenderPass renderPass);
 
-	void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects, const Camera& camera);
+	void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects, Camera& camera);
 
 private:
 	void createPipelineLayout();
