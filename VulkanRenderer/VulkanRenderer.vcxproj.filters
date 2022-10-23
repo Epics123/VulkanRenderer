@@ -90,6 +90,9 @@
     <ClInclude Include="MainApp\TextureSampler.h">
       <Filter>MainApp</Filter>
     </ClInclude>
+    <ClInclude Include="MainApp\Utils.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
     <ClInclude Include="MainApp\VertexAttributes.h">
       <Filter>MainApp</Filter>
     </ClInclude>

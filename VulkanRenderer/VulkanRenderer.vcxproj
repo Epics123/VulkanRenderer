@@ -116,6 +116,7 @@
     <ClInclude Include="MainApp\Renderer.h" />
     <ClInclude Include="MainApp\SwapChain.h" />
     <ClInclude Include="MainApp\TextureSampler.h" />
+    <ClInclude Include="MainApp\Utils.h" />
     <ClInclude Include="MainApp\VertexAttributes.h" />
     <ClInclude Include="MainApp\VertexBuffer.h" />
     <ClInclude Include="MainApp\Window.h" />

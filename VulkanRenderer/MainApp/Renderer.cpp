@@ -11,8 +11,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#define TINYOBJLOADER_IMPLEMENTATION
-#include <tiny_obj_loader.h>
+//#define TINYOBJLOADER_IMPLEMENTATION
+//#include <tiny_obj_loader.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -1073,121 +1073,21 @@ void Renderer::prepareInstanceData()
 void Renderer::loadGameObjects()
 {
 	// Rework test
-	std::shared_ptr<Model> model = createCubeModel(mDevice, {0.0f, 0.0f, 0.0f});
-	GameObject cube = GameObject::createGameObject();
-	cube.model = model;
-	cube.transform.translation = {0.0f, 0.0f, 0.0f};
-	cube.transform.rotation = {1.0f, 1.0f, 3.0f};
-	cube.transform.scale = {1.0f, 1.0f, 1.0f};
-	gameObjects.push_back(std::move(cube));
+	std::shared_ptr<Model> model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/teapot/downScaledPot.obj");
+	GameObject gameObject = GameObject::createGameObject();
+	gameObject.model = model;
+	gameObject.transform.translation = {0.0f, 0.0f, 0.0f};
+	gameObject.transform.rotation = {1.0f, 1.0f, 3.0f};
+	gameObject.transform.scale = {1.0f, 1.0f, 1.0f};
+	gameObjects.push_back(std::move(gameObject));
 
-	GameObject cube2 = GameObject::createGameObject();
-	cube2.model = model;
-	cube2.transform.translation = { 2.0f, 0.0f, 1.0f };
-	cube2.transform.rotation = { 0.0f, 0.0f, 0.0f };
-	cube2.transform.scale = { 1.0f, 1.0f, 1.0f };
-	gameObjects.push_back(std::move(cube2));
-	//
-
-
-	//// Attribute struct, holds vertices, weights, normals, texcoords, etc
-	//tinyobj::attrib_t attributes;
-	//std::vector<tinyobj::shape_t> shapes;	// I don't entirely understand the purpose of these yet  but it seems to be a seperate storage container for individual objects in an obj file?
-	//std::vector<tinyobj::material_t> materials;	// .obj files can define specific materials per face, we currently ignore this
-	//std::string warn, err;
-
-	//// TinyObjectLoader has MTL compatibility
-	//// 	   TODO:: implement MTL loading via TOL
-	//// if(!tinyobj::LoadMtl())
-	//if (!tinyobj::LoadObj(&attributes, &shapes, &materials, &warn, &err, modelPath.c_str()))
-	//{
-	//	throw std::runtime_error(warn + err);
-	//}
-
-	//// The load function already triangulates faces; at this point it can be assumed that there are 3 vertices on each face
-	//for (std::vector<tinyobj::shape_t>::iterator shapeIter = shapes.begin(); shapeIter != shapes.end(); shapeIter++)
-	//{
-	//	for (const tinyobj::index_t index : shapeIter._Ptr->mesh.indices)	// I would like to not be using foreach but good lord the types
-	//	{
-	//		Vertex vertex{};
-	//		
-	//		vertex.pos = {
-	//			attributes.vertices[3 * index.vertex_index + 0],
-	//			attributes.vertices[3 * index.vertex_index + 1],
-	//			attributes.vertices[3 * index.vertex_index + 2]
-	//		};
-
-	//		vertex.vertexNormal = {
-	//			attributes.normals[3 * index.normal_index + 0],
-	//			attributes.normals[3 * index.normal_index + 1],
-	//			attributes.normals[3 * index.normal_index + 2]
-	//		};
-
-	//		vertex.texCoord = {
-	//			attributes.texcoords[2 * index.texcoord_index + 0],
-	//			attributes.texcoords[2 * index.texcoord_index + 1]
-	//		};
-
-	//		vertex.color = { 1.0f, 1.0f, 1.0f };
-
-	//		// We are assuming that each vertex is unique here
-	//		// TODO: account for duplicate vertices
-	//		vertices.push_back(vertex);
-	//		indices.push_back((uint32_t)indices.size());
-	//	}
-	//}
-}
-
-// temporary helper function, creates a 1x1x1 cube centered at offset
-std::unique_ptr<Model> Renderer::createCubeModel(Device& device, glm::vec3 offset)
-{
-	Model::Builder modelBuilder{};
-	modelBuilder.vertices = {
-		// left face (white)
-		{{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
-		{{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
-		{{-.5f, -.5f, .5f}, {.9f, .9f, .9f}},
-		{{-.5f, .5f, -.5f}, {.9f, .9f, .9f}},
-
-		// right face (yellow)
-		{{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
-		{{.5f, .5f, .5f}, {.8f, .8f, .1f}},
-		{{.5f, -.5f, .5f}, {.8f, .8f, .1f}},
-		{{.5f, .5f, -.5f}, {.8f, .8f, .1f}},
-
-		// top face (orange, remember y axis points down)
-		{{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
-		{{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
-		{{-.5f, -.5f, .5f}, {.9f, .6f, .1f}},
-		{{.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
-
-		// bottom face (red)
-		{{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
-		{{.5f, .5f, .5f}, {.8f, .1f, .1f}},
-		{{-.5f, .5f, .5f}, {.8f, .1f, .1f}},
-		{{.5f, .5f, -.5f}, {.8f, .1f, .1f}},
-
-		// nose face (blue)
-		{{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
-		{{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
-		{{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
-		{{.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
-
-		// tail face (green)
-		{{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-		{{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-		{{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-		{{.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-	};
-	for (auto& v : modelBuilder.vertices)
-	{
-		v.position += offset;
-	}
-
-	modelBuilder.indices = { 0,  1,  2,  0,  3,  1,  4,  5,  6,  4,  7,  5,  8,  9,  10, 8,  11, 9,
-							12, 13, 14, 12, 15, 13, 16, 17, 18, 16, 19, 17, 20, 21, 22, 20, 23, 21 };
-
-	return std::make_unique<Model>(device, modelBuilder);
+	std::shared_ptr<Model> model2 = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/smoothVase/smooth_vase.obj");
+	GameObject gameObject2 = GameObject::createGameObject();
+	gameObject2.model = model2;
+	gameObject2.transform.translation = { 1.0f, 0.0f, 0.0f };
+	gameObject2.transform.rotation = { -90.0f, 0.0f, 0.0f };
+	gameObject2.transform.scale = { 2.0f, 2.0f, 2.0f };
+	gameObjects.push_back(std::move(gameObject2));
 }
 
 void Renderer::uploadMeshData(Mesh& mesh)
