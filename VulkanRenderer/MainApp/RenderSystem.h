@@ -11,7 +11,7 @@
 struct SimplePushConstantData
 {
 	glm::mat4 transform{ 1.0f };
-	alignas(16)glm::vec3 color;
+	glm::mat4 normalMatrix{ 1.0f };
 };
 
 class RenderSystem

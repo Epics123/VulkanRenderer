@@ -26,9 +26,11 @@ void RenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<
 	{
 		//obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + 0.01f, glm::two_pi<float>());
 
+		glm::mat4 model = obj.transform.getTransform();
+
 		SimplePushConstantData push{};
-		push.color = obj.color;
-		push.transform = viewProj * obj.transform.getTransform();
+		push.transform = viewProj * model;
+		push.normalMatrix = obj.transform.getNormalMatrix();
 
 		vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
 
