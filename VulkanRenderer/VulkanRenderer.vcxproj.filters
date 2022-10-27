@@ -51,6 +51,9 @@
     <ClInclude Include="MainApp\Application.h">
       <Filter>MainApp</Filter>
     </ClInclude>
+    <ClInclude Include="MainApp\Buffer.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
     <ClInclude Include="MainApp\Camera.h">
       <Filter>MainApp</Filter>
     </ClInclude>
@@ -58,6 +61,9 @@
       <Filter>MainApp</Filter>
     </ClInclude>
     <ClInclude Include="MainApp\Device.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\FrameInfo.h">
       <Filter>MainApp</Filter>
     </ClInclude>
     <ClInclude Include="MainApp\GameObject.h">
@@ -126,6 +132,9 @@
       <Filter>Libraries\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="MainApp\Application.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\Buffer.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
     <ClCompile Include="MainApp\Camera.cpp">

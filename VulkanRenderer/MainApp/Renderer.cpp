@@ -66,10 +66,10 @@ Renderer::Renderer(Window* appWindow)
 void Renderer::init()
 {
 	//createVulkanInstance();
-	loadGameObjects();
 	recreateSwapChain();
 	renderSystem.init(getSwapChainRenderPass());
 	createCommandBuffers();
+	loadGameObjects();
 
 	mainCamera = Camera();
 	mainCamera.updateModel(0.0f);
@@ -1097,47 +1097,47 @@ void Renderer::uploadMeshData(Mesh& mesh)
 
 void Renderer::createTextureImage()
 {
-	int texWidth, texHeight, texChannels;
-	stbi_uc* pixels = stbi_load(texturePath.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-	//stbi_uc* pixels = stbi_load("MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+	//int texWidth, texHeight, texChannels;
+	//stbi_uc* pixels = stbi_load(texturePath.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+	////stbi_uc* pixels = stbi_load("MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 
 
-	// RBGA * area values
-	VkDeviceSize imageSize = texWidth * texHeight * 4;
+	//// RBGA * area values
+	//VkDeviceSize imageSize = texWidth * texHeight * 4;
 
-	if (!pixels)
-	{
-		throw std::runtime_error("Failed to load texture image");
-	}
+	//if (!pixels)
+	//{
+	//	throw std::runtime_error("Failed to load texture image");
+	//}
 
-	// Create buffer to transfer pixel data
-	Buffer stagingBuffer;
-	Buffer::createBuffer(device, physicalDevice, imageSize,
-		VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-		stagingBuffer.buffer, stagingBuffer.bufferMemory, stagingBuffer.bufferInfo);
+	//// Create buffer to transfer pixel data
+	//Buffer stagingBuffer;
+	//Buffer::createBuffer(device, physicalDevice, imageSize,
+	//	VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+	//	stagingBuffer.buffer, stagingBuffer.bufferMemory, stagingBuffer.bufferInfo);
 
-	// Copy pixel values from image loading library to staging buffer
-	void* data;
-	vkMapMemory(device, stagingBuffer.bufferMemory, 0, imageSize, 0, &data);
-	memcpy(data, pixels, static_cast<size_t>(imageSize));
-	vkUnmapMemory(device, stagingBuffer.bufferMemory);
+	//// Copy pixel values from image loading library to staging buffer
+	//void* data;
+	//vkMapMemory(device, stagingBuffer.bufferMemory, 0, imageSize, 0, &data);
+	//memcpy(data, pixels, static_cast<size_t>(imageSize));
+	//vkUnmapMemory(device, stagingBuffer.bufferMemory);
 
-	// Clean up image loading
-	stbi_image_free(pixels);
+	//// Clean up image loading
+	//stbi_image_free(pixels);
 
-	Image::createImage(device, physicalDevice, texWidth, texHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory);
+	//Image::createImage(device, physicalDevice, texWidth, texHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+	//	VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory);
 
-	// Copy the staging buffer to the new image | Can transition from layout_undefined because we don't care about the contents before the copy operation
-	Image::transitionImageLayout(graphicsQueue, device, commandPool, textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-	Image::copyBufferToImage(graphicsQueue, device, commandPool, stagingBuffer.buffer, textureImage, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
+	//// Copy the staging buffer to the new image | Can transition from layout_undefined because we don't care about the contents before the copy operation
+	//Image::transitionImageLayout(graphicsQueue, device, commandPool, textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	//Image::copyBufferToImage(graphicsQueue, device, commandPool, stagingBuffer.buffer, textureImage, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
 
-	// Transition image to format for shader read access
-	Image::transitionImageLayout(graphicsQueue, device, commandPool, textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	//// Transition image to format for shader read access
+	//Image::transitionImageLayout(graphicsQueue, device, commandPool, textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-	// Cleanup
-	vkDestroyBuffer(device, stagingBuffer.buffer, nullptr);
-	vkFreeMemory(device, stagingBuffer.bufferMemory, nullptr);
+	//// Cleanup
+	//vkDestroyBuffer(device, stagingBuffer.buffer, nullptr);
+	//vkFreeMemory(device, stagingBuffer.bufferMemory, nullptr);
 }
 
 void Renderer::createTextureImageView()
@@ -1284,12 +1284,30 @@ VkCommandBuffer Renderer::beginFrame()
 
 void Renderer::drawFrame(float dt)
 {
+	std::vector<std::unique_ptr<Buffer>> uboBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
+	for (int i = 0; i < uboBuffers.size(); i++)
+	{
+		uboBuffers[i] = std::make_unique<Buffer>(mDevice, sizeof(GlobalUbo), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+		uboBuffers[i]->map();
+	}
+
 	// Rework
 	if (VkCommandBuffer commandBuffer = beginFrame())
 	{
+		int frameIndex = getFrameIndex();
+
+		FrameInfo frameInfo { frameIndex, dt, commandBuffer, mainCamera };
+		
+		// update ubos
+		GlobalUbo ubo{};
+		ubo.projectionView = mainCamera.proj * mainCamera.view;
+		uboBuffers[frameIndex]->writeToBuffer(&ubo);
+		uboBuffers[frameIndex]->flush();
+
+		// render
 		beginSwapChainRenderPass(commandBuffer);
 		mainCamera.updateModel(dt);
-		renderSystem.renderGameObjects(commandBuffer, gameObjects, mainCamera);
+		renderSystem.renderGameObjects(frameInfo, gameObjects);
 		endSwapChainRenderPass(commandBuffer);
 		endFrame();
 	}

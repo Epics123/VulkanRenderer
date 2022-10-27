@@ -101,7 +101,7 @@ typedef std::vector<uint32_t> IndexSTDVector;
 typedef std::vector<Vertex>::iterator VertexIter;
 typedef std::vector<uint32_t>::iterator IndexIter;
 
-struct Buffer
+struct OldBuffer
 {
 	VkBuffer buffer;
 	VkDeviceMemory bufferMemory;
@@ -116,17 +116,17 @@ struct Buffer
 	virtual void freeBufferMemory(VkDevice device);
 };
 
-struct VertexBuffer : Buffer
+struct VertexBuffer : OldBuffer
 {
 	VkResult createVertexBuffer(VkDevice device, VertexSTDVector verticies, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue);
 };
 
-struct IndexBuffer : Buffer
+struct IndexBuffer : OldBuffer
 {
 	VkResult createIndexBuffer(VkDevice device, IndexSTDVector indicies, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue);
 };
 
-struct UniformBuffer : Buffer
+struct UniformBuffer : OldBuffer
 {
 	VkResult createUniformBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue, VkDeviceSize bufferSize);
 };

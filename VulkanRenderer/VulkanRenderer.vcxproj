@@ -103,9 +103,11 @@
     <ClInclude Include="Libraries\ImGui\imstb_textedit.h" />
     <ClInclude Include="Libraries\ImGui\imstb_truetype.h" />
     <ClInclude Include="MainApp\Application.h" />
+    <ClInclude Include="MainApp\Buffer.h" />
     <ClInclude Include="MainApp\Camera.h" />
     <ClInclude Include="MainApp\CommandBuffer.h" />
     <ClInclude Include="MainApp\Device.h" />
+    <ClInclude Include="MainApp\FrameInfo.h" />
     <ClInclude Include="MainApp\GameObject.h" />
     <ClInclude Include="MainApp\Image.h" />
     <ClInclude Include="MainApp\Light.h" />
@@ -130,6 +132,7 @@
     <ClCompile Include="Libraries\ImGui\imgui_tables.cpp" />
     <ClCompile Include="Libraries\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="MainApp\Application.cpp" />
+    <ClCompile Include="MainApp\Buffer.cpp" />
     <ClCompile Include="MainApp\Camera.cpp" />
     <ClCompile Include="MainApp\CommandBuffer.cpp" />
     <ClCompile Include="MainApp\Device.cpp" />

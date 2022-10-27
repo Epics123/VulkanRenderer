@@ -27,7 +27,7 @@ VkResult VertexBuffer::createVertexBuffer(VkDevice device, VertexSTDVector verti
 	return result;
 }
 
-VkResult Buffer::createBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory, VkBufferCreateInfo& bufferInfo)
+VkResult OldBuffer::createBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory, VkBufferCreateInfo& bufferInfo)
 {
 	// Create the vertex buffer
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -62,7 +62,7 @@ VkResult Buffer::createBuffer(VkDevice device, VkPhysicalDevice physicalDevice, 
 	return result;
 }
 
-void Buffer::copyBuffer(VkDevice device, VkCommandPool commandPool, VkQueue graphicsQueue, VkBuffer src, VkBuffer dst, VkDeviceSize size)
+void OldBuffer::copyBuffer(VkDevice device, VkCommandPool commandPool, VkQueue graphicsQueue, VkBuffer src, VkBuffer dst, VkDeviceSize size)
 {
 	// TODO: replace this function with single time command buffer function implementation (see texture mapping/images)
 
@@ -73,17 +73,17 @@ void Buffer::copyBuffer(VkDevice device, VkCommandPool commandPool, VkQueue grap
 	endSingleTimeCommands(graphicsQueue, device, commandBuffer, commandPool);
 }
 
-void Buffer::destroyBuffer(VkDevice device)
+void OldBuffer::destroyBuffer(VkDevice device)
 {
 	vkDestroyBuffer(device, buffer, nullptr);
 }
 
-void Buffer::freeBufferMemory(VkDevice device)
+void OldBuffer::freeBufferMemory(VkDevice device)
 {
 	vkFreeMemory(device, bufferMemory, nullptr);
 }
 
-uint32_t Buffer::findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties)
+uint32_t OldBuffer::findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties)
 {
 	VkPhysicalDeviceMemoryProperties memProperties;
 	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties); // Query GPU for available memory types

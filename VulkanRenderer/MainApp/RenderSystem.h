@@ -3,7 +3,7 @@
 #include "Device.h"
 #include "Pipeline.h"
 #include "GameObject.h"
-#include "Camera.h"
+#include "FrameInfo.h"
 
 #include <vector>
 #include <memory>
@@ -25,7 +25,7 @@ public:
 
 	void init(VkRenderPass renderPass);
 
-	void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects, Camera& camera);
+	void renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>& gameObjects);
 
 private:
 	void createPipelineLayout();
