@@ -106,6 +106,7 @@
     <ClInclude Include="MainApp\Buffer.h" />
     <ClInclude Include="MainApp\Camera.h" />
     <ClInclude Include="MainApp\CommandBuffer.h" />
+    <ClInclude Include="MainApp\Descriptors.h" />
     <ClInclude Include="MainApp\Device.h" />
     <ClInclude Include="MainApp\FrameInfo.h" />
     <ClInclude Include="MainApp\GameObject.h" />
@@ -135,6 +136,7 @@
     <ClCompile Include="MainApp\Buffer.cpp" />
     <ClCompile Include="MainApp\Camera.cpp" />
     <ClCompile Include="MainApp\CommandBuffer.cpp" />
+    <ClCompile Include="MainApp\Descriptors.cpp" />
     <ClCompile Include="MainApp\Device.cpp" />
     <ClCompile Include="MainApp\GameObject.cpp" />
     <ClCompile Include="MainApp\Image.cpp" />

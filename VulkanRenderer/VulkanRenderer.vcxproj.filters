@@ -108,6 +108,9 @@
     <ClInclude Include="MainApp\Window.h">
       <Filter>MainApp</Filter>
     </ClInclude>
+    <ClInclude Include="MainApp\Descriptors.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Libraries\ImGui\imgui.cpp">
@@ -186,6 +189,9 @@
       <Filter>MainApp</Filter>
     </ClCompile>
     <ClCompile Include="MainApp\Window.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\Descriptors.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
   </ItemGroup>
