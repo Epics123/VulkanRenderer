@@ -82,7 +82,7 @@ void Renderer::init()
 	}
 
 	// highest set common to all shaders
-	std::unique_ptr<DescriptorSetLayout> globalSetLayout = DescriptorSetLayout::Builder(mDevice).addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT).build();
+	std::unique_ptr<DescriptorSetLayout> globalSetLayout = DescriptorSetLayout::Builder(mDevice).addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS).build();
 
 	globalDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 	for (int i = 0; i < globalDescriptorSets.size(); i++)
@@ -1099,20 +1099,28 @@ void Renderer::loadGameObjects()
 {
 	// Rework test
 	std::shared_ptr<Model> model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/teapot/downScaledPot.obj");
-	GameObject gameObject = GameObject::createGameObject();
-	gameObject.model = model;
-	gameObject.transform.translation = {0.0f, 0.0f, 0.0f};
-	gameObject.transform.rotation = {1.0f, 1.0f, 3.0f};
-	gameObject.transform.scale = {1.0f, 1.0f, 1.0f};
-	gameObjects.push_back(std::move(gameObject));
+	GameObject teapot = GameObject::createGameObject();
+	teapot.model = model;
+	teapot.transform.translation = {-0.5f, 0.0f, 0.0f};
+	teapot.transform.rotation = {0.0f, 0.0f, 0.0f};
+	teapot.transform.scale = {1.0f, 1.0f, 1.0f};
+	gameObjects.emplace(teapot.getID(), std::move(teapot));
 
-	std::shared_ptr<Model> model2 = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/smoothVase/smooth_vase.obj");
-	GameObject gameObject2 = GameObject::createGameObject();
-	gameObject2.model = model2;
-	gameObject2.transform.translation = { 1.0f, 0.0f, 0.0f };
-	gameObject2.transform.rotation = { -90.0f, 0.0f, 0.0f };
-	gameObject2.transform.scale = { 2.0f, 2.0f, 2.0f };
-	gameObjects.push_back(std::move(gameObject2));
+	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/smoothVase/smooth_vase.obj");
+	GameObject smoothVase = GameObject::createGameObject();
+	smoothVase.model = model;
+	smoothVase.transform.translation = { 0.5f, 0.0f, 0.0f };
+	smoothVase.transform.rotation = { 0.0f, 0.0f, 0.0f };
+	smoothVase.transform.scale = { 3.0f, 3.0f, 3.0f };
+	gameObjects.emplace(smoothVase.getID(), std::move(smoothVase));
+
+	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/quad/quad.obj");
+	GameObject floor = GameObject::createGameObject();
+	floor.model = model;
+	floor.transform.translation = { 0.0f, 0.0f, -0.3f };
+	floor.transform.rotation = { 0.0f, 0.0f, 0.0f };
+	floor.transform.scale = { 3.0f, 3.0f, 1.0f };
+	gameObjects.emplace(floor.getID(), std::move(floor));
 }
 
 void Renderer::uploadMeshData(Mesh& mesh)
@@ -1316,7 +1324,7 @@ void Renderer::drawFrame(float dt)
 	{
 		int frameIndex = getFrameIndex();
 
-		FrameInfo frameInfo { frameIndex, dt, commandBuffer, mainCamera, globalDescriptorSets[frameIndex]};
+		FrameInfo frameInfo { frameIndex, dt, commandBuffer, mainCamera, globalDescriptorSets[frameIndex], gameObjects};
 		
 		// update ubos
 		GlobalUbo ubo{};
@@ -1327,7 +1335,7 @@ void Renderer::drawFrame(float dt)
 		// render
 		beginSwapChainRenderPass(commandBuffer);
 		mainCamera.updateModel(dt);
-		renderSystem.renderGameObjects(frameInfo, gameObjects);
+		renderSystem.renderGameObjects(frameInfo);
 		endSwapChainRenderPass(commandBuffer);
 		endFrame();
 	}

@@ -17,7 +17,7 @@ struct Camera
 
 	void setPerspectiveProjection(float fov, float aspectRatio, float near, float far);
 
-	glm::vec3 position = glm::vec3(3.0f, 0.0f, 0.0f);
+	glm::vec3 position = glm::vec3(0.0f, 3.0f, 0.0f);
 	glm::vec3 rotation{};
 	glm::quat orientation{};
 	glm::quat invOrient = glm::conjugate(orientation);
@@ -33,7 +33,7 @@ struct Camera
 	glm::mat4 view;
 	glm::mat4 proj;
 
-	float yaw = 90.0f;
+	float yaw = 0.0f;
 	float pitch = 250.0f;
 	float roll = 0.0f;
 	float fov = 70.0f;

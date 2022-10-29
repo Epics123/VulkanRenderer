@@ -16,15 +16,15 @@ void RenderSystem::init(VkRenderPass renderPass, VkDescriptorSetLayout globalSet
 	createPipeline(renderPass);
 }
 
-void RenderSystem::renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>& gameObjects)
+void RenderSystem::renderGameObjects(FrameInfo& frameInfo)
 {
 	pipeline->bind(frameInfo.commandBuffer);
 
 	vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &frameInfo.globalDescriptorSet, 0, nullptr);
 
-	for (auto& obj : gameObjects)
+	for (auto& keyValue : frameInfo.gameObjects)
 	{
-		//obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + 0.01f, glm::two_pi<float>());
+		GameObject& obj = keyValue.second;
 
 		SimplePushConstantData push{};
 		push.modelMatrix = obj.transform.getTransform();

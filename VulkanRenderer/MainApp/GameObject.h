@@ -6,6 +6,7 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include <memory>
+#include <unordered_map>
 
 struct TransformComponent
 {
@@ -21,6 +22,7 @@ class GameObject
 {
 public:
 	typedef unsigned int id_t;
+	using Map = std::unordered_map<id_t, GameObject>;
 
 	static GameObject createGameObject()
 	{

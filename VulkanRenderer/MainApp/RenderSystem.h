@@ -25,7 +25,7 @@ public:
 
 	void init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
 
-	void renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>& gameObjects);
+	void renderGameObjects(FrameInfo& frameInfo);
 
 private:
 	void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);

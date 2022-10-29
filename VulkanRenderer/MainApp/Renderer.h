@@ -53,7 +53,12 @@ enum RenderMode
 struct GlobalUbo
 {
 	glm::mat4 projectionView{1.0f};
-	glm::vec3 lightDirection = glm::normalize(glm::vec3{1.0f, -3.0f, 1.0f});
+
+	glm::vec4 lightPostion{0.2f, 0.0f, -0.7f, 0.0f}; // ignore w
+	glm::vec4 lightColor{0.0f, 0.3f, 1.0f, 1.0f}; // w is light intensity
+	glm::vec4 abmientColor{1.0f, 1.0f, 1.0f, 0.2f};
+
+	//glm::vec3 lightDirection = glm::normalize(glm::vec3{1.0f, -3.0f, 1.0f});
 };
 
 class Renderer
@@ -262,7 +267,7 @@ private:
 	std::unique_ptr<DescriptorPool> globalDescriptorPool{};
 	std::vector<VkDescriptorSet> globalDescriptorSets;
 	std::vector<std::unique_ptr<Buffer>> uboBuffers;
-	std::vector<GameObject> gameObjects;
+	GameObject::Map gameObjects;
 
 	RenderSystem renderSystem {mDevice};
 	////////////
