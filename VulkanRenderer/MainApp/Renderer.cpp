@@ -92,6 +92,8 @@ void Renderer::init()
 	}
 
 	renderSystem.init(getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
+	pointLightSystem.init(getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
+
 	createCommandBuffers();
 
 	loadGameObjects();
@@ -1328,14 +1330,18 @@ void Renderer::drawFrame(float dt)
 		
 		// update ubos
 		GlobalUbo ubo{};
-		ubo.projectionView = mainCamera.proj * mainCamera.view;
+		ubo.projection = mainCamera.proj;
+		ubo.view = mainCamera.view;
 		uboBuffers[frameIndex]->writeToBuffer(&ubo);
 		uboBuffers[frameIndex]->flush();
 
 		// render
 		beginSwapChainRenderPass(commandBuffer);
 		mainCamera.updateModel(dt);
+
 		renderSystem.renderGameObjects(frameInfo);
+		pointLightSystem.render(frameInfo);
+
 		endSwapChainRenderPass(commandBuffer);
 		endFrame();
 	}

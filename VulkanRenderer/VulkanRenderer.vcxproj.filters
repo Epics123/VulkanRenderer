@@ -10,6 +10,9 @@
     <Filter Include="MainApp">
       <UniqueIdentifier>{6BCAF114-D7A9-70B0-E0C1-FB864C20D711}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MainApp\RenderSystems">
+      <UniqueIdentifier>{F2D589C3-5E42-45BE-2736-DD1B93616726}</UniqueIdentifier>
+    </Filter>
     <Filter Include="MainApp\resources">
       <UniqueIdentifier>{B551250E-2168-23A4-6ADF-AEC5D634F42B}</UniqueIdentifier>
     </Filter>
@@ -60,6 +63,9 @@
     <ClInclude Include="MainApp\CommandBuffer.h">
       <Filter>MainApp</Filter>
     </ClInclude>
+    <ClInclude Include="MainApp\Descriptors.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
     <ClInclude Include="MainApp\Device.h">
       <Filter>MainApp</Filter>
     </ClInclude>
@@ -84,8 +90,8 @@
     <ClInclude Include="MainApp\Pipeline.h">
       <Filter>MainApp</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\RenderSystem.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="MainApp\RenderSystems\RenderSystem.h">
+      <Filter>MainApp\RenderSystems</Filter>
     </ClInclude>
     <ClInclude Include="MainApp\Renderer.h">
       <Filter>MainApp</Filter>
@@ -108,8 +114,8 @@
     <ClInclude Include="MainApp\Window.h">
       <Filter>MainApp</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\Descriptors.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="MainApp\RenderSystems\PointLightSystem.h">
+      <Filter>MainApp\RenderSystems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -146,6 +152,9 @@
     <ClCompile Include="MainApp\CommandBuffer.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
+    <ClCompile Include="MainApp\Descriptors.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
     <ClCompile Include="MainApp\Device.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
@@ -170,8 +179,8 @@
     <ClCompile Include="MainApp\Pipeline.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\RenderSystem.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="MainApp\RenderSystems\RenderSystem.cpp">
+      <Filter>MainApp\RenderSystems</Filter>
     </ClCompile>
     <ClCompile Include="MainApp\Renderer.cpp">
       <Filter>MainApp</Filter>
@@ -191,8 +200,8 @@
     <ClCompile Include="MainApp\Window.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\Descriptors.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="MainApp\RenderSystems\PointLightSystem.cpp">
+      <Filter>MainApp\RenderSystems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -206,6 +215,12 @@
       <Filter>MainApp\resources\vulkan\shaders</Filter>
     </None>
     <None Include="MainApp\resources\vulkan\shaders\Wireframe.vert">
+      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    </None>
+    <None Include="MainApp\resources\vulkan\shaders\PointLight.vert">
+      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    </None>
+    <None Include="MainApp\resources\vulkan\shaders\PointLight.frag">
       <Filter>MainApp\resources\vulkan\shaders</Filter>
     </None>
   </ItemGroup>

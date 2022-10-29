@@ -21,7 +21,8 @@
 #include "SwapChain.h"
 #include "Model.h"
 #include "GameObject.h"
-#include "RenderSystem.h"
+#include "RenderSystems/RenderSystem.h"
+#include "RenderSystems/PointLightSystem.h"
 #include "Buffer.h"
 #include "Descriptors.h"
 
@@ -52,11 +53,12 @@ enum RenderMode
 // TEMP FOR TESTING UBOS
 struct GlobalUbo
 {
-	glm::mat4 projectionView{1.0f};
+	glm::mat4 projection{1.0f};
+	glm::mat4 view{1.0f};
 
-	glm::vec4 lightPostion{0.2f, 0.0f, -0.7f, 0.0f}; // ignore w
-	glm::vec4 lightColor{0.0f, 0.3f, 1.0f, 1.0f}; // w is light intensity
-	glm::vec4 abmientColor{1.0f, 1.0f, 1.0f, 0.2f};
+	glm::vec4 lightPostion{0.5f, 0.0f, 2.0f, 0.0f}; // ignore w
+	glm::vec4 lightColor{1.0f, 1.0f, 1.0f, 3.0f}; // w is light intensity
+	glm::vec4 abmientColor{1.0f, 1.0f, 1.0f, 0.1f};
 
 	//glm::vec3 lightDirection = glm::normalize(glm::vec3{1.0f, -3.0f, 1.0f});
 };
@@ -270,6 +272,7 @@ private:
 	GameObject::Map gameObjects;
 
 	RenderSystem renderSystem {mDevice};
+	PointLightSystem pointLightSystem {mDevice};
 	////////////
 
 	RenderMode renderMode = DEFAULT_LIT;

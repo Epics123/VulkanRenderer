@@ -23,7 +23,7 @@
 Pipeline::Pipeline(Device& device, const std::string& vertFilePath, const std::string& fragFilePath, const PipelineConfigInfo& configInfo)
 	:device(device)
 {
-	createGraphicsPipeline(configInfo);
+	createGraphicsPipeline(configInfo, vertFilePath, fragFilePath);
 }
 
 Pipeline::~Pipeline()
@@ -33,13 +33,13 @@ Pipeline::~Pipeline()
 	vkDestroyPipeline(device.getDevice(), graphicsPipeline, nullptr);
 }
 
-void Pipeline::createGraphicsPipeline(const PipelineConfigInfo& configInfo)
+void Pipeline::createGraphicsPipeline(const PipelineConfigInfo& configInfo, const std::string& vertFilePath, const std::string& fragFilePath)
 {
 	assert(configInfo.pipelineLayout != VK_NULL_HANDLE && "Cannot create graphics pipeline: no pipelineLayout provided in configInfo");
 	assert(configInfo.renderPass != VK_NULL_HANDLE && "Cannot create graphics pipeline: no renderPass provided in configInfo");
 
-	std::vector<char> vertShaderCode = readFile("MainApp/resources/vulkan/shaders/TestVert.spv");
-	std::vector<char> fragShaderCode = readFile("MainApp/resources/vulkan/shaders/TestFrag.spv");
+	std::vector<char> vertShaderCode = readFile(vertFilePath);
+	std::vector<char> fragShaderCode = readFile(fragFilePath);
 
 	createShaderModule(vertShaderCode, &vertShaderModule);
 	createShaderModule(fragShaderCode, &fragShaderModule);
@@ -60,8 +60,8 @@ void Pipeline::createGraphicsPipeline(const PipelineConfigInfo& configInfo)
 	shaderStages[1].pNext = nullptr;
 	shaderStages[1].pSpecializationInfo = nullptr;
 
-	std::vector<VkVertexInputBindingDescription> bindingDescriptions = Model::Vertex::getBindingDescriptions();
-	std::vector<VkVertexInputAttributeDescription> attributeDescriptions = Model::Vertex::getAttributeDescriptions();
+	std::vector<VkVertexInputBindingDescription> bindingDescriptions = configInfo.bindingDescriptions;
+	std::vector<VkVertexInputAttributeDescription> attributeDescriptions = configInfo.attributeDescriptions;
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
@@ -355,6 +355,9 @@ void Pipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo)
 	configInfo.dynamicStateInfo.pDynamicStates = configInfo.dynamicStateEnables.data();
 	configInfo.dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(configInfo.dynamicStateEnables.size());
 	configInfo.dynamicStateInfo.flags = 0;
+
+	configInfo.bindingDescriptions = Model::Vertex::getBindingDescriptions();
+	configInfo.attributeDescriptions = Model::Vertex::getAttributeDescriptions();
 }
 
 void Pipeline::bindPipeline(VkCommandBuffer commandBuffer, VkPipelineBindPoint pipelineBindPoint)

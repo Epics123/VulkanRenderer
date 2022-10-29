@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Device.h"
-#include "Pipeline.h"
-#include "GameObject.h"
-#include "FrameInfo.h"
+#include "../Device.h"
+//#include "../Pipeline.h"
+#include "../GameObject.h"
+#include "../FrameInfo.h"
 
 #include <vector>
 #include <memory>
@@ -33,6 +33,6 @@ private:
 
 	Device& device;
 
-	std::unique_ptr<Pipeline> pipeline;
+	std::unique_ptr<class Pipeline> pipeline;
 	VkPipelineLayout pipelineLayout;
 };

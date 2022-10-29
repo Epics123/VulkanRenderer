@@ -1,4 +1,5 @@
 #include "RenderSystem.h"
+#include "../Pipeline.h"
 
 RenderSystem::RenderSystem(Device& device)
 	: device {device}
