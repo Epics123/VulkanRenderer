@@ -8,9 +8,15 @@ layout (location = 3) in vec2 aTexCoord;
 
 layout (location = 0) out vec3 fragColor;
 
+layout (set = 0, binding = 0) uniform GlobalUbo
+{
+	mat4 projectionView;
+	vec3 directionToLight;
+} ubo;
+
 layout (push_constant) uniform Push
 { 
-	mat4 transform;
+	mat4 modelMatrix;
 	mat4 normalMatrix;
 }push;
 
@@ -19,11 +25,11 @@ const float AMBIENT = 0.02;
 
 void main()
 {
-	gl_Position = push.transform * vec4(aPosition, 1.0f);
+	gl_Position = ubo.projectionView * push.modelMatrix * vec4(aPosition, 1.0f);
 
 	vec3 normalWorld = normalize((push.normalMatrix * vec4(aNormal, 0.0)).xyz);
 
-	float lightIntensity = AMBIENT + max(dot(normalWorld, DIRECTION_TO_LIGHT), 0);
+	float lightIntensity = AMBIENT + max(dot(normalWorld, ubo.directionToLight), 0);
 
 	fragColor = lightIntensity * aColor;
 }

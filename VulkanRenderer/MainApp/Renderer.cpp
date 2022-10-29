@@ -67,8 +67,33 @@ void Renderer::init()
 {
 	//createVulkanInstance();
 	recreateSwapChain();
-	renderSystem.init(getSwapChainRenderPass());
+
+	globalDescriptorPool =
+		DescriptorPool::Builder(mDevice)
+		.setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
+		.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
+		.build();
+
+	uboBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+	for (int i = 0; i < uboBuffers.size(); i++)
+	{
+		uboBuffers[i] = std::make_unique<Buffer>(mDevice, sizeof(GlobalUbo), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+		uboBuffers[i]->map();
+	}
+
+	// highest set common to all shaders
+	std::unique_ptr<DescriptorSetLayout> globalSetLayout = DescriptorSetLayout::Builder(mDevice).addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT).build();
+
+	globalDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+	for (int i = 0; i < globalDescriptorSets.size(); i++)
+	{
+		VkDescriptorBufferInfo bufferInfo = uboBuffers[i]->descriptorInfo();
+		DescriptorWriter(*globalSetLayout, *globalDescriptorPool).writeBuffer(0, &bufferInfo).build(globalDescriptorSets[i]);
+	}
+
+	renderSystem.init(getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
 	createCommandBuffers();
+
 	loadGameObjects();
 
 	mainCamera = Camera();
@@ -1284,19 +1309,14 @@ VkCommandBuffer Renderer::beginFrame()
 
 void Renderer::drawFrame(float dt)
 {
-	std::vector<std::unique_ptr<Buffer>> uboBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
-	for (int i = 0; i < uboBuffers.size(); i++)
-	{
-		uboBuffers[i] = std::make_unique<Buffer>(mDevice, sizeof(GlobalUbo), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-		uboBuffers[i]->map();
-	}
 
 	// Rework
+	
 	if (VkCommandBuffer commandBuffer = beginFrame())
 	{
 		int frameIndex = getFrameIndex();
 
-		FrameInfo frameInfo { frameIndex, dt, commandBuffer, mainCamera };
+		FrameInfo frameInfo { frameIndex, dt, commandBuffer, mainCamera, globalDescriptorSets[frameIndex]};
 		
 		// update ubos
 		GlobalUbo ubo{};
@@ -1576,6 +1596,7 @@ void Renderer::cleanup()
 {
 	freeCommandBuffers();
 	window->cleanupWindow();
+	globalDescriptorPool = nullptr;
 	//cleanupSwapChain();
 
 	//ImGui_ImplVulkan_Shutdown();

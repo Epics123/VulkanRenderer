@@ -40,11 +40,7 @@ DescriptorSetLayout::DescriptorSetLayout(Device& device, std::unordered_map<uint
 	descriptorSetLayoutInfo.bindingCount = static_cast<uint32_t>(setLayoutBindings.size());
 	descriptorSetLayoutInfo.pBindings = setLayoutBindings.data();
 
-	if (vkCreateDescriptorSetLayout(
-		mDevice.getDevice(),
-		&descriptorSetLayoutInfo,
-		nullptr,
-		&descriptorSetLayout) != VK_SUCCESS)
+	if (vkCreateDescriptorSetLayout(mDevice.getDevice(), &descriptorSetLayoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to create descriptor set layout!");
 	}
@@ -111,7 +107,7 @@ bool DescriptorPool::allocateDescriptorSet(const VkDescriptorSetLayout descripto
 	allocInfo.descriptorSetCount = 1;
 
 	// Might want to create a "DescriptorPoolManager" class that handles this case, and builds
-	// a new pool whenever an old pool fills up. But this is beyond our current scope
+	// a new pool whenever an old pool fills up.
 	if (vkAllocateDescriptorSets(mDevice.getDevice(), &allocInfo, &descriptor) != VK_SUCCESS)
 	{
 		return false;
@@ -140,9 +136,7 @@ DescriptorWriter& DescriptorWriter::writeBuffer(uint32_t binding, VkDescriptorBu
 
 	auto& bindingDescription = setLayout.bindings[binding];
 
-	assert(
-		bindingDescription.descriptorCount == 1 &&
-		"Binding single descriptor info, but binding expects multiple");
+	assert(bindingDescription.descriptorCount == 1 && "Binding single descriptor info, but binding expects multiple");
 
 	VkWriteDescriptorSet write{};
 	write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -161,9 +155,7 @@ DescriptorWriter& DescriptorWriter::writeImage(uint32_t binding, VkDescriptorIma
 
 	auto& bindingDescription = setLayout.bindings[binding];
 
-	assert(
-		bindingDescription.descriptorCount == 1 &&
-		"Binding single descriptor info, but binding expects multiple");
+	assert(bindingDescription.descriptorCount == 1 && "Binding single descriptor info, but binding expects multiple");
 
 	VkWriteDescriptorSet write{};
 	write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

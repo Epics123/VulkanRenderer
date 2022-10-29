@@ -10,7 +10,7 @@
 
 struct SimplePushConstantData
 {
-	glm::mat4 transform{ 1.0f };
+	glm::mat4 modelMatrix{ 1.0f };
 	glm::mat4 normalMatrix{ 1.0f };
 };
 
@@ -23,12 +23,12 @@ public:
 	RenderSystem(const RenderSystem&) = delete;
 	RenderSystem& operator=(const RenderSystem&) = delete;
 
-	void init(VkRenderPass renderPass);
+	void init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
 
 	void renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>& gameObjects);
 
 private:
-	void createPipelineLayout();
+	void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
 	void createPipeline(VkRenderPass renderPass);
 
 	Device& device;

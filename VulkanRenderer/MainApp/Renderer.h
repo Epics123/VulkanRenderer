@@ -23,6 +23,7 @@
 #include "GameObject.h"
 #include "RenderSystem.h"
 #include "Buffer.h"
+#include "Descriptors.h"
 
 //struct QueueFamilyIndices
 //{
@@ -257,7 +258,12 @@ private:
 	// Rework //
 	Device mDevice{*window};
 	std::unique_ptr <SwapChain> mSwapChain;
+
+	std::unique_ptr<DescriptorPool> globalDescriptorPool{};
+	std::vector<VkDescriptorSet> globalDescriptorSets;
+	std::vector<std::unique_ptr<Buffer>> uboBuffers;
 	std::vector<GameObject> gameObjects;
+
 	RenderSystem renderSystem {mDevice};
 	////////////
 
