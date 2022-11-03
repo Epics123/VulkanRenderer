@@ -21,3 +21,14 @@ glm::mat3 TransformComponent::getNormalMatrix()
 {
 	return glm::transpose(glm::inverse(getTransform()));
 }
+
+GameObject GameObject::makePointLight(float intensity, float radius, glm::vec3 color)
+{
+	GameObject obj = createGameObject();
+	obj.color = color;
+	obj.transform.scale.x = radius;
+	obj.pointLight = std::make_unique<PointLightComponent>();
+	obj.pointLight->intensity = intensity;
+
+	return obj;
+}

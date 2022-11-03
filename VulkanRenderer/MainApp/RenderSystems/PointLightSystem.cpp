@@ -17,13 +17,36 @@ void PointLightSystem::init(VkRenderPass renderPass, VkDescriptorSetLayout globa
 	createPipeline(renderPass);
 }
 
-void PointLightSystem::render(FrameInfo& frameInfo)
+void PointLightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo)
+{
+	int lightIndex = 0;
+
+	for (auto& keyValue : frameInfo.gameObjects)
+	{
+		GameObject& obj = keyValue.second;
+		
+		if(!obj.pointLight)
+			continue;
+		
+		obj.transform.translation.y += 0.001f;
+		obj.transform.translation.x += 0.005f;
+
+		// copy light info to ubo
+		ubo.pointLights[lightIndex].position = glm::vec4(obj.transform.translation, 1.0f);
+		ubo.pointLights[lightIndex].color = glm::vec4(obj.color, obj.pointLight->intensity);
+		ubo.pointLights[lightIndex].radius = obj.transform.scale.x;
+		lightIndex++;
+	}
+	ubo.numLights = lightIndex;
+}
+
+void PointLightSystem::render(FrameInfo& frameInfo, GlobalUbo& ubo)
 {
 	pipeline->bind(frameInfo.commandBuffer);
 
 	vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &frameInfo.globalDescriptorSet, 0, nullptr);
 
-	vkCmdDraw(frameInfo.commandBuffer, 6, 1, 0, 0);
+	vkCmdDraw(frameInfo.commandBuffer, 6 * ubo.numLights, 1, 0, 0);
 }
 
 void PointLightSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout)

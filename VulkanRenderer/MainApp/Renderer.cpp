@@ -1123,6 +1123,10 @@ void Renderer::loadGameObjects()
 	floor.transform.rotation = { 0.0f, 0.0f, 0.0f };
 	floor.transform.scale = { 3.0f, 3.0f, 1.0f };
 	gameObjects.emplace(floor.getID(), std::move(floor));
+
+	GameObject pointLight = GameObject::makePointLight(0.2f);
+	pointLight.transform.translation = {0.0f, 0.0f, 1.0f};
+	gameObjects.emplace(pointLight.getID(), std::move(pointLight));
 }
 
 void Renderer::uploadMeshData(Mesh& mesh)
@@ -1332,6 +1336,7 @@ void Renderer::drawFrame(float dt)
 		GlobalUbo ubo{};
 		ubo.projection = mainCamera.proj;
 		ubo.view = mainCamera.view;
+		pointLightSystem.update(frameInfo, ubo);
 		uboBuffers[frameIndex]->writeToBuffer(&ubo);
 		uboBuffers[frameIndex]->flush();
 
@@ -1340,7 +1345,7 @@ void Renderer::drawFrame(float dt)
 		mainCamera.updateModel(dt);
 
 		renderSystem.renderGameObjects(frameInfo);
-		pointLightSystem.render(frameInfo);
+		pointLightSystem.render(frameInfo, ubo);
 
 		endSwapChainRenderPass(commandBuffer);
 		endFrame();

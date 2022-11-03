@@ -9,14 +9,22 @@ layout (location = 3) in vec2 aTexCoord;
 layout (location = 0) out vec3 fragColor;
 layout (location = 1) out vec3 fragPosWorld;
 layout (location = 2) out vec3 fragNormalWorld;
+layout (location = 3) flat out int lightIndex;
+
+struct PointLight
+{
+	vec4 position;
+	vec4 color; // w is intensity
+	float radius;
+};
 
 layout (set = 0, binding = 0) uniform GlobalUbo
 {
 	mat4 projection;
 	mat4 view;
-	vec4 lightPosition;
-	vec4 lightColor;
 	vec4 ambientColor;
+	PointLight pointLights[10];
+	int numLights;
 } ubo;
 
 layout (push_constant) uniform Push
@@ -33,6 +41,8 @@ void main()
 	fragNormalWorld = normalize((push.normalMatrix * vec4(aNormal, 0.0)).xyz);
 	fragPosWorld = postitionWorld.xyz;
 	fragColor = aColor;
+
+	lightIndex = int(floor(gl_VertexIndex / 6));
 }
 
 

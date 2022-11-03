@@ -27,6 +27,9 @@ void RenderSystem::renderGameObjects(FrameInfo& frameInfo)
 	{
 		GameObject& obj = keyValue.second;
 
+		if(!obj.model)
+			continue;
+
 		SimplePushConstantData push{};
 		push.modelMatrix = obj.transform.getTransform();
 		push.normalMatrix = obj.transform.getNormalMatrix();
