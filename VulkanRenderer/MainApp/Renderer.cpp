@@ -1351,6 +1351,7 @@ void Renderer::drawFrame(float dt)
 		GlobalUbo ubo{};
 		ubo.projection = mainCamera.proj;
 		ubo.view = mainCamera.view;
+		ubo.inverseView = mainCamera.invView;
 		pointLightSystem.update(frameInfo, ubo);
 		uboBuffers[frameIndex]->writeToBuffer(&ubo);
 		uboBuffers[frameIndex]->flush();

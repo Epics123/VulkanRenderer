@@ -78,11 +78,13 @@ void Camera::updateModel(float dt)
 
 	invModel = rotate * translate;
 	view = invModel;
+	invModel = glm::inverse(view);
 }
 
 void Camera::setPerspectiveProjection(float fov, float aspectRatio, float near, float far)
 {
 	view = invModel;
+	invModel = glm::inverse(view);
 	proj = glm::perspective(glm::radians(fov), aspectRatio, near, far);
 	proj[1][1] *= -1;
 }

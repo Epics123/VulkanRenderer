@@ -18,6 +18,7 @@ layout (set = 0, binding = 0) uniform GlobalUbo
 {
 	mat4 projection;
 	mat4 view;
+	mat4 invView;
 	vec4 ambientColor;
 	PointLight pointLights[10];
 	int numLights;
@@ -29,47 +30,42 @@ layout (push_constant) uniform Push
 	mat4 normalMatrix;
 }push;
 
+const float SPECULAR_POWER = 512.0;
+
 void main()
 {
 	vec3 diffuse = ubo.ambientColor.xyz * ubo.ambientColor.w;
 	vec3 surfaceNormal = normalize(fragNormalWorld);
+	vec3 spec = vec3(0.0);
 
-	vec4 color;
+	vec3 cameraPosWorld = ubo.invView[3].xyz;
+	vec3 viewDirection = normalize(cameraPosWorld - fragPosWorld);
 
 	for(int i = 0; i < ubo.numLights; i++)
 	{
 		PointLight pointLight = ubo.pointLights[i];
 		vec3 dirToLight = pointLight.position.xyz - fragPosWorld;
 		float attenuation = 1.0 / dot(dirToLight, dirToLight); // dist sq
-		float cosAngIncidence = max(dot(surfaceNormal, normalize(dirToLight)), 0);
+		dirToLight = normalize(dirToLight);
+
+
+		float cosAngIncidence = max(dot(surfaceNormal, dirToLight), 0);
 
 		vec3 intensity = pointLight.color.xyz * pointLight.color.w * attenuation;
 
 		diffuse += intensity * cosAngIncidence;
-		//color = vec4(cosAngIncidence, 0.0, 0.0, 1.0);
+		
+		// specular highlight
+		vec3 halfAngle = normalize(dirToLight + viewDirection);
+		float blinnTerm = dot(surfaceNormal, halfAngle);
+		blinnTerm = clamp(blinnTerm, 0, 1);
+		blinnTerm = pow(blinnTerm, SPECULAR_POWER);
+
+		spec += intensity * blinnTerm;
 	}
 	
 
-	color = vec4(diffuse * fragColor, 1.0f);
-	//color = vec4(surfaceNormal, 1.0);
-
-	//vec4 color = vec4(diffuse * fragColor, 1.0);
-	//color = vec4(diffuse * fragColor, 1.0);
-
-	outColor = color;
-	//outColor = vec4(diffuse, 1.0);
-
-//	vec3 dirToLight = (ubo.lightPosition).xyz - fragPosWorld;
-//	float attenuation = 1.0 / dot(dirToLight, dirToLight); // dist sq
-//
-//	vec3 lightColor = ubo.lightColor.xyz * ubo.lightColor.w * attenuation;
-//	vec3 ambientColor = ubo.ambientColor.xyz * ubo.ambientColor.w;
-//
-//	vec3 diffuse = lightColor * max(dot(normalize(fragNormalWorld), normalize(dirToLight)), 0);
-//
-//	vec4 color = vec4((diffuse + ambientColor) * fragColor, 1.0);
-//
-//	outColor = color;
+	outColor = vec4(diffuse * fragColor + spec * fragColor, 1.0f);
 }
 
 

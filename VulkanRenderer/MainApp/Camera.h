@@ -28,9 +28,9 @@ struct Camera
 
 	glm::vec3 worldUp = glm::vec3(0.0f, 0.0f, 1.0f);
 
-	//glm::mat4 transform;
 	glm::mat4 invModel;
 	glm::mat4 view;
+	glm::mat4 invView;
 	glm::mat4 proj;
 
 	float yaw = 0.0f;
