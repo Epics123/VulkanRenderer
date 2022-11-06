@@ -1124,9 +1124,24 @@ void Renderer::loadGameObjects()
 	floor.transform.scale = { 3.0f, 3.0f, 1.0f };
 	gameObjects.emplace(floor.getID(), std::move(floor));
 
-	GameObject pointLight = GameObject::makePointLight(0.2f);
-	pointLight.transform.translation = {0.0f, 0.0f, 1.0f};
-	gameObjects.emplace(pointLight.getID(), std::move(pointLight));
+	std::vector<glm::vec3> lightColors{
+	 {1.f, .1f, .1f},
+	 {.1f, .1f, 1.f},
+	 {.1f, 1.f, .1f},
+	 {1.f, 1.f, .1f},
+	 {.1f, 1.f, 1.f},
+	 {1.f, 1.f, 1.f}
+	};
+
+	for (int i = 0; i < lightColors.size(); i++)
+	{
+		GameObject pointLight = GameObject::makePointLight(0.5f);
+		pointLight.color = lightColors[i];
+		glm::mat4 lightRot = glm::rotate(glm::mat4(1.0f), (i * glm::two_pi<float>()) / lightColors.size(), {0.0f, 0.0f, 1.0f});
+		pointLight.transform.translation = glm::vec3(lightRot * glm::vec4(0.0f, 2.0f, 2.0f, 1.0f));
+		
+		gameObjects.emplace(pointLight.getID(), std::move(pointLight));
+	}
 }
 
 void Renderer::uploadMeshData(Mesh& mesh)

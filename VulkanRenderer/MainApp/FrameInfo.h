@@ -11,7 +11,7 @@ struct PointLight
 {
 	glm::vec4 position{};
 	glm::vec4 color{}; // w is light intensity
-	float radius;
+	alignas(16) float radius;
 };
 
 // TEMP FOR TESTING UBOS

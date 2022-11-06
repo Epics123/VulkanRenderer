@@ -20,6 +20,7 @@ void PointLightSystem::init(VkRenderPass renderPass, VkDescriptorSetLayout globa
 void PointLightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo)
 {
 	int lightIndex = 0;
+	glm::mat4 lightRot = glm::rotate(glm::mat4(1.0f), frameInfo.frameTime, { 0.0f, 0.0f, 1.0f });
 
 	for (auto& keyValue : frameInfo.gameObjects)
 	{
@@ -28,8 +29,7 @@ void PointLightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo)
 		if(!obj.pointLight)
 			continue;
 		
-		obj.transform.translation.y += 0.001f;
-		obj.transform.translation.x += 0.005f;
+		obj.transform.translation = glm::vec3(lightRot * glm::vec4(obj.transform.translation, 1.0f));
 
 		// copy light info to ubo
 		ubo.pointLights[lightIndex].position = glm::vec4(obj.transform.translation, 1.0f);
@@ -47,6 +47,7 @@ void PointLightSystem::render(FrameInfo& frameInfo, GlobalUbo& ubo)
 	vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &frameInfo.globalDescriptorSet, 0, nullptr);
 
 	vkCmdDraw(frameInfo.commandBuffer, 6 * ubo.numLights, 1, 0, 0);
+	
 }
 
 void PointLightSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout)

@@ -36,18 +36,25 @@ void main()
 
 	vec4 color;
 
-	PointLight pointLight = ubo.pointLights[lightIndex];
-	vec3 dirToLight = pointLight.position.xyz - fragPosWorld;
-	float attenuation = 1.0 / dot(dirToLight, dirToLight); // dist sq
-	float cosAngIncidence = max(dot(surfaceNormal, normalize(dirToLight)), 0);
+	for(int i = 0; i < ubo.numLights; i++)
+	{
+		PointLight pointLight = ubo.pointLights[i];
+		vec3 dirToLight = pointLight.position.xyz - fragPosWorld;
+		float attenuation = 1.0 / dot(dirToLight, dirToLight); // dist sq
+		float cosAngIncidence = max(dot(surfaceNormal, normalize(dirToLight)), 0);
 
-	vec3 intensity = pointLight.color.xyz * pointLight.color.w * attenuation;
+		vec3 intensity = pointLight.color.xyz * pointLight.color.w * attenuation;
 
-	diffuse += intensity * cosAngIncidence;
+		diffuse += intensity * cosAngIncidence;
+		//color = vec4(cosAngIncidence, 0.0, 0.0, 1.0);
+	}
+	
 
-	color = vec4(dirToLight, 1.0);
+	color = vec4(diffuse * fragColor, 1.0f);
+	//color = vec4(surfaceNormal, 1.0);
 
 	//vec4 color = vec4(diffuse * fragColor, 1.0);
+	//color = vec4(diffuse * fragColor, 1.0);
 
 	outColor = color;
 	//outColor = vec4(diffuse, 1.0);
