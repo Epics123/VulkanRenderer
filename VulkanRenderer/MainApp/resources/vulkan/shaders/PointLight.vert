@@ -8,6 +8,36 @@ const vec2 OFFSETS[6] = vec2[](
   vec2(1.0, -1.0),
   vec2(-1.0, 1.0),
   vec2(1.0, 1.0)
+//  vec2(-1.0, -1.0),
+//  vec2(-1.0, 1.0),
+//  vec2(1.0, -1.0),
+//  vec2(1.0, -1.0),
+//  vec2(-1.0, 1.0),
+//  vec2(1.0, 1.0),
+//  vec2(-1.0, -1.0),
+//  vec2(-1.0, 1.0),
+//  vec2(1.0, -1.0),
+//  vec2(1.0, -1.0),
+//  vec2(-1.0, 1.0),
+//  vec2(1.0, 1.0),
+//  vec2(-1.0, -1.0),
+//  vec2(-1.0, 1.0),
+//  vec2(1.0, -1.0),
+//  vec2(1.0, -1.0),
+//  vec2(-1.0, 1.0),
+//  vec2(1.0, 1.0),
+//  vec2(-1.0, -1.0),
+//  vec2(-1.0, 1.0),
+//  vec2(1.0, -1.0),
+//  vec2(1.0, -1.0),
+//  vec2(-1.0, 1.0),
+//  vec2(1.0, 1.0),
+//  vec2(-1.0, -1.0),
+//  vec2(-1.0, 1.0),
+//  vec2(1.0, -1.0),
+//  vec2(1.0, -1.0),
+//  vec2(-1.0, 1.0),
+//  vec2(1.0, 1.0)
 );
 
 layout (location = 0) out vec2 fragOffset;
@@ -31,7 +61,7 @@ layout (set = 0, binding = 0) uniform GlobalUbo
 
 void main()
 {
-	fragOffset = OFFSETS[gl_VertexIndex];
+	fragOffset = OFFSETS[int(mod(gl_VertexIndex, 6))];
 	lightIndex = int(floor(gl_VertexIndex / 6));
 
 	vec3 cameraRightWorld = {ubo.view[0][0], ubo.view[1][0], ubo.view[2][0]};
@@ -40,7 +70,6 @@ void main()
 	PointLight light = ubo.pointLights[lightIndex];
 
 	vec3 positionWorld = light.position.xyz + light.radius * fragOffset.x * cameraRightWorld + light.radius * fragOffset.y * cameraUpWorld;
-	//vec3 positionWorld = light.position.xyz + 0.2 * fragOffset.x * cameraRightWorld + 0.2 * fragOffset.y * cameraUpWorld;
 
 	gl_Position = ubo.projection * ubo.view * vec4(positionWorld, 1.0f);
 }

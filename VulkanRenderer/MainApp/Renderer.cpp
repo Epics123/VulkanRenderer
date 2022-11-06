@@ -1138,7 +1138,7 @@ void Renderer::loadGameObjects()
 		GameObject pointLight = GameObject::makePointLight(0.5f);
 		pointLight.color = lightColors[i];
 		glm::mat4 lightRot = glm::rotate(glm::mat4(1.0f), (i * glm::two_pi<float>()) / lightColors.size(), {0.0f, 0.0f, 1.0f});
-		pointLight.transform.translation = glm::vec3(lightRot * glm::vec4(0.0f, 2.0f, 2.0f, 1.0f));
+		pointLight.transform.translation = glm::vec3(lightRot * glm::vec4(0.0f, 1.5f, 1.5f, 1.0f));
 		
 		gameObjects.emplace(pointLight.getID(), std::move(pointLight));
 	}

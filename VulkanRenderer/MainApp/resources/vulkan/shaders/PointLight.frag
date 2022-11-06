@@ -27,6 +27,5 @@ void main()
 	if(dist >= 1.0)
 		discard;
 	
-	//outColor = vec4(ubo.pointLights[lightIndex].color.xyz, 1.0);
-	outColor = vec4(lightIndex, 0.0, 0.0, 1.0);
+	outColor = vec4(ubo.pointLights[lightIndex].color.xyz, 1.0);
 }
