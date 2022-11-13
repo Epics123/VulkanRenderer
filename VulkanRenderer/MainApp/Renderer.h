@@ -23,6 +23,7 @@
 #include "GameObject.h"
 #include "RenderSystems/RenderSystem.h"
 #include "RenderSystems/PointLightSystem.h"
+#include "RenderSystems/WireframeSystem.h"
 #include "Buffer.h"
 #include "Descriptors.h"
 
@@ -260,6 +261,7 @@ private:
 
 	RenderSystem renderSystem {mDevice};
 	PointLightSystem pointLightSystem {mDevice};
+	WireframeSystem wireframeSystem {mDevice};
 	////////////
 
 	RenderMode renderMode = DEFAULT_LIT;

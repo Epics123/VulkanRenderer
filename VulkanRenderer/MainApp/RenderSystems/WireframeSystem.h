@@ -7,20 +7,20 @@
 #include <vector>
 #include <memory>
 
-struct SimplePushConstantData
+struct WireframePushConstantData
 {
 	glm::mat4 modelMatrix{ 1.0f };
 	glm::mat4 normalMatrix{ 1.0f };
 };
 
-class RenderSystem
+class WireframeSystem
 {
 public:
-	RenderSystem(Device& device);
-	~RenderSystem();
+	WireframeSystem(Device& device);
+	~WireframeSystem();
 
-	RenderSystem(const RenderSystem&) = delete;
-	RenderSystem& operator=(const RenderSystem&) = delete;
+	WireframeSystem(const WireframeSystem&) = delete;
+	WireframeSystem& operator=(const WireframeSystem&) = delete;
 
 	void init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
 

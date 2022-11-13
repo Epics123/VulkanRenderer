@@ -118,6 +118,7 @@
     <ClInclude Include="MainApp\RenderSystems\PointLightSystem.h" />
     <ClInclude Include="MainApp\RenderSystems\RenderSystem.h" />
     <ClInclude Include="MainApp\Renderer.h" />
+    <ClInclude Include="MainApp\RenderSystems\WireframeSystem.h" />
     <ClInclude Include="MainApp\SwapChain.h" />
     <ClInclude Include="MainApp\TextureSampler.h" />
     <ClInclude Include="MainApp\Utils.h" />
@@ -149,6 +150,7 @@
     <ClCompile Include="MainApp\RenderSystems\PointLightSystem.cpp" />
     <ClCompile Include="MainApp\RenderSystems\RenderSystem.cpp" />
     <ClCompile Include="MainApp\Renderer.cpp" />
+    <ClCompile Include="MainApp\RenderSystems\WireframeSystem.cpp" />
     <ClCompile Include="MainApp\SwapChain.cpp" />
     <ClCompile Include="MainApp\TextureSampler.cpp" />
     <ClCompile Include="MainApp\VertexAttributes.cpp" />

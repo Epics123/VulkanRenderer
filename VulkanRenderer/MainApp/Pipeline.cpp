@@ -360,6 +360,16 @@ void Pipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo)
 	configInfo.attributeDescriptions = Model::Vertex::getAttributeDescriptions();
 }
 
+void Pipeline::enableWireframe(PipelineConfigInfo& configInfo)
+{
+	configInfo.rasterizationInfo.polygonMode = VK_POLYGON_MODE_LINE;
+}
+
+void Pipeline::disableWireframe(PipelineConfigInfo& configInfo)
+{
+	configInfo.rasterizationInfo.polygonMode = VK_POLYGON_MODE_FILL;
+}
+
 void Pipeline::bindPipeline(VkCommandBuffer commandBuffer, VkPipelineBindPoint pipelineBindPoint)
 {
 	vkCmdBindPipeline(commandBuffer, pipelineBindPoint, graphicsPipeline);

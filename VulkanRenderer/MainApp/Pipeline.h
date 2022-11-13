@@ -52,6 +52,8 @@ public:
 	void createDefaultPipeline(VkShaderModule vertShaderModule, VkShaderModule fragShaderModule, VkRenderPass* renderPass, VkPipelineLayout* pipelineLayout, VkDescriptorSetLayout* descriptorSetLayout, VkExtent2D* swapChainExtent);
 
 	static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
+	static void enableWireframe(PipelineConfigInfo& configInfo);
+	static void disableWireframe(PipelineConfigInfo& configInfo);
 
 	VkPipeline* getPipeline() { return &pipeline; }
 

@@ -117,6 +117,9 @@
     <ClInclude Include="MainApp\RenderSystems\PointLightSystem.h">
       <Filter>MainApp\RenderSystems</Filter>
     </ClInclude>
+    <ClInclude Include="MainApp\RenderSystems\WireframeSystem.h">
+      <Filter>MainApp\RenderSystems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Libraries\ImGui\imgui.cpp">
@@ -201,6 +204,9 @@
       <Filter>MainApp</Filter>
     </ClCompile>
     <ClCompile Include="MainApp\RenderSystems\PointLightSystem.cpp">
+      <Filter>MainApp\RenderSystems</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\RenderSystems\WireframeSystem.cpp">
       <Filter>MainApp\RenderSystems</Filter>
     </ClCompile>
   </ItemGroup>
