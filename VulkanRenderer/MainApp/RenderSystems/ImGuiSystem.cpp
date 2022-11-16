@@ -86,6 +86,12 @@ void ImGuiSystem::drawSceneInfo(FrameInfo& frameInfo)
 				DrawVec3Control("Rotation", obj.transform.rotation, 0.0f, 120.0f);
 				DrawVec3Control("Scale", obj.transform.scale, 1.0f, 120.0f);
 
+				if (obj.pointLight)
+				{
+					DrawFloatControl("Intensity", obj.pointLight->intensity, 1.0f, 120.0f, 0.0f, 20.0f, true);
+					ImGui::NewLine();
+				}
+
 				ImGui::TreePop();
 			}
 		}
@@ -206,7 +212,7 @@ void ImGuiSystem::DrawVec3Control(const char* label, glm::vec4& values, float re
 	ImGui::PopID();
 }
 
-void ImGuiSystem::DrawFloatControl(const char* label, float& value, float resetValue /*= 1.0f*/, float columnWidth /*= 100.0f*/)
+void ImGuiSystem::DrawFloatControl(const char* label, float& value, float resetValue, float columnWidth, float min, float max, bool shouldClamp)
 {
 	ImGui::PushID(label);
 
@@ -228,14 +234,19 @@ void ImGuiSystem::DrawFloatControl(const char* label, float& value, float resetV
 		value = resetValue;
 	ImGui::PopStyleColor(3);
 
+	if (shouldClamp)
+	{
+		value = glm::clamp(value, min, max);
+	}
+
 	ImGui::SameLine();
-	ImGui::DragFloat("##", &value, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::DragFloat("##", &value, 0.1f, min, max, "%.2f");
 	ImGui::PopItemWidth();
 
 	ImGui::PopItemWidth();
 	ImGui::PopStyleVar();
 
-	ImGui::Columns(2);
+	ImGui::Columns(1);
 	ImGui::PopID();
 }
 

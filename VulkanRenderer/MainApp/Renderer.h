@@ -29,24 +29,6 @@
 #include "Descriptors.h"
 #include "Enums.h"
 
-//struct QueueFamilyIndices
-//{
-//	std::optional<uint32_t> graphicsFamily;
-//	std::optional<uint32_t> presentFamily;
-//
-//	bool isComplete()
-//	{
-//		return graphicsFamily.has_value() && presentFamily.has_value();
-//	}
-//};
-//
-//struct SwapChainSupportDetails
-//{
-//	VkSurfaceCapabilitiesKHR capabilities;
-//	std::vector<VkSurfaceFormatKHR> formats;
-//	std::vector<VkPresentModeKHR> presentModes;
-//};
-
 class Renderer
 {
 public:
@@ -73,9 +55,6 @@ public:
 	VkRenderPass getSwapChainRenderPass() const { return mSwapChain->getRenderPass(); }
 
 	void loadGameObjects();
-
-	void createTextureImage();
-	void createTextureImageView();
 
 	bool hasStencilComponent(VkFormat format);
 
@@ -130,7 +109,6 @@ private:
 	
 	std::vector<VkCommandBuffer> commandBuffers;
 	
-	// Rework //
 	Device mDevice{*window};
 	std::unique_ptr <SwapChain> mSwapChain;
 
@@ -144,7 +122,6 @@ private:
 	PointLightSystem pointLightSystem {mDevice};
 	WireframeSystem wireframeSystem {mDevice};
 	ImGuiSystem imguiSystem {mDevice};
-	////////////
 
 	RenderMode renderMode = DEFAULT_LIT;
 
