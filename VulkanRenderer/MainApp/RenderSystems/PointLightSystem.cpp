@@ -20,7 +20,7 @@ void PointLightSystem::init(VkRenderPass renderPass, VkDescriptorSetLayout globa
 void PointLightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo)
 {
 	int lightIndex = 0;
-	glm::mat4 lightRot = glm::rotate(glm::mat4(1.0f), frameInfo.frameTime, { 0.0f, 0.0f, 1.0f });
+	glm::mat4 lightRot = glm::rotate(glm::mat4(1.0f), frameInfo.deltaTime, { 0.0f, 0.0f, 1.0f });
 
 	for (auto& keyValue : frameInfo.gameObjects)
 	{

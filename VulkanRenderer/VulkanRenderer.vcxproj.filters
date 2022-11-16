@@ -120,6 +120,12 @@
     <ClInclude Include="MainApp\RenderSystems\WireframeSystem.h">
       <Filter>MainApp\RenderSystems</Filter>
     </ClInclude>
+    <ClInclude Include="MainApp\RenderSystems\ImGuiSystem.h">
+      <Filter>MainApp\RenderSystems</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\Enums.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Libraries\ImGui\imgui.cpp">
@@ -207,6 +213,9 @@
       <Filter>MainApp\RenderSystems</Filter>
     </ClCompile>
     <ClCompile Include="MainApp\RenderSystems\WireframeSystem.cpp">
+      <Filter>MainApp\RenderSystems</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\RenderSystems\ImGuiSystem.cpp">
       <Filter>MainApp\RenderSystems</Filter>
     </ClCompile>
   </ItemGroup>

@@ -2,6 +2,7 @@
 
 #include "Camera.h"
 #include "GameObject.h"
+#include "Enums.h"
 
 #include <vulkan/vulkan.h>
 
@@ -30,6 +31,9 @@ struct FrameInfo
 {
 	int frameIndex;
 	float frameTime;
+	float framerate;
+	float deltaTime;
+	RenderMode renderMode;
 	VkCommandBuffer commandBuffer;
 	Camera& camera;
 	VkDescriptorSet globalDescriptorSet;

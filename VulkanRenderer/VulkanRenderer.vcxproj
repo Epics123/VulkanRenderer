@@ -108,6 +108,7 @@
     <ClInclude Include="MainApp\CommandBuffer.h" />
     <ClInclude Include="MainApp\Descriptors.h" />
     <ClInclude Include="MainApp\Device.h" />
+    <ClInclude Include="MainApp\Enums.h" />
     <ClInclude Include="MainApp\FrameInfo.h" />
     <ClInclude Include="MainApp\GameObject.h" />
     <ClInclude Include="MainApp\Image.h" />
@@ -115,6 +116,7 @@
     <ClInclude Include="MainApp\Mesh.h" />
     <ClInclude Include="MainApp\Model.h" />
     <ClInclude Include="MainApp\Pipeline.h" />
+    <ClInclude Include="MainApp\RenderSystems\ImGuiSystem.h" />
     <ClInclude Include="MainApp\RenderSystems\PointLightSystem.h" />
     <ClInclude Include="MainApp\RenderSystems\RenderSystem.h" />
     <ClInclude Include="MainApp\Renderer.h" />
@@ -147,6 +149,7 @@
     <ClCompile Include="MainApp\Mesh.cpp" />
     <ClCompile Include="MainApp\Model.cpp" />
     <ClCompile Include="MainApp\Pipeline.cpp" />
+    <ClCompile Include="MainApp\RenderSystems\ImGuiSystem.cpp" />
     <ClCompile Include="MainApp\RenderSystems\PointLightSystem.cpp" />
     <ClCompile Include="MainApp\RenderSystems\RenderSystem.cpp" />
     <ClCompile Include="MainApp\Renderer.cpp" />

@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <string.h>
 
 struct TransformComponent
 {
@@ -43,6 +44,9 @@ public:
 	GameObject& operator=(GameObject&&) = default;
 
 	const id_t getID() { return id; }
+	const std::string& getObjectName() { return objectName; }
+
+	void setObjectName(std::string name) { objectName = name; }
 
 	glm::vec3 color{};
 	TransformComponent transform{};
@@ -55,4 +59,5 @@ private:
 	GameObject(id_t objId) : id{objId} {};
 
 	id_t id;
+	std::string objectName = "Empty";
 };
