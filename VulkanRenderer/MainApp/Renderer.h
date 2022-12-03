@@ -25,6 +25,7 @@
 #include "RenderSystems/PointLightSystem.h"
 #include "RenderSystems/WireframeSystem.h"
 #include "RenderSystems/ImGuiSystem.h"
+#include "RenderSystems/UnlitSystem.h"
 #include "Buffer.h"
 #include "Descriptors.h"
 #include "Enums.h"
@@ -122,6 +123,7 @@ private:
 	PointLightSystem pointLightSystem {mDevice};
 	WireframeSystem wireframeSystem {mDevice};
 	ImGuiSystem imguiSystem {mDevice};
+	UnlitSystem unlitSystem {mDevice};
 
 	RenderMode renderMode = DEFAULT_LIT;
 

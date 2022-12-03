@@ -54,6 +54,9 @@ void ImGuiSystem::drawRenderModeText(RenderMode mode)
 	case WIREFRAME:
 		ImGui::TextColored(ImVec4(0.0f, 0.8f, 0.8f, 1.0f), "Wireframe");
 		break;
+	case UNLIT:
+		ImGui::TextColored(ImVec4(0.0f, 0.8f, 0.1f, 1.0f), "Unlit");
+		break;
 	}
 }
 
@@ -66,7 +69,7 @@ void ImGuiSystem::drawFrameInfo(float framerate, float frameTime)
 
 void ImGuiSystem::drawSceneInfo(FrameInfo& frameInfo)
 {
-	if (ImGui::CollapsingHeader("Scene"))
+	if (ImGui::CollapsingHeader("Scene", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		if (ImGui::TreeNode("Camera"))
 		{

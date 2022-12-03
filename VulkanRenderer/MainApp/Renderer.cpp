@@ -102,6 +102,7 @@ void Renderer::init()
 	renderSystem.init(getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
 	pointLightSystem.init(getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
 	wireframeSystem.init(getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
+	unlitSystem.init(getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
 
 	createCommandBuffers();
 
@@ -343,11 +344,15 @@ void Renderer::drawFrame(float dt)
 		switch (renderMode)
 		{
 		case DEFAULT_LIT:
+			// order matters for transparancy
 			renderSystem.renderGameObjects(frameInfo);
 			pointLightSystem.render(frameInfo, ubo);
 			break;
 		case WIREFRAME:
 			wireframeSystem.renderGameObjects(frameInfo);
+			break;
+		case UNLIT:
+			unlitSystem.renderGameObjects(frameInfo);
 			break;
 		default:
 			break;

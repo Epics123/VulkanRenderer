@@ -3,5 +3,6 @@
 enum RenderMode
 {
 	DEFAULT_LIT,
-	WIREFRAME
+	WIREFRAME,
+	UNLIT
 };

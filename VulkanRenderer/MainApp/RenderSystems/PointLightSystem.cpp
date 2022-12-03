@@ -1,6 +1,8 @@
 #include "PointLightSystem.h"
 #include "../Pipeline.h"
 
+#include <map>
+
 PointLightSystem::PointLightSystem(Device& device)
 	: device{ device }
 {
@@ -42,12 +44,24 @@ void PointLightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo)
 
 void PointLightSystem::render(FrameInfo& frameInfo, GlobalUbo& ubo)
 {
+	// Sort Lights
+	std::map<float, GameObject::id_t> sortedLights;
+	for (auto& keyValue : frameInfo.gameObjects)
+	{
+		GameObject& obj = keyValue.second;
+		if(!obj.pointLight)
+			continue;
+
+		glm::vec3 offset = frameInfo.camera.position - obj.transform.translation;
+		float distSqr = glm::dot(offset, offset);
+		sortedLights[distSqr] = obj.getID();
+	}
+
 	pipeline->bind(frameInfo.commandBuffer);
 
 	vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &frameInfo.globalDescriptorSet, 0, nullptr);
 
 	vkCmdDraw(frameInfo.commandBuffer, 6 * ubo.numLights, 1, 0, 0);
-	
 }
 
 void PointLightSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout)
@@ -72,6 +86,7 @@ void PointLightSystem::createPipeline(VkRenderPass renderPass)
 
 	PipelineConfigInfo pipelineConfig{};
 	Pipeline::defaultPipelineConfigInfo(pipelineConfig);
+	Pipeline::enableAlphaBlending(pipelineConfig);
 	pipelineConfig.attributeDescriptions.clear();
 	pipelineConfig.bindingDescriptions.clear();
 	pipelineConfig.renderPass = renderPass;

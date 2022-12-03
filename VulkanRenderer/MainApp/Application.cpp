@@ -96,16 +96,9 @@ void Application::cleanup()
 {
 	Renderer::cleanupInstance();
 
-	//window->cleanupWindow();
-
-	//ImGui_ImplVulkan_Shutdown();
-	//ImGui::DestroyContext();
 	glfwTerminate();
 
-	// Call renderer cleanup
 	window = nullptr;
-	//if(window)
-	//	delete window;
 }
 
 void Application::processInput(GLFWwindow* window)
@@ -125,15 +118,17 @@ void Application::processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 		vulkanRenderer->getActiveCamera().updatePositon(GLFW_KEY_Q, cameraSpeed);
 	
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
 	{
 		vulkanRenderer->setRenderMode(DEFAULT_LIT);
-		//vulkanRenderer->recreateSwapChain();
 	}
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS)
 	{
 		vulkanRenderer->setRenderMode(WIREFRAME);
-		//vulkanRenderer->recreateSwapChain();
+	}
+	if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS)
+	{
+		vulkanRenderer->setRenderMode(UNLIT);
 	}
 
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE)

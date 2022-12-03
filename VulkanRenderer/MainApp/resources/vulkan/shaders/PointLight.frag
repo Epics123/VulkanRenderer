@@ -22,11 +22,13 @@ layout (set = 0, binding = 0) uniform GlobalUbo
 	int numLights;
 } ubo;
 
+const float PI = 3.14159265;
+
 void main()
 {
 	float dist = sqrt(dot(fragOffset, fragOffset));
 	if(dist >= 1.0)
 		discard;
 	
-	outColor = vec4(ubo.pointLights[lightIndex].color.xyz, 1.0);
+	outColor = vec4(ubo.pointLights[lightIndex].color.xyz, 0.5 * (cos(dist * PI) + 1.0));
 }

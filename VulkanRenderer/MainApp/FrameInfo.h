@@ -27,6 +27,11 @@ struct GlobalUbo
 	int numLights;
 };
 
+//struct PointLightUbo 
+//{
+//
+//};
+
 struct FrameInfo
 {
 	int frameIndex;

@@ -12,6 +12,7 @@
 
 struct PipelineConfigInfo
 {
+	PipelineConfigInfo() = default;
 	PipelineConfigInfo(const PipelineConfigInfo&) = delete;
 	PipelineConfigInfo& operator=(const PipelineConfigInfo&) = delete;
 
@@ -49,34 +50,20 @@ public:
 
 	void createShaderModule(const std::vector<char>& code,  VkShaderModule* shaderModule);
 
-	void createDefaultPipeline(VkShaderModule vertShaderModule, VkShaderModule fragShaderModule, VkRenderPass* renderPass, VkPipelineLayout* pipelineLayout, VkDescriptorSetLayout* descriptorSetLayout, VkExtent2D* swapChainExtent);
-
 	static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
+	static void enableAlphaBlending(PipelineConfigInfo& configInfo);
 	static void enableWireframe(PipelineConfigInfo& configInfo);
 	static void disableWireframe(PipelineConfigInfo& configInfo);
-
-	VkPipeline* getPipeline() { return &pipeline; }
-
-	VkPipelineLayout getPipelineLayout() { return pipelineLayout; }
-
-	VkGraphicsPipelineCreateInfo* getPipelineCreateInfo() { return &pipelineInfo; }
 
 	void bindPipeline(VkCommandBuffer commandBuffer, VkPipelineBindPoint pipelineBindPoint);
 	void bind(VkCommandBuffer commandBuffer);
 
 	void destroyPipeline();
 
-	void setPolygonMode(VkPolygonMode mode);
-	void setVertexAttributeCount(uint32_t count);
-
 private:
 	static std::vector<char> readFile(const std::string& filename);
 
 private:
-	VkPipeline pipeline;
-	VkDevice device_old;
-
-	VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL;
 
 	// rework
 	Device& device;
@@ -86,34 +73,4 @@ private:
 	VkShaderModule fragShaderModule;
 	//
 
-	VkRenderPass renderPass;
-	VkPipelineLayout pipelineLayout;
-	VkDescriptorSetLayout descriptorSetLayout;
-	VkExtent2D swapChainImageExtent;
-
-	VkPipelineShaderStageCreateInfo vertShaderStageInfo;
-	VkPipelineShaderStageCreateInfo fragShaderStageInfo;
-
-	uint32_t maxVertexAttributes;
-	std::vector<VkVertexInputBindingDescription> bindingDescription;
-	std::vector<VkVertexInputAttributeDescription> vertexAttributeDescriptions;
-
-	VkPipelineVertexInputStateCreateInfo vertexInputInfo;
-	VkPipelineInputAssemblyStateCreateInfo inputAssembly;
-
-	VkViewport viewport;
-	VkRect2D scissor;
-	VkPipelineViewportStateCreateInfo viewportState;
-
-	VkPipelineRasterizationStateCreateInfo rasterizer;
-
-	VkPipelineMultisampleStateCreateInfo multisampling;
-	VkPipelineColorBlendAttachmentState colorBlendAttachment;
-	VkPipelineColorBlendStateCreateInfo colorBlending;
-	VkPipelineDepthStencilStateCreateInfo depthStencil;
-
-	VkPipelineDynamicStateCreateInfo dynamicState;
-	VkPipelineLayoutCreateInfo pipelineLayoutInfo;
-
-	VkGraphicsPipelineCreateInfo pipelineInfo;
 };
