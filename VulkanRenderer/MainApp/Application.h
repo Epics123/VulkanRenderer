@@ -50,6 +50,7 @@ private:
 	double mouseX, mouseY;
 	float mouseOffsetX, mouseOffsetY;
 	bool firstMouse;
+	bool firstKeyPress;
 
 	double prevTime = 0.0;
 	double curTime = 0.0;

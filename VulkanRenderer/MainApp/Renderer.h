@@ -11,6 +11,7 @@
 #include <optional>
 #include <cassert>
 #include <memory>
+#include <unordered_map>
 
 #include "VertexBuffer.h"
 #include "Image.h"
@@ -21,14 +22,18 @@
 #include "SwapChain.h"
 #include "Model.h"
 #include "GameObject.h"
+#include "Buffer.h"
+#include "Descriptors.h"
+#include "Enums.h"
+#include "Utils.h"
+
+// Render Systems
 #include "RenderSystems/RenderSystem.h"
 #include "RenderSystems/PointLightSystem.h"
 #include "RenderSystems/WireframeSystem.h"
 #include "RenderSystems/ImGuiSystem.h"
 #include "RenderSystems/UnlitSystem.h"
-#include "Buffer.h"
-#include "Descriptors.h"
-#include "Enums.h"
+#include "RenderSystems/WorldGridSystem.h"
 
 class Renderer
 {
@@ -56,6 +61,9 @@ public:
 	VkRenderPass getSwapChainRenderPass() const { return mSwapChain->getRenderPass(); }
 
 	void loadGameObjects();
+
+	void loadTextures(DescriptorSetLayout& layout);
+	void cleanupTextures();
 
 	bool hasStencilComponent(VkFormat format);
 
@@ -91,6 +99,9 @@ public:
 
 	void setRenderMode(RenderMode mode);
 
+	void setShowGrid(bool show) { showGrid = show; }
+	bool getShowGrid() { return showGrid; }
+
 	static void compileShaders();
 
 	static std::vector<char> readBinaryFile(const std::string& filename);
@@ -124,8 +135,11 @@ private:
 	WireframeSystem wireframeSystem {mDevice};
 	ImGuiSystem imguiSystem {mDevice};
 	UnlitSystem unlitSystem {mDevice};
+	WorldGridSystem gridSystem {mDevice};
 
 	RenderMode renderMode = DEFAULT_LIT;
+
+	bool showGrid = false;
 
 	size_t currentFrame = 0;
 	bool framebufferResized = false;
@@ -145,6 +159,8 @@ private:
 	VkImage depthImage;
 	VkDeviceMemory depthImageMemory;
 	VkImageView depthImageView;
+
+	std::unordered_map<std::string, Texture> loadedTextures;
 };
 
 #endif // !RENDERER_H

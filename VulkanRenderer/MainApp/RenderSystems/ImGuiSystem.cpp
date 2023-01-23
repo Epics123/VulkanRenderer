@@ -30,6 +30,10 @@ void ImGuiSystem::drawImGui(FrameInfo& frameInfo)
 
 	ImGui::NewLine();
 
+	drawShowGridText(frameInfo);
+
+	ImGui::NewLine();
+
 	drawSceneInfo(frameInfo);
 
 	ImGui::End();
@@ -99,6 +103,16 @@ void ImGuiSystem::drawSceneInfo(FrameInfo& frameInfo)
 			}
 		}
 	}
+}
+
+void ImGuiSystem::drawShowGridText(FrameInfo& frameInfo)
+{
+	ImGui::Text("Grid Enabled:");
+	ImGui::SameLine();
+	if (frameInfo.showGrid)
+		ImGui::TextColored(ImVec4(0.2f, 0.8f, 0.1f, 1.0f), "True");
+	else
+		ImGui::TextColored(ImVec4(0.8f, 0.1f, 0.1f, 1.0f), "False");
 }
 
 void ImGuiSystem::DrawVec3Control(const char* label, glm::vec3& values, float resetValue /*= 0.0f*/, float columnWidth /*= 100.0f*/)

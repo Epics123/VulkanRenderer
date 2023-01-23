@@ -27,17 +27,13 @@ struct GlobalUbo
 	int numLights;
 };
 
-//struct PointLightUbo 
-//{
-//
-//};
-
 struct FrameInfo
 {
 	int frameIndex;
 	float frameTime;
 	float framerate;
 	float deltaTime;
+	bool showGrid;
 	RenderMode renderMode;
 	VkCommandBuffer commandBuffer;
 	Camera& camera;

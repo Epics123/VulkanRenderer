@@ -129,6 +129,12 @@
     <ClInclude Include="MainApp\Window.h">
       <Filter>MainApp</Filter>
     </ClInclude>
+    <ClInclude Include="MainApp\RenderSystems\WorldGridSystem.h">
+      <Filter>MainApp\RenderSystems</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\Texture.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Libraries\ImGui\imgui.cpp">
@@ -224,6 +230,15 @@
     <ClCompile Include="MainApp\Window.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
+    <ClCompile Include="MainApp\RenderSystems\WorldGridSystem.cpp">
+      <Filter>MainApp\RenderSystems</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\Texture.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\Utils.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="MainApp\resources\vulkan\shaders\BasicUnlit.frag">
@@ -248,6 +263,12 @@
       <Filter>MainApp\resources\vulkan\shaders</Filter>
     </None>
     <None Include="MainApp\resources\vulkan\shaders\Wireframe.vert">
+      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    </None>
+    <None Include="MainApp\resources\vulkan\shaders\WorldGrid.vert">
+      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    </None>
+    <None Include="MainApp\resources\vulkan\shaders\WorldGrid.frag">
       <Filter>MainApp\resources\vulkan\shaders</Filter>
     </None>
   </ItemGroup>

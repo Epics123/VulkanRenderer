@@ -2,10 +2,19 @@
 
 #include <functional>
 
-// from: https://stackoverflow.com/a/57595105
-template <typename T, typename... Rest>
-void hashCombine(std::size_t& seed, const T& v, const Rest&... rest)
+#include "Device.h"
+#include "Texture.h"
+
+namespace Utils
 {
-	seed ^= std::hash<T>{}(v)+0x9e3779b9 + (seed << 6) + (seed >> 2);
-	(hashCombine(seed, rest), ...);
-};
+	// from: https://stackoverflow.com/a/57595105
+	template <typename T, typename... Rest>
+	void hashCombine(std::size_t& seed, const T& v, const Rest&... rest)
+	{
+		seed ^= std::hash<T>{}(v)+0x9e3779b9 + (seed << 6) + (seed >> 2);
+		(hashCombine(seed, rest), ...);
+	};
+
+	bool loadImageFromFile(Device& device, const char* filepath, Texture& outTexture);
+}
+

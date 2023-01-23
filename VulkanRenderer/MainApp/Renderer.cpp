@@ -66,13 +66,13 @@ Renderer::Renderer(Window* appWindow)
 
 void Renderer::init()
 {
-	//createVulkanInstance();
 	recreateSwapChain();
 
 	globalDescriptorPool =
 		DescriptorPool::Builder(mDevice)
 		.setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
 		.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
+		.addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, SwapChain::MAX_FRAMES_IN_FLIGHT)
 		.build();
 
 	imguiDescriptorPool =
@@ -90,27 +90,34 @@ void Renderer::init()
 	}
 
 	// highest set common to all shaders
-	std::unique_ptr<DescriptorSetLayout> globalSetLayout = DescriptorSetLayout::Builder(mDevice).addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS).build();
+	std::unique_ptr<DescriptorSetLayout> globalSetLayout = DescriptorSetLayout::Builder(mDevice)
+														   .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
+														   .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+														   .build();
 
 	globalDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 	for (int i = 0; i < globalDescriptorSets.size(); i++)
 	{
 		VkDescriptorBufferInfo bufferInfo = uboBuffers[i]->descriptorInfo();
-		DescriptorWriter(*globalSetLayout, *globalDescriptorPool).writeBuffer(0, &bufferInfo).build(globalDescriptorSets[i]);
+		DescriptorWriter(*globalSetLayout, *globalDescriptorPool)
+						.writeBuffer(0, &bufferInfo)
+						.build(globalDescriptorSets[i]);
 	}
 
 	renderSystem.init(getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
 	pointLightSystem.init(getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
 	wireframeSystem.init(getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
 	unlitSystem.init(getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
+	gridSystem.init(getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
 
 	createCommandBuffers();
 
+	loadTextures(*globalSetLayout);
 	loadGameObjects();
 
 	mainCamera = Camera();
 	mainCamera.updateModel(0.0f);
-	mainCamera.setPerspectiveProjection(mainCamera.fov, mSwapChain->extentAspectRatio(), 0.1f, 500.0f);
+	mainCamera.setPerspectiveProjection(mainCamera.fov, mSwapChain->extentAspectRatio(), 0.1f, 50.0f);
 
 	imguiInit();
 }
@@ -282,6 +289,32 @@ void Renderer::loadGameObjects()
 	}
 }
 
+void Renderer::loadTextures(DescriptorSetLayout& layout)
+{
+	Texture bricks;
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png", bricks);
+	bricks.createTextureImageView(mDevice);
+	bricks.createTextureSampler(mDevice);
+	loadedTextures["bricks_basecolor"] = bricks;
+
+	VkDescriptorImageInfo imageInfo{};
+	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	imageInfo.imageView = bricks.getTextureImageView();
+	imageInfo.sampler = bricks.getTextureSampler();
+	for (int i = 0; i < globalDescriptorSets.size(); i++)
+	{
+		DescriptorWriter(layout, *globalDescriptorPool).writeImage(1, &imageInfo).overwrite(globalDescriptorSets[i]);
+	}
+}
+
+void Renderer::cleanupTextures()
+{
+	for(std::pair<std::string, Texture> texture : loadedTextures)
+	{
+		texture.second.cleanup(mDevice);
+	}
+}
+
 bool Renderer::hasStencilComponent(VkFormat format)
 {
 	return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
@@ -326,7 +359,7 @@ void Renderer::drawFrame(float dt)
 	{
 		int frameIndex = getFrameIndex();
 
-		FrameInfo frameInfo { frameIndex, currentFrametime, currentFramerate, dt, renderMode, commandBuffer, mainCamera, globalDescriptorSets[frameIndex], gameObjects};
+		FrameInfo frameInfo { frameIndex, currentFrametime, currentFramerate, dt, showGrid, renderMode, commandBuffer, mainCamera, globalDescriptorSets[frameIndex], gameObjects};
 		
 		// update ubos
 		GlobalUbo ubo{};
@@ -357,6 +390,9 @@ void Renderer::drawFrame(float dt)
 		default:
 			break;
 		}
+
+		if(showGrid)
+			gridSystem.render(frameInfo, ubo);
 
 		drawImGui(frameInfo);
 		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
@@ -442,6 +478,8 @@ void Renderer::drawImGui(FrameInfo& frameInfo)
 
 void Renderer::cleanup()
 {
+	cleanupTextures();
+
 	freeCommandBuffers();
 	window->cleanupWindow();
 	globalDescriptorPool = nullptr;

@@ -30,6 +30,7 @@ Application::Application()
 	mouseOffsetY = 0.0f;
 
 	firstMouse = true;
+	firstKeyPress = true;
 
 	window = new Window(name, width, height);
 }
@@ -51,6 +52,7 @@ Application::Application(const char* appName, uint32_t appWidth, uint32_t appHei
 	mouseOffsetY = 0.0f;
 
 	firstMouse = true;
+	firstKeyPress = true;
 
 	window = new Window(name, width, height, true);
 }
@@ -130,6 +132,15 @@ void Application::processInput(GLFWwindow* window)
 	{
 		vulkanRenderer->setRenderMode(UNLIT);
 	}
+
+	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS && firstKeyPress)
+	{
+		firstKeyPress = false;
+		vulkanRenderer->setShowGrid(!vulkanRenderer->getShowGrid());
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_RELEASE)
+		firstKeyPress = true;
 
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE)
 		firstMouse = true;

@@ -20,7 +20,7 @@ namespace std
 		size_t operator()(Model::Vertex const &vertex) const
 		{
 			size_t seed = 0;
-			hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
+			Utils::hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
 			return seed;
 		}
 	};
