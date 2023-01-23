@@ -16,5 +16,7 @@ namespace Utils
 	};
 
 	bool loadImageFromFile(Device& device, const char* filepath, Texture& outTexture);
+
+	std::string getCPUName();
 }
 

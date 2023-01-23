@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <memory>
+#include <string.h>
 
 class ImGuiSystem
 {
@@ -20,6 +21,7 @@ public:
 	void drawDebugWindow();
 	void drawRenderModeText(RenderMode mode);
 	void drawFrameInfo(float framerate, float frameTime);
+	void drawDeviceSpecs();
 	void drawSceneInfo(FrameInfo& frameInfo);
 	void drawShowGridText(FrameInfo& frameInfo);
 
@@ -29,4 +31,6 @@ public:
 
 private:
 	Device& device;
+
+	std::string cpuInfo;
 };

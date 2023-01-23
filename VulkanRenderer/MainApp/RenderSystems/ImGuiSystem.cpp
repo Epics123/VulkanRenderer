@@ -8,11 +8,12 @@
 #include "../Pipeline.h"
 #include "../Camera.h"
 #include "../GameObject.h"
+#include "../Utils.h"
 
 ImGuiSystem::ImGuiSystem(Device& device)
 	:device {device}
 {
-
+	cpuInfo = Utils::getCPUName();
 }
 
 void ImGuiSystem::drawImGui(FrameInfo& frameInfo)
@@ -24,6 +25,9 @@ void ImGuiSystem::drawImGui(FrameInfo& frameInfo)
 	drawDebugWindow();
 	drawFrameInfo(frameInfo.framerate, frameInfo.frameTime);
 
+	ImGui::NewLine();
+
+	drawDeviceSpecs();
 	ImGui::NewLine();
 
 	drawRenderModeText(frameInfo.renderMode);
@@ -69,6 +73,13 @@ void ImGuiSystem::drawFrameInfo(float framerate, float frameTime)
 	ImGui::Text("FPS: %f /", framerate);
 	ImGui::SameLine();
 	ImGui::Text("%f ms", frameTime);
+}
+
+void ImGuiSystem::drawDeviceSpecs()
+{
+	ImGui::Text("GPU: %s", device.properties.deviceName);
+	ImGui::NewLine();
+	ImGui::Text("CPU: %s", cpuInfo.c_str());
 }
 
 void ImGuiSystem::drawSceneInfo(FrameInfo& frameInfo)

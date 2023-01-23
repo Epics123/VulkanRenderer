@@ -3,6 +3,7 @@
 #include "Buffer.h"
 
 #include <stb_image.h>
+#include <intrin.h>
 
 bool Utils::loadImageFromFile(Device& device, const char* filepath, Texture& outTexture)
 {
@@ -51,4 +52,31 @@ bool Utils::loadImageFromFile(Device& device, const char* filepath, Texture& out
 	device.transitionImageLayout(outTexture.getTextureImage(), imageFormat, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 	return true;
+}
+
+std::string Utils::getCPUName()
+{
+	// WILL ONLY WORK ON WINDOWS https://vcpptips.wordpress.com/2012/12/30/how-to-get-the-cpu-name/
+
+	int CPUInfo[4] = { -1 };
+	char CPUBrandString[0x40];
+	__cpuid(CPUInfo, 0x80000000);
+	unsigned int nExIds = CPUInfo[0];
+
+	memset(CPUBrandString, 0, sizeof(CPUBrandString));
+
+	// Get the information associated with each extended ID.
+	for (int i = 0x80000000; i <= nExIds; ++i)
+	{
+		__cpuid(CPUInfo, i);
+		// Interpret CPU brand string.
+		if (i == 0x80000002)
+			memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
+		else if (i == 0x80000003)
+			memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
+		else if (i == 0x80000004)
+			memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
+	}
+
+	return CPUBrandString;
 }
