@@ -13,7 +13,7 @@ Clone the repository with `git clone https://github.com/Epics123/VulkanRenderer.
 
 <ins>**2. Dependencies:**</ins>
 
-1. Run the [Setup.bat](https://github.com/Epics123/VulkanRenderer/blob/dev/scripts/Setup.bat) found in the `scripts` folder. This will download all the required prerequisites for the project if they are no present yet.
+1. Run the [Setup.bat](https://github.com/Epics123/VulkanRenderer/blob/dev/scripts/Setup.bat) found in the `scripts` folder. This will download all the required prerequisites for the project if they are not present yet.
 2. The main prerequisite is the Vulkan SDK. If it is not installed, the script will prompt the user to install the SDK.
 3. After the SDK is installed, run the [Setup.bat](https://github.com/Epics123/VulkanRenderer/blob/dev/scripts/Setup.bat) file again.
 4. After all dependencies are downloaded, the [Win-GenProject.bat](https://github.com/Epics123/VulkanRenderer/blob/dev/scripts/Win-GenProject.bat) will run automatically, which will generate a Visual Studio solution file that the user can use.
