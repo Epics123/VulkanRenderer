@@ -95,6 +95,8 @@ void Renderer::init()
 														   .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
 														   .build();
 
+	std::unique_ptr<DescriptorSetLayout> textureSetLayout = DescriptorSetLayout::Builder(mDevice).addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT).build();
+
 	globalDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 	for (int i = 0; i < globalDescriptorSets.size(); i++)
 	{
@@ -358,6 +360,8 @@ void Renderer::drawFrame(float dt)
 	if (VkCommandBuffer commandBuffer = beginFrame())
 	{
 		int frameIndex = getFrameIndex();
+
+		imguiSystem.setViewportInfo(window->getWidth() * 0.5f, window->getHeight() * 0.5f, window->getWidth(), window->getHeight());
 
 		FrameInfo frameInfo { frameIndex, currentFrametime, currentFramerate, dt, showGrid, renderMode, commandBuffer, mainCamera, globalDescriptorSets[frameIndex], gameObjects};
 		

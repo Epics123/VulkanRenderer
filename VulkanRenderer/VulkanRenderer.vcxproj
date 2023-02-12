@@ -93,6 +93,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Libraries\ImGui\ImGuizmo\GraphEditor.h" />
+    <ClInclude Include="Libraries\ImGui\ImGuizmo\ImCurveEdit.h" />
+    <ClInclude Include="Libraries\ImGui\ImGuizmo\ImGradient.h" />
+    <ClInclude Include="Libraries\ImGui\ImGuizmo\ImGuizmo.h" />
+    <ClInclude Include="Libraries\ImGui\ImGuizmo\ImSequencer.h" />
+    <ClInclude Include="Libraries\ImGui\ImGuizmo\ImZoomSlider.h" />
     <ClInclude Include="Libraries\ImGui\imconfig.h" />
     <ClInclude Include="Libraries\ImGui\imgui.h" />
     <ClInclude Include="Libraries\ImGui\imgui_impl_glfw.h" />
@@ -113,6 +119,7 @@
     <ClInclude Include="MainApp\GameObject.h" />
     <ClInclude Include="MainApp\Image.h" />
     <ClInclude Include="MainApp\Light.h" />
+    <ClInclude Include="MainApp\Material.h" />
     <ClInclude Include="MainApp\Mesh.h" />
     <ClInclude Include="MainApp\Model.h" />
     <ClInclude Include="MainApp\Pipeline.h" />
@@ -121,8 +128,8 @@
     <ClInclude Include="MainApp\RenderSystems\RenderSystem.h" />
     <ClInclude Include="MainApp\RenderSystems\UnlitSystem.h" />
     <ClInclude Include="MainApp\RenderSystems\WireframeSystem.h" />
-    <ClInclude Include="MainApp\Renderer.h" />
     <ClInclude Include="MainApp\RenderSystems\WorldGridSystem.h" />
+    <ClInclude Include="MainApp\Renderer.h" />
     <ClInclude Include="MainApp\SwapChain.h" />
     <ClInclude Include="MainApp\Texture.h" />
     <ClInclude Include="MainApp\TextureSampler.h" />
@@ -132,6 +139,11 @@
     <ClInclude Include="MainApp\Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Libraries\ImGui\ImGuizmo\GraphEditor.cpp" />
+    <ClCompile Include="Libraries\ImGui\ImGuizmo\ImCurveEdit.cpp" />
+    <ClCompile Include="Libraries\ImGui\ImGuizmo\ImGradient.cpp" />
+    <ClCompile Include="Libraries\ImGui\ImGuizmo\ImGuizmo.cpp" />
+    <ClCompile Include="Libraries\ImGui\ImGuizmo\ImSequencer.cpp" />
     <ClCompile Include="Libraries\ImGui\imgui.cpp" />
     <ClCompile Include="Libraries\ImGui\imgui_demo.cpp" />
     <ClCompile Include="Libraries\ImGui\imgui_draw.cpp" />
@@ -157,8 +169,8 @@
     <ClCompile Include="MainApp\RenderSystems\RenderSystem.cpp" />
     <ClCompile Include="MainApp\RenderSystems\UnlitSystem.cpp" />
     <ClCompile Include="MainApp\RenderSystems\WireframeSystem.cpp" />
-    <ClCompile Include="MainApp\Renderer.cpp" />
     <ClCompile Include="MainApp\RenderSystems\WorldGridSystem.cpp" />
+    <ClCompile Include="MainApp\Renderer.cpp" />
     <ClCompile Include="MainApp\SwapChain.cpp" />
     <ClCompile Include="MainApp\Texture.cpp" />
     <ClCompile Include="MainApp\TextureSampler.cpp" />

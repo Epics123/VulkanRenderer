@@ -27,7 +27,7 @@ struct PointLightComponent
 class GameObject
 {
 public:
-	typedef unsigned int id_t;
+	typedef int id_t;
 	using Map = std::unordered_map<id_t, GameObject>;
 
 	static GameObject createGameObject()
@@ -55,9 +55,11 @@ public:
 	std::shared_ptr<Model> model{};
 	std::unique_ptr<PointLightComponent> pointLight = nullptr;
 
+	bool operator==(GameObject& other) { return getID() == other.getID(); }
+	bool operator!=(GameObject& other) { return !(*this == other); }
 private:
 	GameObject(id_t objId) : id{objId} {};
 
-	id_t id;
+	id_t id = -1;
 	std::string objectName = "Empty";
 };

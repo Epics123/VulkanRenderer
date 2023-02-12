@@ -4,10 +4,11 @@
 #include "imgui_impl_vulkan.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_internal.h"
+#include "ImGuizmo/ImGuizmo.h"
+#include "glm/gtc/type_ptr.hpp"
 
 #include "../Pipeline.h"
 #include "../Camera.h"
-#include "../GameObject.h"
 #include "../Utils.h"
 
 ImGuiSystem::ImGuiSystem(Device& device)
@@ -16,11 +17,21 @@ ImGuiSystem::ImGuiSystem(Device& device)
 	cpuInfo = Utils::getCPUName();
 }
 
+void ImGuiSystem::drawViewport()
+{
+	ImGui::Begin("Viewport");
+	ImVec2 viewportSize = ImGui::GetContentRegionAvail();
+
+	ImGui::End();
+}
+
 void ImGuiSystem::drawImGui(FrameInfo& frameInfo)
 {
 	ImGui_ImplVulkan_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
+
+	//drawViewport();
 
 	drawDebugWindow();
 	drawFrameInfo(frameInfo.framerate, frameInfo.frameTime);
@@ -39,6 +50,8 @@ void ImGuiSystem::drawImGui(FrameInfo& frameInfo)
 	ImGui::NewLine();
 
 	drawSceneInfo(frameInfo);
+
+	//drawGizmos(frameInfo);
 
 	ImGui::End();
 	ImGui::Render();
@@ -97,8 +110,16 @@ void ImGuiSystem::drawSceneInfo(FrameInfo& frameInfo)
 		for (auto& keyValue : frameInfo.gameObjects)
 		{
 			GameObject& obj = keyValue.second;
+			ImGuiTreeNodeFlags flags = (selectionContext == obj.getID() ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
 
-			if (ImGui::TreeNode(obj.getObjectName().c_str()))
+			bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)obj.getID(), flags, obj.getObjectName().c_str());
+
+			if(ImGui::IsItemClicked())
+			{
+				selectionContext = obj.getID();
+			}
+
+			if (opened)
 			{
 				DrawVec3Control("Position", obj.transform.translation, 0.0f, 120.0f);
 				DrawVec3Control("Rotation", obj.transform.rotation, 0.0f, 120.0f);
@@ -124,6 +145,43 @@ void ImGuiSystem::drawShowGridText(FrameInfo& frameInfo)
 		ImGui::TextColored(ImVec4(0.2f, 0.8f, 0.1f, 1.0f), "True");
 	else
 		ImGui::TextColored(ImVec4(0.8f, 0.1f, 0.1f, 1.0f), "False");
+}
+
+void ImGuiSystem::drawGizmos(FrameInfo& frameInfo)
+{
+	//TODO: Switch to using Imgui viewport so gizmos work properly
+
+	if(frameInfo.gameObjects.empty())
+		return;
+
+	GameObject& selectedObject = getSelectedObject(frameInfo);
+	if(selectedObject.getID() != -1)
+	{
+		ImGuizmo::SetOrthographic(false);
+		ImGuizmo::SetDrawlist();
+		float windowWidth = (float)ImGui::GetWindowWidth();
+		float windowHeight = (float)ImGui::GetWindowHeight();
+		float x = ImGui::GetWindowPos().x;
+		float y = ImGui::GetWindowPos().y;
+		ImGuizmo::SetRect(x, y, windowWidth, windowHeight);
+
+		glm::mat4 cameraView = glm::inverse(frameInfo.camera.getTransform());
+		glm::mat4 cameraProjection = frameInfo.camera.proj;
+
+		glm::mat4 transform = selectedObject.transform.getTransform();
+
+		ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection), ImGuizmo::OPERATION::TRANSLATE, IMGUIZMO_NAMESPACE::LOCAL, glm::value_ptr(transform));
+	}
+}
+
+GameObject& ImGuiSystem::getSelectedObject(FrameInfo& frameInfo)
+{
+	return frameInfo.gameObjects.at(selectionContext);
+}
+
+void ImGuiSystem::setViewportInfo(float x, float y, float width, float height)
+{
+	viewportInfo = {x, y, width, height};
 }
 
 void ImGuiSystem::DrawVec3Control(const char* label, glm::vec3& values, float resetValue /*= 0.0f*/, float columnWidth /*= 100.0f*/)

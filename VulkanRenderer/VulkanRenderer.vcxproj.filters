@@ -7,6 +7,9 @@
     <Filter Include="Libraries\ImGui">
       <UniqueIdentifier>{AC07BDE7-1893-2AAC-21A4-ADA08DAE86AC}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Libraries\ImGui\ImGuizmo">
+      <UniqueIdentifier>{8CDBB723-7800-07A4-A14B-EC338DCF05C2}</UniqueIdentifier>
+    </Filter>
     <Filter Include="MainApp">
       <UniqueIdentifier>{6BCAF114-D7A9-70B0-E0C1-FB864C20D711}</UniqueIdentifier>
     </Filter>
@@ -24,6 +27,24 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Libraries\ImGui\ImGuizmo\GraphEditor.h">
+      <Filter>Libraries\ImGui\ImGuizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\ImGui\ImGuizmo\ImCurveEdit.h">
+      <Filter>Libraries\ImGui\ImGuizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\ImGui\ImGuizmo\ImGradient.h">
+      <Filter>Libraries\ImGui\ImGuizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\ImGui\ImGuizmo\ImGuizmo.h">
+      <Filter>Libraries\ImGui\ImGuizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\ImGui\ImGuizmo\ImSequencer.h">
+      <Filter>Libraries\ImGui\ImGuizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\ImGui\ImGuizmo\ImZoomSlider.h">
+      <Filter>Libraries\ImGui\ImGuizmo</Filter>
+    </ClInclude>
     <ClInclude Include="Libraries\ImGui\imconfig.h">
       <Filter>Libraries\ImGui</Filter>
     </ClInclude>
@@ -84,6 +105,9 @@
     <ClInclude Include="MainApp\Light.h">
       <Filter>MainApp</Filter>
     </ClInclude>
+    <ClInclude Include="MainApp\Material.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
     <ClInclude Include="MainApp\Mesh.h">
       <Filter>MainApp</Filter>
     </ClInclude>
@@ -108,10 +132,16 @@
     <ClInclude Include="MainApp\RenderSystems\WireframeSystem.h">
       <Filter>MainApp\RenderSystems</Filter>
     </ClInclude>
+    <ClInclude Include="MainApp\RenderSystems\WorldGridSystem.h">
+      <Filter>MainApp\RenderSystems</Filter>
+    </ClInclude>
     <ClInclude Include="MainApp\Renderer.h">
       <Filter>MainApp</Filter>
     </ClInclude>
     <ClInclude Include="MainApp\SwapChain.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\Texture.h">
       <Filter>MainApp</Filter>
     </ClInclude>
     <ClInclude Include="MainApp\TextureSampler.h">
@@ -129,14 +159,23 @@
     <ClInclude Include="MainApp\Window.h">
       <Filter>MainApp</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\RenderSystems\WorldGridSystem.h">
-      <Filter>MainApp\RenderSystems</Filter>
-    </ClInclude>
-    <ClInclude Include="MainApp\Texture.h">
-      <Filter>MainApp</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Libraries\ImGui\ImGuizmo\GraphEditor.cpp">
+      <Filter>Libraries\ImGui\ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\ImGui\ImGuizmo\ImCurveEdit.cpp">
+      <Filter>Libraries\ImGui\ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\ImGui\ImGuizmo\ImGradient.cpp">
+      <Filter>Libraries\ImGui\ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\ImGui\ImGuizmo\ImGuizmo.cpp">
+      <Filter>Libraries\ImGui\ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\ImGui\ImGuizmo\ImSequencer.cpp">
+      <Filter>Libraries\ImGui\ImGuizmo</Filter>
+    </ClCompile>
     <ClCompile Include="Libraries\ImGui\imgui.cpp">
       <Filter>Libraries\ImGui</Filter>
     </ClCompile>
@@ -212,13 +251,22 @@
     <ClCompile Include="MainApp\RenderSystems\WireframeSystem.cpp">
       <Filter>MainApp\RenderSystems</Filter>
     </ClCompile>
+    <ClCompile Include="MainApp\RenderSystems\WorldGridSystem.cpp">
+      <Filter>MainApp\RenderSystems</Filter>
+    </ClCompile>
     <ClCompile Include="MainApp\Renderer.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
     <ClCompile Include="MainApp\SwapChain.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
+    <ClCompile Include="MainApp\Texture.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
     <ClCompile Include="MainApp\TextureSampler.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\Utils.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
     <ClCompile Include="MainApp\VertexAttributes.cpp">
@@ -228,15 +276,6 @@
       <Filter>MainApp</Filter>
     </ClCompile>
     <ClCompile Include="MainApp\Window.cpp">
-      <Filter>MainApp</Filter>
-    </ClCompile>
-    <ClCompile Include="MainApp\RenderSystems\WorldGridSystem.cpp">
-      <Filter>MainApp\RenderSystems</Filter>
-    </ClCompile>
-    <ClCompile Include="MainApp\Texture.cpp">
-      <Filter>MainApp</Filter>
-    </ClCompile>
-    <ClCompile Include="MainApp\Utils.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
   </ItemGroup>
@@ -265,10 +304,10 @@
     <None Include="MainApp\resources\vulkan\shaders\Wireframe.vert">
       <Filter>MainApp\resources\vulkan\shaders</Filter>
     </None>
-    <None Include="MainApp\resources\vulkan\shaders\WorldGrid.vert">
+    <None Include="MainApp\resources\vulkan\shaders\WorldGrid.frag">
       <Filter>MainApp\resources\vulkan\shaders</Filter>
     </None>
-    <None Include="MainApp\resources\vulkan\shaders\WorldGrid.frag">
+    <None Include="MainApp\resources\vulkan\shaders\WorldGrid.vert">
       <Filter>MainApp\resources\vulkan\shaders</Filter>
     </None>
   </ItemGroup>

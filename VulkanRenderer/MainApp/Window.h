@@ -37,6 +37,9 @@ public:
 	void setWidth(uint32_t newWidth) { width = newWidth; }
 	void setHeight(uint32_t newHeight) { width = newHeight; }
 
+	const uint32_t getWidth() { return width; }
+	const uint32_t getHeight() { return height; }
+
 private:
 	const char* name;
 	uint32_t width;

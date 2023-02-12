@@ -1,8 +1,11 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#define GLM_ENABLE_EXPERIMENTAL
+
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <glfw3.h>
 #include <glfw3native.h>
 
@@ -16,6 +19,13 @@ struct Camera
 	void updateModel(float dt);
 
 	void setPerspectiveProjection(float fov, float aspectRatio, float near, float far);
+
+	glm::mat4 getTransform()
+	{
+		glm::mat4 rot = glm::toMat4(orientation);
+
+		return glm::translate(glm::mat4(1.0f), position) * rot * glm::scale(glm::mat4(1.0f), glm::vec3(1.0f));
+	}
 
 	glm::vec3 position = glm::vec3(0.0f, 3.0f, 0.0f);
 	glm::vec3 rotation{};
