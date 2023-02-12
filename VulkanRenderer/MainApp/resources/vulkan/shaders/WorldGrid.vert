@@ -15,11 +15,6 @@ vec3 gridPlane[6] = vec3[](
     vec3(1, 1, 0), vec3(-1, -1, 0), vec3(-1, 1, 0),
     vec3(-1, -1, 0), vec3(1, 1, 0), vec3(1, -1, 0)
 );
-//
-//vec3 gridPlane[6] = vec3[](
-//    vec3(1, 0, 1), vec3(-1, 0, -1), vec3(-1, 0, 1),
-//    vec3(-1, 0, -1), vec3(1, 0, 1), vec3(1, 0, -1)
-//);
 
 vec3 unprojectPoint(float x, float y, float z, mat4 invView, mat4 invProj)
 {
@@ -36,9 +31,5 @@ void main()
 	nearPoint = unprojectPoint(pos.x, pos.y, 0.0, invView, invProj).xyz; // unprojecting on the near plane
     farPoint = unprojectPoint(pos.x, pos.y, 1.0, invView, invProj).xyz; // unprojecting on the far plane
 
-	//nearPoint = unprojectPoint(pos.x, 0.0, pos.z, ubo.invView, invProj).xyz; // unprojecting on the near plane
-    //farPoint = unprojectPoint(pos.x, 1.0, pos.z, ubo.invView, invProj).xyz; // unprojecting on the far plane
-
 	gl_Position = vec4(pos, 1.0);
-	//gl_Position = ubo.projection * ubo.view * vec4(pos, 1.0);
 }
