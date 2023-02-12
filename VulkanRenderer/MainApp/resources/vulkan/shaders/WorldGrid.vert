@@ -1,6 +1,8 @@
 #version 450
 #extension GL_KHR_vulkan_glsl:enable
 
+// Grid shader code from http://asliceofrendering.com/scene%20helper/2020/01/05/InfiniteGrid/
+
 layout(location = 1) out vec3 nearPoint;
 layout(location = 2) out vec3 farPoint;
 

@@ -1,5 +1,7 @@
 #version 450
 
+// Grid shader code from http://asliceofrendering.com/scene%20helper/2020/01/05/InfiniteGrid/
+
 layout(location = 1) in vec3 nearPoint;
 layout(location = 2) in vec3 farPoint;
 
