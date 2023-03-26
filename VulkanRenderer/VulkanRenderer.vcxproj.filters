@@ -117,6 +117,9 @@
     <ClInclude Include="MainApp\Pipeline.h">
       <Filter>MainApp</Filter>
     </ClInclude>
+    <ClInclude Include="MainApp\RenderPass.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
     <ClInclude Include="MainApp\RenderSystems\ImGuiSystem.h">
       <Filter>MainApp\RenderSystems</Filter>
     </ClInclude>
@@ -234,6 +237,9 @@
       <Filter>MainApp</Filter>
     </ClCompile>
     <ClCompile Include="MainApp\Pipeline.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\RenderPass.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
     <ClCompile Include="MainApp\RenderSystems\ImGuiSystem.cpp">

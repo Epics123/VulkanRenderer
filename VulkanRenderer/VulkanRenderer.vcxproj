@@ -123,6 +123,7 @@
     <ClInclude Include="MainApp\Mesh.h" />
     <ClInclude Include="MainApp\Model.h" />
     <ClInclude Include="MainApp\Pipeline.h" />
+    <ClInclude Include="MainApp\RenderPass.h" />
     <ClInclude Include="MainApp\RenderSystems\ImGuiSystem.h" />
     <ClInclude Include="MainApp\RenderSystems\PointLightSystem.h" />
     <ClInclude Include="MainApp\RenderSystems\RenderSystem.h" />
@@ -164,6 +165,7 @@
     <ClCompile Include="MainApp\Mesh.cpp" />
     <ClCompile Include="MainApp\Model.cpp" />
     <ClCompile Include="MainApp\Pipeline.cpp" />
+    <ClCompile Include="MainApp\RenderPass.cpp" />
     <ClCompile Include="MainApp\RenderSystems\ImGuiSystem.cpp" />
     <ClCompile Include="MainApp\RenderSystems\PointLightSystem.cpp" />
     <ClCompile Include="MainApp\RenderSystems\RenderSystem.cpp" />
