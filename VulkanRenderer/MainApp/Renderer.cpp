@@ -272,11 +272,11 @@ void Renderer::loadGameObjects()
 	gameObjects.emplace(floor.getID(), std::move(floor));
 
 	std::vector<glm::vec3> lightColors{
-	 {1.f, .1f, .1f},
-	 {.1f, .1f, 1.f},
-	 {.1f, 1.f, .1f},
-	 {1.f, 1.f, .1f},
-	 {.1f, 1.f, 1.f},
+	 //{1.f, .1f, .1f},
+	 //{.1f, .1f, 1.f},
+	 //{.1f, 1.f, .1f},
+	 //{1.f, 1.f, .1f},
+	 //{.1f, 1.f, 1.f},
 	 {1.f, 1.f, 1.f}
 	};
 
@@ -284,6 +284,7 @@ void Renderer::loadGameObjects()
 	{
 		GameObject pointLight = GameObject::makePointLight(0.5f);
 		pointLight.color = lightColors[i];
+		pointLight.pointLight->lightType = LightType::POINT;
 		glm::mat4 lightRot = glm::rotate(glm::mat4(1.0f), (i * glm::two_pi<float>()) / lightColors.size(), {0.0f, 0.0f, 1.0f});
 		pointLight.transform.translation = glm::vec3(lightRot * glm::vec4(0.0f, 1.5f, 1.5f, 1.0f));
 		pointLight.setObjectName("PointLight" + std::to_string(i));

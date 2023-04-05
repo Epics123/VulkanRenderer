@@ -32,3 +32,13 @@ GameObject GameObject::makePointLight(float intensity, float radius, glm::vec3 c
 
 	return obj;
 }
+
+GameObject GameObject::makeSpotLight(float intensity, float cutoffAngle, glm::vec3 color)
+{
+	GameObject obj = createGameObject();
+	obj.color = color;
+	obj.spotLight = std::make_unique<SpotLightComponent>();
+	obj.pointLight->intensity = intensity;
+	obj.spotLight->cutoffAngle = cutoffAngle;
+	return obj;
+}

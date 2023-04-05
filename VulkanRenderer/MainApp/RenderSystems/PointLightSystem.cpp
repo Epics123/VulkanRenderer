@@ -31,7 +31,7 @@ void PointLightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo)
 		if(!obj.pointLight)
 			continue;
 		
-		obj.transform.translation = glm::vec3(lightRot * glm::vec4(obj.transform.translation, 1.0f));
+		obj.transform.translation = glm::vec3(lightRot * glm::vec4(obj.transform.translation, (float)obj.pointLight->lightType));
 
 		// copy light info to ubo
 		ubo.pointLights[lightIndex].position = glm::vec4(obj.transform.translation, 1.0f);

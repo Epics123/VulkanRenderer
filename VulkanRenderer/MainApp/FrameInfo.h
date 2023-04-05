@@ -3,17 +3,11 @@
 #include "Camera.h"
 #include "GameObject.h"
 #include "Enums.h"
+#include "Light.h"
 
 #include <vulkan/vulkan.h>
 
 #define MAX_LIGHTS 10
-
-struct PointLight
-{
-	glm::vec4 position{};
-	glm::vec4 color{}; // w is light intensity
-	alignas(16) float radius;
-};
 
 // TEMP FOR TESTING UBOS
 struct GlobalUbo

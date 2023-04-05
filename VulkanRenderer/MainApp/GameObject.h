@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Model.h"
+#include "Enums.h"
 
 #include "glm/gtc/matrix_transform.hpp"
 #include <glm/gtc/quaternion.hpp>
@@ -19,9 +20,19 @@ struct TransformComponent
 	glm::mat3 getNormalMatrix();
 };
 
-struct PointLightComponent
+struct LightComponent
+{
+	LightType lightType;
+};
+
+struct PointLightComponent : LightComponent
 {
 	float intensity = 1.0f;
+};
+
+struct SpotLightComponent : LightComponent
+{
+	float cutoffAngle = 15.0f;
 };
 
 class GameObject
@@ -37,6 +48,7 @@ public:
 	}
 
 	static GameObject makePointLight(float intensity = 1.0f, float radius = 0.1f, glm::vec3 color = glm::vec3(1.0f));
+	static GameObject makeSpotLight(float intensity = 1.0f, float cutoffAngle = 15.0f, glm::vec3 color = glm::vec3(1.0f));
 
 	GameObject(const GameObject&) = delete;
 	GameObject& operator=(const GameObject&) = delete;
@@ -54,6 +66,7 @@ public:
 	// optional components
 	std::shared_ptr<Model> model{};
 	std::unique_ptr<PointLightComponent> pointLight = nullptr;
+	std::unique_ptr<SpotLightComponent> spotLight = nullptr;
 
 	bool operator==(GameObject& other) { return getID() == other.getID(); }
 	bool operator!=(GameObject& other) { return !(*this == other); }
