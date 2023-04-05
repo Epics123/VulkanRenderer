@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "Device.h"
+#include "RenderPass.h"
 
 class SwapChain
 {
@@ -20,9 +21,7 @@ public:
     SwapChain(const SwapChain&) = delete;
     SwapChain& operator=(const SwapChain&) = delete;
 
-    VkFramebuffer getFrameBuffer(int index) { return swapChainFramebuffers[index]; }
-    VkRenderPass getRenderPass() { return renderPass; }
-    VkImageView getImageView(int index) { return swapChainImageViews[index]; }
+    RenderPass& getRenderPass() { return renderPass; }
     size_t imageCount() { return swapChainImages.size(); }
     VkFormat getSwapChainImageFormat() { return swapChainImageFormat; }
     VkExtent2D getSwapChainExtent() { return swapChainExtent; }
@@ -47,9 +46,7 @@ private:
     void init();
     void createSwapChain();
     void createImageViews();
-    void createDepthResources();
     void createRenderPass();
-    void createFramebuffers();
     void createSyncObjects();
 
     VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
@@ -60,14 +57,8 @@ private:
     VkFormat swapChainDepthFormat;
     VkExtent2D swapChainExtent;
 
-    std::vector<VkFramebuffer> swapChainFramebuffers;
-    VkRenderPass renderPass;
-
-    std::vector<VkImage> depthImages;
-    std::vector<VkDeviceMemory> depthImageMemorys;
-    std::vector<VkImageView> depthImageViews;
-    std::vector<VkImage> swapChainImages;
-    std::vector<VkImageView> swapChainImageViews;
+    RenderPass renderPass;
+	std::vector<VkImage> swapChainImages;
 
     Device& device;
     VkExtent2D windowExtent;

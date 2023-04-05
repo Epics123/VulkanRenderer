@@ -106,11 +106,11 @@ void Renderer::init()
 						.build(globalDescriptorSets[i]);
 	}
 
-	renderSystem.init(getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
-	pointLightSystem.init(getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
-	wireframeSystem.init(getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
-	unlitSystem.init(getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
-	gridSystem.init(getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
+	renderSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
+	pointLightSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
+	wireframeSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
+	unlitSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
+	gridSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
 
 	createCommandBuffers();
 
@@ -145,7 +145,7 @@ void Renderer::imguiInit()
 	init_info.ImageCount = 3;
 	init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
-	ImGui_ImplVulkan_Init(&init_info, getSwapChainRenderPass());
+	ImGui_ImplVulkan_Init(&init_info, getSwapChainRenderPass().renderPass);
 
 	// Upload Fonts
 	VkCommandBuffer fontCmdBuffer = mDevice.beginSingleTimeCommands();
@@ -439,9 +439,11 @@ void Renderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer)
 	assert(isFrameInProgress() && "Can't call beginSwapChainRenderPass while frame is not in progress!");
 	assert(commandBuffer == getCurrentCommandBuffer() && "Can't begin render pass on command buffer from a different frame!");
 
-	VkRenderPassBeginInfo renderPassInfo{};
+	getSwapChainRenderPass().begin(commandBuffer, currentImageIndex);
+
+	/*VkRenderPassBeginInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-	renderPassInfo.renderPass = mSwapChain->getRenderPass();
+	renderPassInfo.renderPass = mSwapChain->getRenderPass().renderPass;
 	renderPassInfo.framebuffer = mSwapChain->getFrameBuffer(currentImageIndex);
 	renderPassInfo.renderArea.offset = { 0, 0 };
 	renderPassInfo.renderArea.extent = mSwapChain->getSwapChainExtent();
@@ -464,7 +466,7 @@ void Renderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer)
 	viewport.maxDepth = 1.0f;
 	VkRect2D scissor = { {0, 0}, mSwapChain->getSwapChainExtent() };
 	vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
-	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);*/
 }
 
 void Renderer::endSwapChainRenderPass(VkCommandBuffer commandBuffer)
@@ -472,7 +474,8 @@ void Renderer::endSwapChainRenderPass(VkCommandBuffer commandBuffer)
 	assert(isFrameInProgress() && "Can't call endSwapChainRenderPass while frame is not in progress!");
 	assert(commandBuffer == getCurrentCommandBuffer() && "Can't end render pass on command buffer from a different frame!");
 
-	vkCmdEndRenderPass(commandBuffer);
+	getSwapChainRenderPass().end(commandBuffer);
+	//vkCmdEndRenderPass(commandBuffer);
 }
 
 void Renderer::drawImGui(FrameInfo& frameInfo)

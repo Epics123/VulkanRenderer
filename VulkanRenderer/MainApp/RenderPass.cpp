@@ -11,14 +11,11 @@ RenderPass::RenderPass()
 
 RenderPass::~RenderPass()
 {
-	//cleanup();
+	
 }
 
-void RenderPass::begin(VkCommandBuffer commandBuffer, bool frameInProgress, int frameIndex)
+void RenderPass::begin(VkCommandBuffer commandBuffer, int frameIndex)
 {
-	assert(frameInProgress && "Can't begin render pass while frame is not in progress!");
-	//assert(commandBuffer == getCurrentCommandBuffer() && "Can't begin render pass on command buffer from a different frame!");
-
 	VkRenderPassBeginInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	renderPassInfo.renderPass = renderPass;
@@ -47,16 +44,22 @@ void RenderPass::begin(VkCommandBuffer commandBuffer, bool frameInProgress, int 
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 }
 
-void RenderPass::end(VkCommandBuffer commandBuffer, bool frameInProgress)
+void RenderPass::end(VkCommandBuffer commandBuffer)
 {
-	assert(frameInProgress && "Can't call endSwapChainRenderPass while frame is not in progress!");
-	//assert(commandBuffer == getCurrentCommandBuffer() && "Can't end render pass on command buffer from a different frame!");
-
 	vkCmdEndRenderPass(commandBuffer);
 }
 
-void RenderPass::createRenderPass(Device& device)
+void RenderPass::createRenderPass(Device& device, uint32_t passWidth, uint32_t passHeight)
 {
+	framebuffers.resize(maxFramebuffers);
+	colors.resize(maxFramebuffers);
+	depths.resize(maxFramebuffers);
+
+	width = passWidth;
+	height = passHeight;
+
+	createRenderPassImageViews(device);
+
 	VkAttachmentDescription depthAttachment{};
 	depthAttachment.format = depthFormat;
 	depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -113,16 +116,25 @@ void RenderPass::createRenderPass(Device& device)
 	{
 		throw std::runtime_error("failed to create render pass!");
 	}
+
+	createRenderPassFramebuffers(device, width, height);
 }
 
 void RenderPass::createRenderPassFramebuffers(Device& device, uint32_t framebufferWidth, uint32_t framebufferHeight)
 {
 	assert(maxFramebuffers > 0 && "RenderPass must have at least 1 frame buffer");
 
+	if(colors.size() != framebuffers.size() && depths.size() != framebuffers.size())
+	{
+		throw std::runtime_error("Must have the same number of Framebuffer attachments as framebuffers!");
+	}
+
 	framebuffers.resize(maxFramebuffers);
 	for (size_t i = 0; i < maxFramebuffers; i++)
 	{
-		std::array<VkImageView, 2> attachments = { color.view, depth.view };
+		VkImageView colorView = colors[i].view;
+		VkImageView depthView = depths[i].view;
+		std::array<VkImageView, 2> attachments = { colorView, depthView };
 
 		VkExtent2D swapChainExtent = {width, height};
 		VkFramebufferCreateInfo framebufferInfo = {};
@@ -150,19 +162,90 @@ void RenderPass::createRenderPassSampler(Device& device)
 
 }
 
+void RenderPass::createRenderPassImageViews(class Device& device)
+{
+	for (uint32_t i = 0; i < (uint32_t)colors.size(); i++)
+	{
+		VkImageViewCreateInfo viewInfo{};
+		viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		viewInfo.image = colors[i].image;
+		viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		viewInfo.format = imageFormat;
+		viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		viewInfo.subresourceRange.baseMipLevel = 0;
+		viewInfo.subresourceRange.levelCount = 1;
+		viewInfo.subresourceRange.baseArrayLayer = 0;
+		viewInfo.subresourceRange.layerCount = 1;
+
+		if (vkCreateImageView(device.getDevice(), &viewInfo, nullptr, &colors[i].view) != VK_SUCCESS)
+		{
+			throw std::runtime_error("failed to create texture image view!");
+		}
+	}
+
+	for (uint32_t i = 0; i < (uint32_t)depths.size(); i++)
+	{
+		VkImageCreateInfo imageInfo{};
+		imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+		imageInfo.imageType = VK_IMAGE_TYPE_2D;
+		imageInfo.extent.width = width;
+		imageInfo.extent.height = height;
+		imageInfo.extent.depth = 1;
+		imageInfo.mipLevels = 1;
+		imageInfo.arrayLayers = 1;
+		imageInfo.format = depthFormat;
+		imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+		imageInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;;
+		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+
+		device.createImageWithInfo(imageInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depths[i].image, depths[i].memory);
+
+		VkImageViewCreateInfo viewInfo{};
+		viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		viewInfo.image = depths[i].image;
+		viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		viewInfo.format = depthFormat;
+		viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+		viewInfo.subresourceRange.baseMipLevel = 0;
+		viewInfo.subresourceRange.levelCount = 1;
+		viewInfo.subresourceRange.baseArrayLayer = 0;
+		viewInfo.subresourceRange.layerCount = 1;
+
+		if (vkCreateImageView(device.getDevice(), &viewInfo, nullptr, &depths[i].view) != VK_SUCCESS)
+		{
+			throw std::runtime_error("failed to create texture image view!");
+		}
+	}
+}
+
 void RenderPass::cleanup(Device& device)
 {
 	if (device.getDevice())
 	{
-		vkDestroySampler(device.getDevice(), sampler, nullptr);
+		if(sampler != VK_NULL_HANDLE)
+			vkDestroySampler(device.getDevice(), sampler, nullptr);
 
-		vkDestroyImageView(device.getDevice(), color.view, nullptr);
-		vkDestroyImage(device.getDevice(), color.image, nullptr);
-		vkFreeMemory(device.getDevice(), color.memory, nullptr);
-
-		vkDestroyImageView(device.getDevice(), depth.view, nullptr);
-		vkDestroyImage(device.getDevice(), depth.image, nullptr);
-		vkFreeMemory(device.getDevice(), depth.memory, nullptr);
+		if ((uint32_t)colors.size() > 0)
+		{
+			for (FrameBufferAttachment color : colors)
+			{
+				vkDestroyImageView(device.getDevice(), color.view, nullptr);
+				if(shouldDestroyColorImages)
+					vkDestroyImage(device.getDevice(), color.image, nullptr);
+				vkFreeMemory(device.getDevice(), color.memory, nullptr);
+			}
+		}
+		
+		if ((uint32_t)depths.size() > 0)
+		{
+			for (FrameBufferAttachment depth : depths)
+			{
+				vkDestroyImageView(device.getDevice(), depth.view, nullptr);
+				if(shouldDestroyDepthImages)
+					vkDestroyImage(device.getDevice(), depth.image, nullptr);
+				vkFreeMemory(device.getDevice(), depth.memory, nullptr);
+			}
+		}
 
 		if((uint32_t)framebuffers.size() > 0)
 		{
@@ -183,9 +266,13 @@ DepthPass::DepthPass()
 	
 }
 
-void DepthPass::createRenderPass(Device& device)
+void DepthPass::createRenderPass(Device& device, uint32_t passWidth, uint32_t passHeight)
 {
 	maxFramebuffers = 1;
+
+	framebuffers.resize(maxFramebuffers);
+	colors.resize(maxFramebuffers);
+	depths.resize(maxFramebuffers);
 
 	VkFormat depthFormat = device.findSupportedFormat({ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
 		VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
@@ -245,7 +332,7 @@ void DepthPass::createRenderPass(Device& device)
 
 void DepthPass::createRenderPassFramebuffers(Device& device, uint32_t framebufferWidth, uint32_t framebufferHeight)
 {
-	framebuffers.resize(maxFramebuffers);
+	assert(depths.size() > 0 && "Depth pass must have at least 1 depth attachment!");
 
 	width = framebufferWidth;
 	height = framebufferHeight;
@@ -263,11 +350,11 @@ void DepthPass::createRenderPassFramebuffers(Device& device, uint32_t framebuffe
 	imageInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;;
 	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 
-	device.createImageWithInfo(imageInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depth.image, depth.memory);
+	device.createImageWithInfo(imageInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depths[0].image, depths[0].memory);
 
 	VkImageViewCreateInfo viewInfo{};
 	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-	viewInfo.image = depth.image;
+	viewInfo.image = depths[0].image;
 	viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
 	viewInfo.format = depthFormat;
 	viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
@@ -276,7 +363,7 @@ void DepthPass::createRenderPassFramebuffers(Device& device, uint32_t framebuffe
 	viewInfo.subresourceRange.baseArrayLayer = 0;
 	viewInfo.subresourceRange.layerCount = 1;
 
-	if (vkCreateImageView(device.getDevice(), &viewInfo, nullptr, &depth.view) != VK_SUCCESS)
+	if (vkCreateImageView(device.getDevice(), &viewInfo, nullptr, &depths[0].view) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to create texture image view!");
 	}
@@ -287,7 +374,7 @@ void DepthPass::createRenderPassFramebuffers(Device& device, uint32_t framebuffe
 	framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 	framebufferInfo.renderPass = renderPass;
 	framebufferInfo.attachmentCount = 1;
-	framebufferInfo.pAttachments = &depth.view;
+	framebufferInfo.pAttachments = &depths[0].view;
 	framebufferInfo.width = width;
 	framebufferInfo.height = height;
 	framebufferInfo.layers = 1;
@@ -329,28 +416,6 @@ void DepthPass::createRenderPassSampler(Device& device)
 	if (vkCreateSampler(device.getDevice(), &samplerInfo, nullptr, &sampler) != VK_SUCCESS)
 	{
 		throw std::runtime_error("Failed to create depth pass sampler");
-	}
-}
-
-void DepthPass::cleanup(Device& device)
-{
-	if (device.getDevice())
-	{
-		vkDestroySampler(device.getDevice(), sampler, nullptr);
-
-		vkDestroyImageView(device.getDevice(), depth.view, nullptr);
-		vkDestroyImage(device.getDevice(), depth.image, nullptr);
-		vkFreeMemory(device.getDevice(), depth.memory, nullptr);
-
-		if ((uint32_t)framebuffers.size() > 0)
-		{
-			for (VkFramebuffer framebuffer : framebuffers)
-			{
-				vkDestroyFramebuffer(device.getDevice(), framebuffer, nullptr);
-			}
-		}
-
-		vkDestroyRenderPass(device.getDevice(), renderPass, nullptr);
 	}
 }
 

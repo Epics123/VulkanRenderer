@@ -58,7 +58,7 @@ public:
 
 
 	void recreateSwapChain();
-	VkRenderPass getSwapChainRenderPass() const { return mSwapChain->getRenderPass(); }
+	RenderPass getSwapChainRenderPass() const { return mSwapChain->getRenderPass(); }
 
 	void loadGameObjects();
 
