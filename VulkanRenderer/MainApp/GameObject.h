@@ -30,7 +30,7 @@ struct PointLightComponent : LightComponent
 	float intensity = 1.0f;
 };
 
-struct SpotLightComponent : LightComponent
+struct SpotLightComponent : PointLightComponent
 {
 	float cutoffAngle = 15.0f;
 };

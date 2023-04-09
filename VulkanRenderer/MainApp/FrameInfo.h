@@ -18,6 +18,7 @@ struct GlobalUbo
 
 	glm::vec4 abmientColor{ 1.0f, 1.0f, 1.0f, 0.1f };
 	PointLight pointLights[MAX_LIGHTS];
+	SpotLight spotLights[MAX_LIGHTS];
 	int numLights;
 };
 

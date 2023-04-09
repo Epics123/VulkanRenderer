@@ -6,7 +6,7 @@ glm::mat4 TransformComponent::getTransform()
 
 	glm::quat qPitch = glm::angleAxis(rotation.x, glm::vec3(1, 0, 0));
 	glm::quat qYaw = glm::angleAxis(rotation.z, glm::vec3(0, 0, 1));
-	glm::quat qRoll = glm::angleAxis(rotation.y, glm::vec3(0, 0, 1));
+	glm::quat qRoll = glm::angleAxis(rotation.y, glm::vec3(0, 1, 0));
 
 	glm::quat orientation = qPitch * qYaw * qRoll;
 	glm::mat4 rotate = glm::mat4_cast(orientation);
@@ -29,6 +29,7 @@ GameObject GameObject::makePointLight(float intensity, float radius, glm::vec3 c
 	obj.transform.scale.x = radius;
 	obj.pointLight = std::make_unique<PointLightComponent>();
 	obj.pointLight->intensity = intensity;
+	obj.pointLight->lightType = LightType::POINT;
 
 	return obj;
 }
@@ -38,7 +39,9 @@ GameObject GameObject::makeSpotLight(float intensity, float cutoffAngle, glm::ve
 	GameObject obj = createGameObject();
 	obj.color = color;
 	obj.spotLight = std::make_unique<SpotLightComponent>();
-	obj.pointLight->intensity = intensity;
+	obj.spotLight->intensity = intensity;
 	obj.spotLight->cutoffAngle = cutoffAngle;
+	obj.spotLight->lightType = LightType::SPOT;
+
 	return obj;
 }

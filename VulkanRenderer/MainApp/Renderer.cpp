@@ -273,23 +273,27 @@ void Renderer::loadGameObjects()
 
 	std::vector<glm::vec3> lightColors{
 	 //{1.f, .1f, .1f},
-	 //{.1f, .1f, 1.f},
+	 {.1f, .1f, 1.f},
 	 //{.1f, 1.f, .1f},
 	 //{1.f, 1.f, .1f},
 	 //{.1f, 1.f, 1.f},
-	 {1.f, 1.f, 1.f}
+	 //{1.f, 1.f, 1.f}
 	};
 
 	for (int i = 0; i < lightColors.size(); i++)
 	{
-		GameObject pointLight = GameObject::makePointLight(0.5f);
+		GameObject pointLight = GameObject::makePointLight();
 		pointLight.color = lightColors[i];
-		pointLight.pointLight->lightType = LightType::POINT;
 		glm::mat4 lightRot = glm::rotate(glm::mat4(1.0f), (i * glm::two_pi<float>()) / lightColors.size(), {0.0f, 0.0f, 1.0f});
 		pointLight.transform.translation = glm::vec3(lightRot * glm::vec4(0.0f, 1.5f, 1.5f, 1.0f));
 		pointLight.setObjectName("PointLight" + std::to_string(i));
 		gameObjects.emplace(pointLight.getID(), std::move(pointLight));
 	}
+
+	GameObject spotLight = GameObject::makeSpotLight();
+	spotLight.transform.translation = {0.0f, 0.0f, 2.0f};
+	spotLight.setObjectName("spotLight");
+	gameObjects.emplace(spotLight.getID(), std::move(spotLight));
 }
 
 void Renderer::loadTextures(DescriptorSetLayout& layout)
@@ -375,6 +379,8 @@ void Renderer::drawFrame(float dt)
 		uboBuffers[frameIndex]->writeToBuffer(&ubo);
 		uboBuffers[frameIndex]->flush();
 
+		//TODO: Objects should rotate around their origin and not the world origin
+
 		// render
 		beginSwapChainRenderPass(commandBuffer);
 		mainCamera.updateModel(dt);
@@ -441,33 +447,6 @@ void Renderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer)
 	assert(commandBuffer == getCurrentCommandBuffer() && "Can't begin render pass on command buffer from a different frame!");
 
 	getSwapChainRenderPass().begin(commandBuffer, currentImageIndex);
-
-	/*VkRenderPassBeginInfo renderPassInfo{};
-	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-	renderPassInfo.renderPass = mSwapChain->getRenderPass().renderPass;
-	renderPassInfo.framebuffer = mSwapChain->getFrameBuffer(currentImageIndex);
-	renderPassInfo.renderArea.offset = { 0, 0 };
-	renderPassInfo.renderArea.extent = mSwapChain->getSwapChainExtent();
-
-	std::array<VkClearValue, 2> clearValues{};
-	clearValues[0].color = clearColor;
-	clearValues[1].depthStencil = { 1.0f, 0 };
-
-	renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-	renderPassInfo.pClearValues = clearValues.data();
-
-	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-	VkViewport viewport{};
-	viewport.x = 0.0f;
-	viewport.y = 0.0f;
-	viewport.width = static_cast<float>(mSwapChain->getSwapChainExtent().width);
-	viewport.height = static_cast<float>(mSwapChain->getSwapChainExtent().height);
-	viewport.minDepth = 0.0f;
-	viewport.maxDepth = 1.0f;
-	VkRect2D scissor = { {0, 0}, mSwapChain->getSwapChainExtent() };
-	vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
-	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);*/
 }
 
 void Renderer::endSwapChainRenderPass(VkCommandBuffer commandBuffer)

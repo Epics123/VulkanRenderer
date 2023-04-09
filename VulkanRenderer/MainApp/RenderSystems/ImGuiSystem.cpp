@@ -131,6 +131,13 @@ void ImGuiSystem::drawSceneInfo(FrameInfo& frameInfo)
 					ImGui::NewLine();
 				}
 
+				if(obj.spotLight)
+				{
+					DrawFloatControl("Intensity", obj.spotLight->intensity, 1.0f, 120.0f, 0.0f, 20.0f, true);
+					DrawFloatControl("Cutoff Angle", obj.spotLight->cutoffAngle, 0.0f, 120.0f, 0.0f, 90.0f, true);
+					ImGui::NewLine();
+				}
+
 				ImGui::TreePop();
 			}
 		}

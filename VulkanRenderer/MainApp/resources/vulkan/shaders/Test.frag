@@ -14,6 +14,13 @@ struct PointLight
 	float radius;
 };
 
+struct SpotLight
+{
+	vec4 position;
+	vec4 color; // w is intensity
+	vec4 direction;
+};
+
 layout (set = 0, binding = 0) uniform GlobalUbo
 {
 	mat4 projection;
@@ -21,6 +28,7 @@ layout (set = 0, binding = 0) uniform GlobalUbo
 	mat4 invView;
 	vec4 ambientColor;
 	PointLight pointLights[10];
+	SpotLight spotLight[10];
 	int numLights;
 } ubo;
 
