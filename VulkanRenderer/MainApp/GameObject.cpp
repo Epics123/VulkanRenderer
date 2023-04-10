@@ -13,7 +13,7 @@ glm::mat4 TransformComponent::getTransform()
 
 	glm::mat4 scaleMat = glm::scale(transate, scale);
 
-	glm::mat4 transform = rotate * scaleMat * transate;
+	glm::mat4 transform = scaleMat * transate * rotate;
 	return transform;
 }
 
