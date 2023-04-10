@@ -388,7 +388,7 @@ void Renderer::drawFrame(float dt)
 		switch (renderMode)
 		{
 		case DEFAULT_LIT:
-			// order matters for transparancy
+			// order matters for transparency
 			renderSystem.renderGameObjects(frameInfo);
 			pointLightSystem.render(frameInfo, ubo);
 			break;

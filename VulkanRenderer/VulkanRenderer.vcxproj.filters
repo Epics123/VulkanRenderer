@@ -162,6 +162,9 @@
     <ClInclude Include="MainApp\Window.h">
       <Filter>MainApp</Filter>
     </ClInclude>
+    <ClInclude Include="MainApp\RenderSystems\SpotLightSystem.h">
+      <Filter>MainApp\RenderSystems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Libraries\ImGui\ImGuizmo\GraphEditor.cpp">
@@ -283,6 +286,9 @@
     </ClCompile>
     <ClCompile Include="MainApp\Window.cpp">
       <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\RenderSystems\SpotLightSystem.cpp">
+      <Filter>MainApp\RenderSystems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

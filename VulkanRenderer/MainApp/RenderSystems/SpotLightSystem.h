@@ -7,14 +7,14 @@
 #include <vector>
 #include <memory>
 
-class PointLightSystem
+class SpotLightSystem
 {
 public:
-	PointLightSystem(Device& device);
-	~PointLightSystem();
+	SpotLightSystem(Device& device);
+	~SpotLightSystem();
 
-	PointLightSystem(const PointLightSystem&) = delete;
-	PointLightSystem& operator=(const PointLightSystem&) = delete;
+	SpotLightSystem(const SpotLightSystem&) = delete;
+	SpotLightSystem& operator=(const SpotLightSystem&) = delete;
 
 	void init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
 
