@@ -292,8 +292,8 @@ void Renderer::loadGameObjects()
 	}
 
 	GameObject spotLight = GameObject::makeSpotLight();
-	//spotLight.color = {1.0f, 0.1f, 0.1f};
-	spotLight.transform.translation = {0.0f, 0.0f, 2.0f};
+	spotLight.transform.translation = {0.0f, 0.0f, 1.0f};
+	//spotLight.transform.rotation = {0.0f, -90.0f, 0.0f};
 	spotLight.setObjectName("spotLight");
 	gameObjects.emplace(spotLight.getID(), std::move(spotLight));
 }

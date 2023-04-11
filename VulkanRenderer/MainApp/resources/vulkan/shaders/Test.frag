@@ -93,8 +93,7 @@ void main()
 		{
 			calculateLighting(dirToLight, surfaceNormal, viewDirection, spotLight.color);
 		}
-	}	
-	
+	}
 
 	outColor = vec4((diffuse * fragColor + spec * fragColor) * texture(texSampler, texCoord).rgb, 1.0f);
 }
