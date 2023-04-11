@@ -39,5 +39,5 @@ void main()
 	if(dist >= 1.0)
 		discard;
 	
-	outColor = vec4(ubo.pointLights[lightIndex].color.xyz, 0.5 * (cos(dist * PI) + 1.0));
+	outColor = vec4(ubo.spotLights[lightIndex].color.xyz, 1.0);//0.5 * (cos(dist * PI) + 1.0));
 }

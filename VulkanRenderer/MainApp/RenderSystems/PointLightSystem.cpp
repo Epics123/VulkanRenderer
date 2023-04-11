@@ -34,7 +34,7 @@ void PointLightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo)
 		obj.transform.translation = glm::vec3(lightRot * glm::vec4(obj.transform.translation, (float)obj.pointLight->lightType));
 
 		// copy light info to ubo
-		ubo.pointLights[lightIndex].position = glm::vec4(obj.transform.translation, 1.0f);
+		ubo.pointLights[lightIndex].position = glm::vec4(obj.transform.translation, obj.pointLight->lightType);
 		ubo.pointLights[lightIndex].color = glm::vec4(obj.color, obj.pointLight->intensity);
 		ubo.pointLights[lightIndex].radius = obj.transform.scale.x;
 		lightIndex++;
@@ -73,7 +73,7 @@ void PointLightSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayou
 	pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(descriptorSetLayouts.size());
 	pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
 	pipelineLayoutInfo.pushConstantRangeCount = 0;
-	pipelineLayoutInfo.pPushConstantRanges = nullptr;//&pushConstantRange;
+	pipelineLayoutInfo.pPushConstantRanges = nullptr;
 
 	VkResult res = vkCreatePipelineLayout(device.getDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout);
 	if (res != VK_SUCCESS)

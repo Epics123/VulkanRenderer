@@ -32,8 +32,9 @@ layout (set = 0, binding = 0) uniform GlobalUbo
 	mat4 invView;
 	vec4 ambientColor;
 	PointLight pointLights[10];
-	SpotLight spotLight[10];
+	SpotLight spotLights[10];
 	int numLights;
+	int numSpotLights;
 } ubo;
 
 layout (push_constant) uniform Push

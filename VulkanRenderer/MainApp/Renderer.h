@@ -34,6 +34,7 @@
 #include "RenderSystems/ImGuiSystem.h"
 #include "RenderSystems/UnlitSystem.h"
 #include "RenderSystems/WorldGridSystem.h"
+#include "RenderSystems/SpotLightSystem.h"
 
 class Renderer
 {
@@ -136,6 +137,7 @@ private:
 	ImGuiSystem imguiSystem {mDevice};
 	UnlitSystem unlitSystem {mDevice};
 	WorldGridSystem gridSystem {mDevice};
+	SpotLightSystem spotLightSystem {mDevice};
 
 	RenderMode renderMode = DEFAULT_LIT;
 

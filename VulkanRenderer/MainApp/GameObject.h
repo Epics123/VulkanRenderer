@@ -60,6 +60,9 @@ public:
 
 	void setObjectName(std::string name) { objectName = name; }
 
+	void setPointLightColor(glm::vec3& color);
+	void setSpotLightColor(glm::vec3& color);
+
 	glm::vec3 color{};
 	TransformComponent transform{};
 

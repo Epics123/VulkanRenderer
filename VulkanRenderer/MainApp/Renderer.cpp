@@ -111,6 +111,7 @@ void Renderer::init()
 	wireframeSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
 	unlitSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
 	gridSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
+	spotLightSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
 
 	createCommandBuffers();
 
@@ -291,6 +292,7 @@ void Renderer::loadGameObjects()
 	}
 
 	GameObject spotLight = GameObject::makeSpotLight();
+	//spotLight.color = {1.0f, 0.1f, 0.1f};
 	spotLight.transform.translation = {0.0f, 0.0f, 2.0f};
 	spotLight.setObjectName("spotLight");
 	gameObjects.emplace(spotLight.getID(), std::move(spotLight));
@@ -376,10 +378,9 @@ void Renderer::drawFrame(float dt)
 		ubo.view = mainCamera.view;
 		ubo.inverseView = mainCamera.invView;
 		pointLightSystem.update(frameInfo, ubo);
+		spotLightSystem.update(frameInfo, ubo);
 		uboBuffers[frameIndex]->writeToBuffer(&ubo);
 		uboBuffers[frameIndex]->flush();
-
-		//TODO: Objects should rotate around their origin and not the world origin
 
 		// render
 		beginSwapChainRenderPass(commandBuffer);
@@ -391,6 +392,7 @@ void Renderer::drawFrame(float dt)
 			// order matters for transparency
 			renderSystem.renderGameObjects(frameInfo);
 			pointLightSystem.render(frameInfo, ubo);
+			spotLightSystem.render(frameInfo, ubo);
 			break;
 		case WIREFRAME:
 			wireframeSystem.renderGameObjects(frameInfo);

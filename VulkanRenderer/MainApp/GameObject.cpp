@@ -45,3 +45,15 @@ GameObject GameObject::makeSpotLight(float intensity, float cutoffAngle, glm::ve
 
 	return obj;
 }
+
+void GameObject::setPointLightColor(glm::vec3& color)
+{
+	if(pointLight)
+		color = color;
+}
+
+void GameObject::setSpotLightColor(glm::vec3& color)
+{
+	if(spotLight)
+		color = color;
+}

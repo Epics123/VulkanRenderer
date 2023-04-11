@@ -188,6 +188,8 @@
     <None Include="MainApp\resources\vulkan\shaders\BasicUnlit.vert" />
     <None Include="MainApp\resources\vulkan\shaders\PointLight.frag" />
     <None Include="MainApp\resources\vulkan\shaders\PointLight.vert" />
+    <None Include="MainApp\resources\vulkan\shaders\SpotLight.frag" />
+    <None Include="MainApp\resources\vulkan\shaders\SpotLight.vert" />
     <None Include="MainApp\resources\vulkan\shaders\Test.frag" />
     <None Include="MainApp\resources\vulkan\shaders\Test.vert" />
     <None Include="MainApp\resources\vulkan\shaders\Wireframe.frag" />
