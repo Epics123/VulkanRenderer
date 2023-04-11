@@ -11,6 +11,11 @@ glm::mat4 TransformComponent::getTransform()
 	glm::quat orientation = qPitch * qYaw * qRoll;
 	glm::mat4 rotate = glm::mat4_cast(orientation);
 
+	glm::quat invOrient = glm::conjugate(orientation);
+	forward = invOrient * glm::vec3(0.0f, 0.0f, 1.0f);
+	up = invOrient * glm::vec3(0.0f, 1.0f, 0.0f);
+	right = glm::normalize(glm::cross(forward, up));
+
 	glm::mat4 scaleMat = glm::scale(transate, scale);
 
 	glm::mat4 transform = scaleMat * transate * rotate;
@@ -20,6 +25,11 @@ glm::mat4 TransformComponent::getTransform()
 glm::mat3 TransformComponent::getNormalMatrix()
 {
 	return glm::transpose(glm::inverse(getTransform()));
+}
+
+void TransformComponent::updateTransform()
+{
+	transformMat = getTransform();
 }
 
 GameObject GameObject::makePointLight(float intensity, float radius, glm::vec3 color)
