@@ -291,7 +291,7 @@ void Renderer::loadGameObjects()
 		gameObjects.emplace(pointLight.getID(), std::move(pointLight));
 	}
 
-	GameObject spotLight = GameObject::makeSpotLight(1.0f, 90.0f, glm::vec3(0.1f, 1.0f, 0.1f));
+	GameObject spotLight = GameObject::makeSpotLight(1.0f, 15.0f, glm::vec3(0.1f, 1.0f, 0.1f));
 	spotLight.transform.translation = {0.0f, 0.0f, 1.0f};
 	spotLight.setObjectName("spotLight");
 	gameObjects.emplace(spotLight.getID(), std::move(spotLight));

@@ -48,22 +48,22 @@ vec3 spec;
 
 void calculateLighting(vec3 dirToLight, vec3 surfaceNormal, vec3 viewDirection, vec4 color)
 {
-		float attenuation = 1.0 / dot(dirToLight, dirToLight); // dist sq
-		dirToLight = normalize(dirToLight);
+	float attenuation = 1.0 / dot(dirToLight, dirToLight); // dist sq
+	dirToLight = normalize(dirToLight);
 
-		float cosAngIncidence = max(dot(surfaceNormal, dirToLight), 0);
+	float cosAngIncidence = max(dot(surfaceNormal, dirToLight), 0);
 
-		vec3 intensity = color.xyz * color.w * attenuation;
+	vec3 intensity = color.xyz * color.w * attenuation;
 
-		diffuse += intensity * cosAngIncidence;
-		
-		// specular highlight
-		vec3 halfAngle = normalize(dirToLight + viewDirection);
-		float blinnTerm = dot(surfaceNormal, halfAngle);
-		blinnTerm = clamp(blinnTerm, 0, 1);
-		blinnTerm = pow(blinnTerm, SPECULAR_POWER);
+	diffuse += intensity * cosAngIncidence;
+	
+	// specular highlight
+	vec3 halfAngle = normalize(dirToLight + viewDirection);
+	float blinnTerm = dot(surfaceNormal, halfAngle);
+	blinnTerm = clamp(blinnTerm, 0, 1);
+	blinnTerm = pow(blinnTerm, SPECULAR_POWER);
 
-		spec += intensity * blinnTerm;
+	spec += intensity * blinnTerm;
 }
 
 void main()
@@ -87,7 +87,8 @@ void main()
 	{
 		SpotLight spotLight = ubo.spotLights[j];
 		vec3 dirToLight = spotLight.position.xyz - fragPosWorld;
-		float theta = dot(dirToLight, normalize(-spotLight.direction.xyz));
+		float theta = dot(normalize(dirToLight), normalize(-spotLight.direction.xyz));
+		float spotFactor = dot(normalize(dirToLight), normalize(spotLight.direction.xyz));
 
 		if(theta > spotLight.direction.w)
 		{
