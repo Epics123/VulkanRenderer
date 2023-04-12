@@ -273,12 +273,12 @@ void Renderer::loadGameObjects()
 	gameObjects.emplace(floor.getID(), std::move(floor));
 
 	std::vector<glm::vec3> lightColors{
-	 //{1.f, .1f, .1f},
+	 {1.f, .1f, .1f},
 	 {.1f, .1f, 1.f},
-	 //{.1f, 1.f, .1f},
-	 //{1.f, 1.f, .1f},
-	 //{.1f, 1.f, 1.f},
-	 //{1.f, 1.f, 1.f}
+	 {.1f, 1.f, .1f},
+	 {1.f, 1.f, .1f},
+	 {.1f, 1.f, 1.f},
+	 {1.f, 1.f, 1.f}
 	};
 
 	for (int i = 0; i < lightColors.size(); i++)
@@ -292,8 +292,13 @@ void Renderer::loadGameObjects()
 	}
 
 	GameObject spotLight = GameObject::makeSpotLight(1.0f, 15.0f, glm::vec3(0.1f, 1.0f, 0.1f));
-	spotLight.transform.translation = {0.0f, 0.0f, 1.0f};
-	spotLight.setObjectName("spotLight");
+	spotLight.transform.translation = {2.0f, -2.0f, 1.0f};
+	spotLight.setObjectName("SpotLight");
+	gameObjects.emplace(spotLight.getID(), std::move(spotLight));
+
+	spotLight = GameObject::makeSpotLight(1.0f, 25.0f, glm::vec3(1.0f, 1.0f, 0.0f));
+	spotLight.transform.translation = { -2.0f, -2.0f, 1.0f };
+	spotLight.setObjectName("SpotLight2");
 	gameObjects.emplace(spotLight.getID(), std::move(spotLight));
 }
 

@@ -93,6 +93,7 @@ void main()
 		if(theta > spotLight.direction.w)
 		{
 			calculateLighting(dirToLight, surfaceNormal, viewDirection, spotLight.color);
+			//diffuse *= (1.0 - (1.0 - theta)/(1.0 - ubo.spotLights[j].direction.w));
 		}
 	}
 

@@ -41,6 +41,7 @@ struct PointLightComponent : LightComponent
 struct SpotLightComponent : PointLightComponent
 {
 	float cutoffAngle = 15.0f;
+	float outerCutoffAngle;
 };
 
 class GameObject
