@@ -23,6 +23,7 @@ struct SpotLight
 	vec4 position;
 	vec4 color; // w is intensity
 	vec4 direction;
+	float outerCutoff;
 };
 
 layout (set = 0, binding = 0) uniform GlobalUbo

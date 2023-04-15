@@ -19,6 +19,7 @@ struct SpotLight
 	vec4 position;
 	vec4 color; // w is intensity
 	vec4 direction; // w is cutoff angle
+	float outerCutoff;
 };
 
 layout (set = 0, binding = 0) uniform GlobalUbo
@@ -83,17 +84,20 @@ void main()
 		calculateLighting(dirToLight, surfaceNormal, viewDirection, pointLight.color);
 	}
 
+	float f;
 	for(int j = 0; j < ubo.numSpotLights; j++)
 	{
 		SpotLight spotLight = ubo.spotLights[j];
 		vec3 dirToLight = spotLight.position.xyz - fragPosWorld;
 		float theta = dot(normalize(dirToLight), normalize(-spotLight.direction.xyz));
-		float spotFactor = dot(normalize(dirToLight), normalize(spotLight.direction.xyz));
 
 		if(theta > spotLight.direction.w)
 		{
+			float epsilon = spotLight.direction.w - spotLight.outerCutoff;
+			float spotFadeIntensity = clamp((theta - spotLight.outerCutoff) / epsilon, 0.0, 1.0);
 			calculateLighting(dirToLight, surfaceNormal, viewDirection, spotLight.color);
-			//diffuse *= (1.0 - (1.0 - theta)/(1.0 - ubo.spotLights[j].direction.w));
+			diffuse *= spotFadeIntensity;
+			spec *= spotFadeIntensity;
 		}
 	}
 

@@ -20,7 +20,7 @@ struct PointLight : Light
 struct SpotLight : Light
 {
 	glm::vec4 direction{}; // w is cos of cutoff angle
-	//float outerCutoff;
+	alignas(16) float outerCutoff;
 };
 
 #endif // !LIGHT_H
