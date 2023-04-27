@@ -423,7 +423,7 @@ void DepthPass::createRenderPassSampler(Device& device)
 	}
 }
 
-void DepthPass::createDepthImage(class Device& device)
+void DepthPass::createDepthImage(Device& device)
 {
 	
 }

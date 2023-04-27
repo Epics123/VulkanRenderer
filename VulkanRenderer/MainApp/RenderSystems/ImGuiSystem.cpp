@@ -102,7 +102,7 @@ void ImGuiSystem::drawSceneInfo(FrameInfo& frameInfo)
 		if (ImGui::TreeNode("Camera"))
 		{
 			DrawVec3Control("Position", frameInfo.camera.position, 0.0f, 120.0f);
-			DrawVec3Control("Rotation", frameInfo.camera.rotation, 0.0f, 120.0f);
+			DrawVec3Control("Rotation", frameInfo.camera.rotation, 0.0f, 120.0f, true);
 
 			ImGui::TreePop();
 		}
@@ -122,7 +122,7 @@ void ImGuiSystem::drawSceneInfo(FrameInfo& frameInfo)
 			if (opened)
 			{
 				DrawVec3Control("Position", obj.transform.translation, 0.0f, 120.0f);
-				DrawVec3Control("Rotation", obj.transform.rotation, 0.0f, 120.0f);
+				DrawVec3Control("Rotation", obj.transform.rotation, 0.0f, 120.0f, true);
 				DrawVec3Control("Scale", obj.transform.scale, 1.0f, 120.0f);
 
 				if (obj.pointLight)
@@ -191,7 +191,7 @@ void ImGuiSystem::setViewportInfo(float x, float y, float width, float height)
 	viewportInfo = {x, y, width, height};
 }
 
-void ImGuiSystem::DrawVec3Control(const char* label, glm::vec3& values, float resetValue /*= 0.0f*/, float columnWidth /*= 100.0f*/)
+void ImGuiSystem::DrawVec3Control(const char* label, glm::vec3& values, float resetValue /*= 0.0f*/, float columnWidth /*= 100.0f*/, bool isRotation)
 {
 	ImGui::PushID(label);
 
@@ -210,8 +210,18 @@ void ImGuiSystem::DrawVec3Control(const char* label, glm::vec3& values, float re
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-	if (ImGui::Button("X", buttonSize))
-		values.x = resetValue;
+
+	if(!isRotation)
+	{
+		if (ImGui::Button("X", buttonSize))
+			values.x = resetValue;
+	}
+	else
+	{
+		if (ImGui::Button("R", buttonSize))
+			values.x = resetValue;
+	}
+
 	ImGui::PopStyleColor(3);
 
 	ImGui::SameLine();
@@ -222,8 +232,18 @@ void ImGuiSystem::DrawVec3Control(const char* label, glm::vec3& values, float re
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.3f, 1.0f });
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.3f, 1.0f });
-	if (ImGui::Button("Y", buttonSize))
-		values.y = resetValue;
+
+	if (!isRotation)
+	{
+		if (ImGui::Button("Y", buttonSize))
+			values.y = resetValue;
+	}
+	else
+	{
+		if (ImGui::Button("P", buttonSize))
+			values.y = resetValue;
+	}
+	
 	ImGui::PopStyleColor(3);
 
 	ImGui::SameLine();
@@ -234,8 +254,19 @@ void ImGuiSystem::DrawVec3Control(const char* label, glm::vec3& values, float re
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-	if (ImGui::Button("Z", buttonSize))
-		values.z = resetValue;
+
+	if (!isRotation)
+	{
+		if (ImGui::Button("Z", buttonSize))
+			values.z = resetValue;
+	}
+	else
+	{
+		if (ImGui::Button("Y", buttonSize))
+			values.z = resetValue;
+	}
+
+	
 	ImGui::PopStyleColor(3);
 
 	ImGui::SameLine();

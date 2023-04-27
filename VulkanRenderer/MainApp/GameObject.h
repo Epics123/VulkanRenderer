@@ -20,6 +20,8 @@ struct TransformComponent
 	glm::vec3 up;
 	glm::vec3 right;
 
+	glm::quat orientation;
+
 	glm::mat4 transformMat;
 	
 	glm::mat4 getTransform();

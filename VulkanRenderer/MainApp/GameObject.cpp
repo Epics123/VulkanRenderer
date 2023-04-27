@@ -8,7 +8,7 @@ glm::mat4 TransformComponent::getTransform()
 	glm::quat qYaw = glm::angleAxis(glm::radians(rotation.z), glm::vec3(0, 0, 1));
 	glm::quat qRoll = glm::angleAxis(glm::radians(rotation.y), glm::vec3(0, 1, 0));
 
-	glm::quat orientation = qPitch * qYaw * qRoll;
+	orientation = qPitch * qYaw * qRoll;
 	glm::mat4 rotate = glm::mat4_cast(orientation);
 
 	glm::quat invOrient = glm::conjugate(orientation);
