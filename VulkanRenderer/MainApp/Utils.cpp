@@ -5,7 +5,7 @@
 #include <stb_image.h>
 #include <intrin.h>
 
-bool Utils::loadImageFromFile(Device& device, const char* filepath, Texture& outTexture)
+bool Utils::loadImageFromFile(Device& device, const char* filepath, Texture& outTexture, VkFormat format)
 {
 	int width, height, channels;
 	stbi_uc* pixels = stbi_load(filepath, &width, &height, &channels, STBI_rgb_alpha);
@@ -18,7 +18,7 @@ bool Utils::loadImageFromFile(Device& device, const char* filepath, Texture& out
 
 	void* pixelPtr = pixels;
 	VkDeviceSize imageSize = width * height * 4;
-	VkFormat imageFormat = VK_FORMAT_R8G8B8A8_SRGB;
+	VkFormat imageFormat = format;
 
 	Buffer stagingBuffer(device, imageSize, 1, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 	stagingBuffer.map();

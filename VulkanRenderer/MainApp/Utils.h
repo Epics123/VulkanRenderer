@@ -15,7 +15,7 @@ namespace Utils
 		(hashCombine(seed, rest), ...);
 	};
 
-	bool loadImageFromFile(Device& device, const char* filepath, Texture& outTexture);
+	bool loadImageFromFile(Device& device, const char* filepath, Texture& outTexture, VkFormat format = VK_FORMAT_R8G8B8A8_SRGB);
 
 	std::string getCPUName();
 }

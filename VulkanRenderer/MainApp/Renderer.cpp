@@ -70,9 +70,9 @@ void Renderer::init()
 
 	globalDescriptorPool =
 		DescriptorPool::Builder(mDevice)
-		.setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
+		.setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT * 2)
 		.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
-		.addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, SwapChain::MAX_FRAMES_IN_FLIGHT)
+		.addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 6)
 		.build();
 
 	imguiDescriptorPool =
@@ -92,21 +92,37 @@ void Renderer::init()
 	// highest set common to all shaders
 	std::unique_ptr<DescriptorSetLayout> globalSetLayout = DescriptorSetLayout::Builder(mDevice)
 														   .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
-														   .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
 														   .build();
 
-	std::unique_ptr<DescriptorSetLayout> textureSetLayout = DescriptorSetLayout::Builder(mDevice).addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT).build();
+	std::unique_ptr<DescriptorSetLayout> textureSetLayout = DescriptorSetLayout::Builder(mDevice)
+															.addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+															.addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+															.addBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+															.addBinding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+															.addBinding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+															.addBinding(5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+															.build();
 
 	globalDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
-	for (int i = 0; i < globalDescriptorSets.size(); i++)
+	/*for (int i = 0; i < globalDescriptorSets.size(); i++)
 	{
 		VkDescriptorBufferInfo bufferInfo = uboBuffers[i]->descriptorInfo();
 		DescriptorWriter(*globalSetLayout, *globalDescriptorPool)
 						.writeBuffer(0, &bufferInfo)
 						.build(globalDescriptorSets[i]);
+	}*/
+	for (int i = 0; i < globalDescriptorSets.size(); i++)
+	{
+		VkDescriptorBufferInfo bufferInfo = uboBuffers[i]->descriptorInfo();
+		DescriptorWriter(*globalSetLayout, *globalDescriptorPool)
+			.writeBuffer(0, &bufferInfo)
+			.build(globalDescriptorSets[i]);
 	}
 
-	renderSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
+	textureDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+	loadTextures(*textureSetLayout);
+
+	renderSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout(), textureSetLayout->getDescriptorSetLayout());
 	pointLightSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
 	wireframeSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
 	unlitSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
@@ -115,7 +131,6 @@ void Renderer::init()
 
 	createCommandBuffers();
 
-	loadTextures(*globalSetLayout);
 	loadGameObjects();
 
 	mainCamera = Camera();
@@ -310,14 +325,47 @@ void Renderer::loadTextures(DescriptorSetLayout& layout)
 	bricks.createTextureSampler(mDevice);
 	loadedTextures["bricks_basecolor"] = bricks;
 
+	std::vector<VkDescriptorImageInfo> descriptorImageInfos;
+
 	VkDescriptorImageInfo imageInfo{};
 	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 	imageInfo.imageView = bricks.getTextureImageView();
 	imageInfo.sampler = bricks.getTextureSampler();
-	for (int i = 0; i < globalDescriptorSets.size(); i++)
+
+	descriptorImageInfos.push_back(imageInfo);
+
+	for (int i = 0; i < textureDescriptorSets.size(); i++)
 	{
-		DescriptorWriter(layout, *globalDescriptorPool).writeImage(1, &imageInfo).overwrite(globalDescriptorSets[i]);
+		DescriptorWriter(layout, *globalDescriptorPool).writeImage(0, &imageInfo).build(textureDescriptorSets[i]);
 	}
+
+	Texture bricksNrm;
+	bricksNrm.setTextureFormat(VK_FORMAT_R8G8B8A8_UNORM);
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_normal.png", bricksNrm, VK_FORMAT_R8G8B8A8_UNORM);
+	bricksNrm.createTextureImageView(mDevice);
+	bricksNrm.createTextureSampler(mDevice);
+	loadedTextures["bricks_nrm"] = bricksNrm;
+
+	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	imageInfo.imageView = bricksNrm.getTextureImageView();
+	imageInfo.sampler = bricksNrm.getTextureSampler();
+
+	descriptorImageInfos.push_back(imageInfo);
+
+	for (int i = 0; i < textureDescriptorSets.size(); i++)
+	{
+		DescriptorWriter(layout, *globalDescriptorPool).writeImage(1, &imageInfo).overwrite(textureDescriptorSets[i]);
+	}
+
+	/*for(int i = 0; i < descriptorImageInfos.size(); i++)
+	{
+		for (int j = 0; j < textureDescriptorSets.size(); j++)
+		{
+			DescriptorWriter(layout, *globalDescriptorPool).writeImage(i, &descriptorImageInfos[i]).build(textureDescriptorSets[j]);
+		}
+	}*/
+
+	
 }
 
 void Renderer::cleanupTextures()
@@ -374,7 +422,12 @@ void Renderer::drawFrame(float dt)
 
 		imguiSystem.setViewportInfo(window->getWidth() * 0.5f, window->getHeight() * 0.5f, window->getWidth(), window->getHeight());
 
-		FrameInfo frameInfo { frameIndex, currentFrametime, currentFramerate, dt, showGrid, renderMode, commandBuffer, mainCamera, globalDescriptorSets[frameIndex], gameObjects};
+		FrameInfo frameInfo 
+		{ 
+			frameIndex, currentFrametime, currentFramerate, dt, 
+			showGrid, renderMode, commandBuffer, mainCamera, 
+			globalDescriptorSets[frameIndex], textureDescriptorSets[frameIndex], gameObjects
+		};
 		
 		// update ubos
 		GlobalUbo ubo{};

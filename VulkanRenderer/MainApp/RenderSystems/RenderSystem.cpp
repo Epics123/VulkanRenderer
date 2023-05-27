@@ -11,9 +11,9 @@ RenderSystem::~RenderSystem()
 	vkDestroyPipelineLayout(device.getDevice(), pipelineLayout, nullptr);
 }
 
-void RenderSystem::init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout)
+void RenderSystem::init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout textureSetLayout)
 {
-	createPipelineLayout(globalSetLayout);
+	createPipelineLayout(globalSetLayout, textureSetLayout);
 	createPipeline(renderPass);
 }
 
@@ -22,6 +22,10 @@ void RenderSystem::renderGameObjects(FrameInfo& frameInfo)
 	pipeline->bind(frameInfo.commandBuffer);
 
 	vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &frameInfo.globalDescriptorSet, 0, nullptr);
+	if(frameInfo.textureDescriptorSet)
+	{
+		vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, &frameInfo.textureDescriptorSet, 0, nullptr);
+	}
 
 	for (auto& keyValue : frameInfo.gameObjects)
 	{
@@ -41,7 +45,7 @@ void RenderSystem::renderGameObjects(FrameInfo& frameInfo)
 	}
 }
 
-void RenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout)
+void RenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout textureSetLayout)
 {
 	VkPushConstantRange pushConstantRange{};
 	pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -49,6 +53,8 @@ void RenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout)
 	pushConstantRange.size = sizeof(SimplePushConstantData);
 
 	std::vector<VkDescriptorSetLayout> descriptorSetLayouts {globalSetLayout};
+	if(textureSetLayout != VK_NULL_HANDLE)
+		descriptorSetLayouts.push_back(textureSetLayout);
 
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;

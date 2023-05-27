@@ -22,12 +22,12 @@ public:
 	RenderSystem(const RenderSystem&) = delete;
 	RenderSystem& operator=(const RenderSystem&) = delete;
 
-	void init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
+	void init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout textureSetLayout = VK_NULL_HANDLE);
 
 	void renderGameObjects(FrameInfo& frameInfo);
 
 private:
-	void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
+	void createPipelineLayout(VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout textureSetLayout);
 	void createPipeline(VkRenderPass renderPass);
 
 	Device& device;

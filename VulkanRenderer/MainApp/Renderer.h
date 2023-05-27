@@ -128,6 +128,7 @@ private:
 	std::unique_ptr<DescriptorPool> globalDescriptorPool{};
 	std::unique_ptr<DescriptorPool> imguiDescriptorPool{};
 	std::vector<VkDescriptorSet> globalDescriptorSets;
+	std::vector<VkDescriptorSet> textureDescriptorSets;
 	std::vector<std::unique_ptr<Buffer>> uboBuffers;
 	GameObject::Map gameObjects;
 
