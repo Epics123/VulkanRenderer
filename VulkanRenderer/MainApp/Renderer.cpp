@@ -320,18 +320,37 @@ void Renderer::loadGameObjects()
 void Renderer::loadTextures(DescriptorSetLayout& layout)
 {
 	Texture bricks;
-	//Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png", bricks);
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_color_1k.jpg", bricks);
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png", bricks);
 	bricks.createTextureImageView(mDevice);
 	bricks.createTextureSampler(mDevice);
 	loadedTextures["bricks_basecolor"] = bricks;
+
+	Texture bricksNrm;
+	bricksNrm.setTextureFormat(VK_FORMAT_R8G8B8A8_UNORM);
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_normal.png", bricksNrm, VK_FORMAT_R8G8B8A8_UNORM);
+	bricksNrm.createTextureImageView(mDevice);
+	bricksNrm.createTextureSampler(mDevice);
+	loadedTextures["bricks_nrm"] = bricksNrm;
+
+	Texture stoneFloor;
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_color_1k.jpg", stoneFloor);
+	stoneFloor.createTextureImageView(mDevice);
+	stoneFloor.createTextureSampler(mDevice);
+	loadedTextures["stoneFloor_basecolor"] = stoneFloor;
+
+	Texture stoneFloorNrm;
+	stoneFloorNrm.setTextureFormat(VK_FORMAT_R8G8B8A8_UNORM);
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_normal_directx_1k.png", stoneFloorNrm, VK_FORMAT_R8G8B8A8_UNORM);
+	stoneFloorNrm.createTextureImageView(mDevice);
+	stoneFloorNrm.createTextureSampler(mDevice);
+	loadedTextures["stoneFloor_nrm"] = stoneFloorNrm;
 
 	std::vector<VkDescriptorImageInfo> descriptorImageInfos;
 
 	VkDescriptorImageInfo imageInfo{};
 	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-	imageInfo.imageView = bricks.getTextureImageView();
-	imageInfo.sampler = bricks.getTextureSampler();
+	imageInfo.imageView = stoneFloor.getTextureImageView();
+	imageInfo.sampler = stoneFloor.getTextureSampler();
 
 	descriptorImageInfos.push_back(imageInfo);
 
@@ -340,17 +359,9 @@ void Renderer::loadTextures(DescriptorSetLayout& layout)
 		DescriptorWriter(layout, *globalDescriptorPool).writeImage(0, &imageInfo).build(textureDescriptorSets[i]);
 	}
 
-	Texture bricksNrm;
-	bricksNrm.setTextureFormat(VK_FORMAT_R8G8B8A8_UNORM);
-	//Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_normal.png", bricksNrm, VK_FORMAT_R8G8B8A8_UNORM);
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_normal_directx_1k.png", bricksNrm, VK_FORMAT_R8G8B8A8_UNORM);
-	bricksNrm.createTextureImageView(mDevice);
-	bricksNrm.createTextureSampler(mDevice);
-	loadedTextures["bricks_nrm"] = bricksNrm;
-
 	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-	imageInfo.imageView = bricksNrm.getTextureImageView();
-	imageInfo.sampler = bricksNrm.getTextureSampler();
+	imageInfo.imageView = stoneFloorNrm.getTextureImageView();
+	imageInfo.sampler = stoneFloorNrm.getTextureSampler();
 
 	descriptorImageInfos.push_back(imageInfo);
 
@@ -358,16 +369,6 @@ void Renderer::loadTextures(DescriptorSetLayout& layout)
 	{
 		DescriptorWriter(layout, *globalDescriptorPool).writeImage(1, &imageInfo).overwrite(textureDescriptorSets[i]);
 	}
-
-	/*for(int i = 0; i < descriptorImageInfos.size(); i++)
-	{
-		for (int j = 0; j < textureDescriptorSets.size(); j++)
-		{
-			DescriptorWriter(layout, *globalDescriptorPool).writeImage(i, &descriptorImageInfos[i]).build(textureDescriptorSets[j]);
-		}
-	}*/
-
-	
 }
 
 void Renderer::cleanupTextures()
