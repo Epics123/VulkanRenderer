@@ -125,7 +125,7 @@ void Renderer::init()
 	renderSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout(), textureSetLayout->getDescriptorSetLayout());
 	pointLightSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
 	wireframeSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
-	unlitSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
+	unlitSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout(), textureSetLayout->getDescriptorSetLayout());
 	gridSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
 	spotLightSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
 
@@ -320,7 +320,8 @@ void Renderer::loadGameObjects()
 void Renderer::loadTextures(DescriptorSetLayout& layout)
 {
 	Texture bricks;
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png", bricks);
+	//Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png", bricks);
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_color_1k.jpg", bricks);
 	bricks.createTextureImageView(mDevice);
 	bricks.createTextureSampler(mDevice);
 	loadedTextures["bricks_basecolor"] = bricks;
@@ -341,7 +342,8 @@ void Renderer::loadTextures(DescriptorSetLayout& layout)
 
 	Texture bricksNrm;
 	bricksNrm.setTextureFormat(VK_FORMAT_R8G8B8A8_UNORM);
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_normal.png", bricksNrm, VK_FORMAT_R8G8B8A8_UNORM);
+	//Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_normal.png", bricksNrm, VK_FORMAT_R8G8B8A8_UNORM);
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_normal_directx_1k.png", bricksNrm, VK_FORMAT_R8G8B8A8_UNORM);
 	bricksNrm.createTextureImageView(mDevice);
 	bricksNrm.createTextureSampler(mDevice);
 	loadedTextures["bricks_nrm"] = bricksNrm;

@@ -20,7 +20,7 @@ namespace std
 		size_t operator()(Model::Vertex const &vertex) const
 		{
 			size_t seed = 0;
-			Utils::hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
+			Utils::hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv, vertex.tangent, vertex.bitangent);
 			return seed;
 		}
 	};
@@ -119,6 +119,8 @@ std::vector<VkVertexInputAttributeDescription> Model::Vertex::getAttributeDescri
 	attributeDescriptions.push_back({1, 0, VK_FORMAT_R32G32B32_SFLOAT , offsetof(Vertex, color)});
 	attributeDescriptions.push_back({2, 0, VK_FORMAT_R32G32B32_SFLOAT , offsetof(Vertex, normal)});
 	attributeDescriptions.push_back({3, 0, VK_FORMAT_R32G32_SFLOAT , offsetof(Vertex, uv)});
+	attributeDescriptions.push_back({4, 0, VK_FORMAT_R32G32B32_SFLOAT , offsetof(Vertex, tangent)});
+	attributeDescriptions.push_back({5, 0, VK_FORMAT_R32G32B32_SFLOAT , offsetof(Vertex, bitangent)});
 
 	return attributeDescriptions;
 }
@@ -192,5 +194,32 @@ void Model::Builder::loadModel(const std::string& filepath)
 			
 			indices.push_back(uniqueVerticies[vertex]);
 		}
+	}
+
+	// calculate tangent basis
+	for(int i = 0; i < indices.size(); i+=3)
+	{
+		Vertex& v0 = vertices[indices[i]];
+		Vertex& v1 = vertices[indices[i + 1]];
+		Vertex& v2 = vertices[indices[i + 2]];
+
+		glm::vec3 edge1 = v1.position - v0.position;
+		glm::vec3 edge2 = v2.position - v0.position;
+
+		glm::vec2 deltaUV1 = v1.uv - v0.uv;
+		glm::vec2 deltaUV2 = v2.uv - v0.uv;
+
+		float r = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
+
+		glm::vec3 tangent = (edge1 * deltaUV2.y - edge2 * deltaUV1.y) * r;
+		glm::vec3 bitangent = (edge2 * deltaUV1.x - edge1 * deltaUV2.x) * r;
+
+		v0.tangent += tangent;
+		v1.tangent += tangent;
+		v2.tangent += tangent;
+
+		v0.bitangent += bitangent;
+		v1.bitangent += bitangent;
+		v2.bitangent += bitangent;
 	}
 }
