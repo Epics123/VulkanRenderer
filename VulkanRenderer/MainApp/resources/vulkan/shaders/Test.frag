@@ -39,6 +39,7 @@ layout (set = 0, binding = 0) uniform GlobalUbo
 
 layout(set = 1, binding = 0) uniform sampler2D texSampler;
 layout(set = 1, binding = 1) uniform sampler2D nrmTexSampler;
+layout(set = 1, binding = 4) uniform sampler2D heightTexSampler;
 
 layout (push_constant) uniform Push
 { 
@@ -47,10 +48,12 @@ layout (push_constant) uniform Push
 }push;
 
 const float SPECULAR_POWER = 512.0;
+const float PARALAX_HEIGHT_SCALE = 0.05;
 
 vec3 diffuse;
 vec3 spec;
 
+// blinn-phong lighting calculation
 void calculateLighting(vec3 dirToLight, vec3 surfaceNormal, vec3 viewDirection, vec4 color)
 {
 	float attenuation = 1.0 / dot(dirToLight, dirToLight); // dist sq
@@ -71,16 +74,20 @@ void calculateLighting(vec3 dirToLight, vec3 surfaceNormal, vec3 viewDirection, 
 	spec += intensity * blinnTerm;
 }
 
-vec3 calculateNormal()
+// calculate normals from normal map
+vec3 calculateNormal(vec2 uv)
 {
 	vec3 result;
 
+	// get TBN basis vectors
 	vec3 normal = normalize(fragNormalWorld);
 	vec3 tangent = normalize(fragTangent);
 	vec3 bitangent = normalize(fragBitangent);
 
-	vec3 normalMapNormal = normalize(texture(nrmTexSampler, texCoord).xyz * 2.0 - 1.0);
+	// sample normal map and bring range to [-1.0, 1.0]
+	vec3 normalMapNormal = normalize(texture(nrmTexSampler, uv).xyz * 2.0 - 1.0);
 
+	// construct TBN matrix
 	mat3 TBN = mat3(tangent, bitangent, normal);
 
 	result = TBN * normalMapNormal;
@@ -89,14 +96,57 @@ vec3 calculateNormal()
 	return result;
 }
 
+vec2 calculateParalaxTexCoords(vec2 uv, vec3 viewDir)
+{
+	float heightScale = PARALAX_HEIGHT_SCALE;
+	const float minLayers = 8.0;
+	const float maxLayers = 64.0;
+
+	// set number of layers dynamically based on view direction
+	float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));
+
+	float layerDepth = 1.0 / numLayers;
+	float currentLayerDepth = 0.0;
+
+	vec2 S = viewDir.xy * heightScale;
+	vec2 deltaUV = S / numLayers;
+
+	float currentDepthMapValue = 1.0 - texture(heightTexSampler, uv).r;
+
+	vec2 UVs = uv;
+
+	// loop until the point on the height map is "hit"
+	while(currentLayerDepth < currentDepthMapValue)
+	{
+		UVs -= deltaUV;
+		currentDepthMapValue = 1.0 - texture(heightTexSampler, UVs).r;
+		currentLayerDepth += layerDepth;
+	}
+
+	// Apply occlusion (interpolate w/ prev uvs)
+	vec2 prevUVs = UVs + deltaUV;
+	float afterDepth = currentDepthMapValue - currentLayerDepth;
+	float beforeDepth = 1.0 - texture(heightTexSampler, prevUVs).r - currentLayerDepth + layerDepth;
+	float weight = afterDepth / (afterDepth - beforeDepth);
+	UVs = prevUVs * weight + UVs * (1.0 - weight);
+
+	// Discard anything outside of the normal range
+//	if(UVs.x > 1.0 || UVs.y > 1.0 || UVs.x < 0.0 || UVs.y < 0.0)
+//		discard;
+	
+	return UVs;
+}
+
 void main()
 {
 	diffuse = ubo.ambientColor.xyz * ubo.ambientColor.w;
-	vec3 surfaceNormal = calculateNormal();//normalize(fragNormalWorld);
 	spec = vec3(0.0);
 
 	vec3 cameraPosWorld = ubo.invView[3].xyz;
 	vec3 viewDirection = normalize(cameraPosWorld - fragPosWorld);
+
+	vec2 uv = calculateParalaxTexCoords(texCoord, viewDirection);
+	vec3 surfaceNormal = calculateNormal(uv);
 
 	for(int i = 0; i < ubo.numLights; i++)
 	{
@@ -123,5 +173,5 @@ void main()
 		}
 	}
 
-	outColor = vec4((diffuse * fragColor + spec * fragColor) * texture(texSampler, texCoord).rgb, 1.0f);
+	outColor = vec4((diffuse * fragColor + spec * fragColor) * texture(texSampler, uv).rgb, 1.0f);
 }

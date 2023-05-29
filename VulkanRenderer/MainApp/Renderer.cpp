@@ -319,6 +319,8 @@ void Renderer::loadGameObjects()
 
 void Renderer::loadTextures(DescriptorSetLayout& layout)
 {
+	std::vector<Texture> textures;
+
 	Texture bricks;
 	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png", bricks);
 	bricks.createTextureImageView(mDevice);
@@ -337,6 +339,7 @@ void Renderer::loadTextures(DescriptorSetLayout& layout)
 	stoneFloor.createTextureImageView(mDevice);
 	stoneFloor.createTextureSampler(mDevice);
 	loadedTextures["stoneFloor_basecolor"] = stoneFloor;
+	textures.push_back(stoneFloor);
 
 	Texture stoneFloorNrm;
 	stoneFloorNrm.setTextureFormat(VK_FORMAT_R8G8B8A8_UNORM);
@@ -344,30 +347,50 @@ void Renderer::loadTextures(DescriptorSetLayout& layout)
 	stoneFloorNrm.createTextureImageView(mDevice);
 	stoneFloorNrm.createTextureSampler(mDevice);
 	loadedTextures["stoneFloor_nrm"] = stoneFloorNrm;
+	textures.push_back(stoneFloorNrm);
 
-	std::vector<VkDescriptorImageInfo> descriptorImageInfos;
+	Texture stoneFloorRoughness;
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_roughness_1k.jpg", stoneFloorRoughness);
+	stoneFloorRoughness.createTextureImageView(mDevice);
+	stoneFloorRoughness.createTextureSampler(mDevice);
+	loadedTextures["stoneFloor_roughness"] = stoneFloorRoughness;
+	textures.push_back(stoneFloorRoughness);
+
+	Texture stoneFloorAO;
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_ao_1k.jpg", stoneFloorAO);
+	stoneFloorAO.createTextureImageView(mDevice);
+	stoneFloorAO.createTextureSampler(mDevice);
+	loadedTextures["stoneFloor_ao"] = stoneFloorAO;
+	textures.push_back(stoneFloorAO);
+
+	Texture stoneFloorHeight;
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_height_1k.png", stoneFloorHeight);
+	stoneFloorHeight.createTextureImageView(mDevice);
+	stoneFloorHeight.createTextureSampler(mDevice);
+	loadedTextures["stoneFloor_height"] = stoneFloorHeight;
+	textures.push_back(stoneFloorHeight);
 
 	VkDescriptorImageInfo imageInfo{};
 	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 	imageInfo.imageView = stoneFloor.getTextureImageView();
 	imageInfo.sampler = stoneFloor.getTextureSampler();
 
-	descriptorImageInfos.push_back(imageInfo);
-
 	for (int i = 0; i < textureDescriptorSets.size(); i++)
 	{
-		DescriptorWriter(layout, *globalDescriptorPool).writeImage(0, &imageInfo).build(textureDescriptorSets[i]);
+		DescriptorWriter(layout, *globalDescriptorPool).build(textureDescriptorSets[i]);
 	}
 
-	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-	imageInfo.imageView = stoneFloorNrm.getTextureImageView();
-	imageInfo.sampler = stoneFloorNrm.getTextureSampler();
-
-	descriptorImageInfos.push_back(imageInfo);
-
-	for (int i = 0; i < textureDescriptorSets.size(); i++)
+	for(int i = 0; i < textures.size(); i++)
 	{
-		DescriptorWriter(layout, *globalDescriptorPool).writeImage(1, &imageInfo).overwrite(textureDescriptorSets[i]);
+		VkDescriptorImageInfo imageInfo{};
+		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		imageInfo.imageView = textures[i].getTextureImageView();
+		imageInfo.sampler = textures[i].getTextureSampler();
+
+		for(int j = 0; j < textureDescriptorSets.size(); j++)
+		{
+			DescriptorWriter(layout, *globalDescriptorPool).writeImage(i, &imageInfo).overwrite(textureDescriptorSets[j]);
+		}
 	}
 }
 
