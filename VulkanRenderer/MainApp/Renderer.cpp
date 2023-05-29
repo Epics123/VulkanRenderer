@@ -471,7 +471,7 @@ void Renderer::drawFrame(float dt)
 			spotLightSystem.render(frameInfo, ubo);
 			break;
 		case WIREFRAME:
-			wireframeSystem.renderGameObjects(frameInfo);
+			wireframeSystem.render(frameInfo);
 			break;
 		case UNLIT:
 			unlitSystem.render(frameInfo);

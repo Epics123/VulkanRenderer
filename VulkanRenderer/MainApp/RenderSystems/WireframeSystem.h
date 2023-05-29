@@ -1,37 +1,19 @@
 #pragma once
 
-#include "../Device.h"
-#include "../GameObject.h"
-#include "../FrameInfo.h"
+#include "RenderSystem.h"
 
 #include <vector>
 #include <memory>
 
-struct WireframePushConstantData
-{
-	glm::mat4 modelMatrix{ 1.0f };
-	glm::mat4 normalMatrix{ 1.0f };
-};
-
-class WireframeSystem
+class WireframeSystem : public RenderSystem
 {
 public:
 	WireframeSystem(Device& device);
-	~WireframeSystem();
 
-	WireframeSystem(const WireframeSystem&) = delete;
-	WireframeSystem& operator=(const WireframeSystem&) = delete;
-
-	void init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
-
-	void renderGameObjects(FrameInfo& frameInfo);
+	virtual void init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout additionalLayout = VK_NULL_HANDLE) override;
+	virtual void render(FrameInfo& frameInfo) override;
 
 private:
-	void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
-	void createPipeline(VkRenderPass renderPass);
-
-	Device& device;
-
-	std::unique_ptr<class Pipeline> pipeline;
-	VkPipelineLayout pipelineLayout;
+	virtual void createPipelineLayout(VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout additionalLayout = VK_NULL_HANDLE) override;
+	virtual void createPipeline(VkRenderPass renderPass) override;
 };

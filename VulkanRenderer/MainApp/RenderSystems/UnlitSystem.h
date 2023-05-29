@@ -2,10 +2,6 @@
 
 #include "RenderSystem.h"
 
-#include "../Device.h"
-#include "../GameObject.h"
-#include "../FrameInfo.h"
-
 #include <vector>
 #include <memory>
 

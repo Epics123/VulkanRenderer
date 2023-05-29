@@ -2,18 +2,20 @@
 #include "../Pipeline.h"
 
 WireframeSystem::WireframeSystem(Device& device)
-	: device{ device }
+	:RenderSystem(device)
 {
 
 }
 
-void WireframeSystem::init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout)
+void WireframeSystem::init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout additionalLayout /*= VK_NULL_HANDLE*/)
 {
-	createPipelineLayout(globalSetLayout);
-	createPipeline(renderPass);
+	vertFilePath = "MainApp/resources/vulkan/shaders/WireframeVert.spv";
+	fragFilePath = "MainApp/resources/vulkan/shaders/WireframeFrag.spv";
+
+	RenderSystemBase::init(renderPass, globalSetLayout, additionalLayout);
 }
 
-void WireframeSystem::renderGameObjects(FrameInfo& frameInfo)
+void WireframeSystem::render(FrameInfo& frameInfo)
 {
 	pipeline->bind(frameInfo.commandBuffer);
 
@@ -26,36 +28,20 @@ void WireframeSystem::renderGameObjects(FrameInfo& frameInfo)
 		if (!obj.model)
 			continue;
 
-		WireframePushConstantData push{};
+		SimplePushConstantData push{};
 		push.modelMatrix = obj.transform.getTransform();
 		push.normalMatrix = obj.transform.getNormalMatrix();
 
-		vkCmdPushConstants(frameInfo.commandBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(WireframePushConstantData), &push);
+		vkCmdPushConstants(frameInfo.commandBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
 
 		obj.model->bind(frameInfo.commandBuffer);
 		obj.model->draw(frameInfo.commandBuffer);
 	}
 }
 
-void WireframeSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout)
+void WireframeSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout additionalLayout /*= VK_NULL_HANDLE*/)
 {
-	VkPushConstantRange pushConstantRange{};
-	pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
-	pushConstantRange.offset = 0;
-	pushConstantRange.size = sizeof(WireframePushConstantData);
-
-	std::vector<VkDescriptorSetLayout> descriptorSetLayouts{ globalSetLayout };
-
-	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(descriptorSetLayouts.size());
-	pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
-	pipelineLayoutInfo.pushConstantRangeCount = 1;
-	pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
-
-	VkResult res = vkCreatePipelineLayout(device.getDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout);
-	if (res != VK_SUCCESS)
-		throw std::runtime_error("Failed to create pipeline layout!");
+	RenderSystem::createPipelineLayout(globalSetLayout, additionalLayout);
 }
 
 void WireframeSystem::createPipeline(VkRenderPass renderPass)
@@ -67,10 +53,5 @@ void WireframeSystem::createPipeline(VkRenderPass renderPass)
 	Pipeline::enableWireframe(pipelineConfig);
 	pipelineConfig.renderPass = renderPass;
 	pipelineConfig.pipelineLayout = pipelineLayout;
-	pipeline = std::make_unique<Pipeline>(device, "MainApp/resources/vulkan/shaders/WireframeVert.spv", "MainApp/resources/vulkan/shaders/WireframeFrag.spv", pipelineConfig);
-}
-
-WireframeSystem::~WireframeSystem()
-{
-	vkDestroyPipelineLayout(device.getDevice(), pipelineLayout, nullptr);
+	pipeline = std::make_unique<Pipeline>(device, vertFilePath, fragFilePath, pipelineConfig);
 }
