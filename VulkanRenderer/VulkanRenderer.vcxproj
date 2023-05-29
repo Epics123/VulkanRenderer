@@ -127,6 +127,7 @@
     <ClInclude Include="MainApp\RenderSystems\ImGuiSystem.h" />
     <ClInclude Include="MainApp\RenderSystems\PointLightSystem.h" />
     <ClInclude Include="MainApp\RenderSystems\RenderSystem.h" />
+    <ClInclude Include="MainApp\RenderSystems\RenderSystemBase.h" />
     <ClInclude Include="MainApp\RenderSystems\SpotLightSystem.h" />
     <ClInclude Include="MainApp\RenderSystems\UnlitSystem.h" />
     <ClInclude Include="MainApp\RenderSystems\WireframeSystem.h" />
@@ -170,6 +171,7 @@
     <ClCompile Include="MainApp\RenderSystems\ImGuiSystem.cpp" />
     <ClCompile Include="MainApp\RenderSystems\PointLightSystem.cpp" />
     <ClCompile Include="MainApp\RenderSystems\RenderSystem.cpp" />
+    <ClCompile Include="MainApp\RenderSystems\RenderSystemBase.cpp" />
     <ClCompile Include="MainApp\RenderSystems\SpotLightSystem.cpp" />
     <ClCompile Include="MainApp\RenderSystems\UnlitSystem.cpp" />
     <ClCompile Include="MainApp\RenderSystems\WireframeSystem.cpp" />

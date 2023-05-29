@@ -104,13 +104,6 @@ void Renderer::init()
 															.build();
 
 	globalDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
-	/*for (int i = 0; i < globalDescriptorSets.size(); i++)
-	{
-		VkDescriptorBufferInfo bufferInfo = uboBuffers[i]->descriptorInfo();
-		DescriptorWriter(*globalSetLayout, *globalDescriptorPool)
-						.writeBuffer(0, &bufferInfo)
-						.build(globalDescriptorSets[i]);
-	}*/
 	for (int i = 0; i < globalDescriptorSets.size(); i++)
 	{
 		VkDescriptorBufferInfo bufferInfo = uboBuffers[i]->descriptorInfo();
@@ -473,7 +466,7 @@ void Renderer::drawFrame(float dt)
 		{
 		case DEFAULT_LIT:
 			// order matters for transparency
-			renderSystem.renderGameObjects(frameInfo);
+			renderSystem.render(frameInfo);
 			pointLightSystem.render(frameInfo, ubo);
 			spotLightSystem.render(frameInfo, ubo);
 			break;
@@ -481,7 +474,7 @@ void Renderer::drawFrame(float dt)
 			wireframeSystem.renderGameObjects(frameInfo);
 			break;
 		case UNLIT:
-			unlitSystem.renderGameObjects(frameInfo);
+			unlitSystem.render(frameInfo);
 			break;
 		default:
 			break;

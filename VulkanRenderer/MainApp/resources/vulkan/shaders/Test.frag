@@ -37,9 +37,9 @@ layout (set = 0, binding = 0) uniform GlobalUbo
 	int numSpotLights;
 } ubo;
 
-layout(set = 1, binding = 0) uniform sampler2D texSampler;
-layout(set = 1, binding = 1) uniform sampler2D nrmTexSampler;
-layout(set = 1, binding = 4) uniform sampler2D heightTexSampler;
+layout(set = 1, binding = 0) uniform sampler2D diffuseMap;
+layout(set = 1, binding = 1) uniform sampler2D normalMap;
+layout(set = 1, binding = 4) uniform sampler2D heightMap;
 
 layout (push_constant) uniform Push
 { 
@@ -54,7 +54,7 @@ vec3 diffuse;
 vec3 spec;
 
 // blinn-phong lighting calculation
-void calculateLighting(vec3 dirToLight, vec3 surfaceNormal, vec3 viewDirection, vec4 color)
+void calculateBlinnPongLighting(vec3 dirToLight, vec3 surfaceNormal, vec3 viewDirection, vec4 color)
 {
 	float attenuation = 1.0 / dot(dirToLight, dirToLight); // dist sq
 	dirToLight = normalize(dirToLight);
@@ -85,7 +85,7 @@ vec3 calculateNormal(vec2 uv)
 	vec3 bitangent = normalize(fragBitangent);
 
 	// sample normal map and bring range to [-1.0, 1.0]
-	vec3 normalMapNormal = normalize(texture(nrmTexSampler, uv).xyz * 2.0 - 1.0);
+	vec3 normalMapNormal = normalize(texture(normalMap, uv).xyz * 2.0 - 1.0);
 
 	// construct TBN matrix
 	mat3 TBN = mat3(tangent, bitangent, normal);
@@ -111,7 +111,7 @@ vec2 calculateParalaxTexCoords(vec2 uv, vec3 viewDir)
 	vec2 S = viewDir.xy * heightScale;
 	vec2 deltaUV = S / numLayers;
 
-	float currentDepthMapValue = 1.0 - texture(heightTexSampler, uv).r;
+	float currentDepthMapValue = 1.0 - texture(heightMap, uv).r;
 
 	vec2 UVs = uv;
 
@@ -119,14 +119,14 @@ vec2 calculateParalaxTexCoords(vec2 uv, vec3 viewDir)
 	while(currentLayerDepth < currentDepthMapValue)
 	{
 		UVs -= deltaUV;
-		currentDepthMapValue = 1.0 - texture(heightTexSampler, UVs).r;
+		currentDepthMapValue = 1.0 - texture(heightMap, UVs).r;
 		currentLayerDepth += layerDepth;
 	}
 
 	// Apply occlusion (interpolate w/ prev uvs)
 	vec2 prevUVs = UVs + deltaUV;
 	float afterDepth = currentDepthMapValue - currentLayerDepth;
-	float beforeDepth = 1.0 - texture(heightTexSampler, prevUVs).r - currentLayerDepth + layerDepth;
+	float beforeDepth = 1.0 - texture(heightMap, prevUVs).r - currentLayerDepth + layerDepth;
 	float weight = afterDepth / (afterDepth - beforeDepth);
 	UVs = prevUVs * weight + UVs * (1.0 - weight);
 
@@ -153,7 +153,7 @@ void main()
 		PointLight pointLight = ubo.pointLights[i];
 		vec3 dirToLight = pointLight.position.xyz - fragPosWorld;
 
-		calculateLighting(dirToLight, surfaceNormal, viewDirection, pointLight.color);
+		calculateBlinnPongLighting(dirToLight, surfaceNormal, viewDirection, pointLight.color);
 	}
 
 	float f;
@@ -167,11 +167,11 @@ void main()
 		{
 			float epsilon = spotLight.direction.w - spotLight.outerCutoff;
 			float spotFadeIntensity = clamp((theta - spotLight.outerCutoff) / epsilon, 0.0, 1.0);
-			calculateLighting(dirToLight, surfaceNormal, viewDirection, spotLight.color);
+			calculateBlinnPongLighting(dirToLight, surfaceNormal, viewDirection, spotLight.color);
 			diffuse *= spotFadeIntensity;
 			spec *= spotFadeIntensity;
 		}
 	}
 
-	outColor = vec4((diffuse * fragColor + spec * fragColor) * texture(texSampler, uv).rgb, 1.0f);
+	outColor = vec4((diffuse * fragColor + spec * fragColor) * texture(diffuseMap, uv).rgb, 1.0f);
 }

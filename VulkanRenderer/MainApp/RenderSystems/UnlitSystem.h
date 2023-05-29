@@ -1,5 +1,7 @@
 #pragma once
 
+#include "RenderSystem.h"
+
 #include "../Device.h"
 #include "../GameObject.h"
 #include "../FrameInfo.h"
@@ -7,31 +9,16 @@
 #include <vector>
 #include <memory>
 
-struct UnlitPushConstantData
-{
-	glm::mat4 modelMatrix{ 1.0f };
-	glm::mat4 normalMatrix{ 1.0f };
-};
 
-class UnlitSystem
+class UnlitSystem : public RenderSystem
 {
 public:
 	UnlitSystem(Device& device);
-	~UnlitSystem();
 
-	UnlitSystem(const UnlitSystem&) = delete;
-	UnlitSystem& operator=(const UnlitSystem&) = delete;
-
-	void init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout textureSetLayout = VK_NULL_HANDLE);
-
-	void renderGameObjects(FrameInfo& frameInfo);
+	virtual void init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout additionalLayout = VK_NULL_HANDLE) override;
+	virtual void render(FrameInfo& frameInfo) override;
 
 private:
-	void createPipelineLayout(VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout textureSetLayout);
-	void createPipeline(VkRenderPass renderPass);
-
-	Device& device;
-
-	std::unique_ptr<class Pipeline> pipeline;
-	VkPipelineLayout pipelineLayout;
+	virtual void createPipelineLayout(VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout additionalLayout = VK_NULL_HANDLE) override;
+	virtual void createPipeline(VkRenderPass renderPass) override;
 };

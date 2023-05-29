@@ -1,5 +1,7 @@
 #pragma once
 
+#include "RenderSystemBase.h"
+
 #include "../Device.h"
 #include "../GameObject.h"
 #include "../FrameInfo.h"
@@ -13,25 +15,18 @@ struct SimplePushConstantData
 	glm::mat4 normalMatrix{ 1.0f };
 };
 
-class RenderSystem
+class RenderSystem : public RenderSystemBase
 {
 public:
 	RenderSystem(Device& device);
-	~RenderSystem();
 
-	RenderSystem(const RenderSystem&) = delete;
-	RenderSystem& operator=(const RenderSystem&) = delete;
+	virtual void init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout additionalLayout = VK_NULL_HANDLE) override;
+	virtual void render(FrameInfo& frameInfo) override;
 
-	void init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout textureSetLayout = VK_NULL_HANDLE);
+protected:
+	virtual void createPipelineLayout(VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout additionalLayout = VK_NULL_HANDLE) override;
+	virtual void createPipeline(VkRenderPass renderPass) override;
 
-	void renderGameObjects(FrameInfo& frameInfo);
-
-private:
-	void createPipelineLayout(VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout textureSetLayout);
-	void createPipeline(VkRenderPass renderPass);
-
-	Device& device;
-
-	std::unique_ptr<class Pipeline> pipeline;
-	VkPipelineLayout pipelineLayout;
+public:
+	std::vector<VkDescriptorSet> textureDescriptorSets;
 };
