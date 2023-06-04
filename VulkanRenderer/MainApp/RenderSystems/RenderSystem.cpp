@@ -9,8 +9,10 @@ RenderSystem::RenderSystem(Device& device)
 void RenderSystem::init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout additionalLayout)
 {
 	textureDescriptorSets.resize(maxDescriptorSets);
-	vertFilePath = "MainApp/resources/vulkan/shaders/TestVert.spv";
-	fragFilePath = "MainApp/resources/vulkan/shaders/TestFrag.spv";
+	//vertFilePath = "MainApp/resources/vulkan/shaders/TestVert.spv";
+	//fragFilePath = "MainApp/resources/vulkan/shaders/TestFrag.spv";
+	vertFilePath = "MainApp/resources/vulkan/shaders/PBRVert.spv";
+	fragFilePath = "MainApp/resources/vulkan/shaders/PBRFrag.spv";
 
 	RenderSystemBase::init(renderPass, globalSetLayout, additionalLayout);
 }

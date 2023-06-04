@@ -188,6 +188,8 @@
   <ItemGroup>
     <None Include="MainApp\resources\vulkan\shaders\BasicUnlit.frag" />
     <None Include="MainApp\resources\vulkan\shaders\BasicUnlit.vert" />
+    <None Include="MainApp\resources\vulkan\shaders\PBR.frag" />
+    <None Include="MainApp\resources\vulkan\shaders\PBR.vert" />
     <None Include="MainApp\resources\vulkan\shaders\PointLight.frag" />
     <None Include="MainApp\resources\vulkan\shaders\PointLight.vert" />
     <None Include="MainApp\resources\vulkan\shaders\SpotLight.frag" />
