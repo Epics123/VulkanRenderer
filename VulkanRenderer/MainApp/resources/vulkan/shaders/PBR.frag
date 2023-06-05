@@ -61,62 +61,68 @@ vec3 spec;
 
 vec3 albedo;
 float roughness;
+float attenuation;
 
-// GGX/Trowbridge-Reitz normal distribution
-float normalDisribution(float alpha, vec3 nrm, vec3 halfway)
+float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
-	float numerator = pow(alpha, 2.0);
-
-	float NdotH = max(dot(nrm, halfway), 0.0);
-	float denominator = PI * pow(pow(NdotH, 2.0) * (pow(alpha, 2.0) - 1.0) + 1.0, 2.0);
-	denominator = max(denominator, 0.000001);
-
-	return numerator / denominator;
+    float a = roughness * roughness;
+    float a2 = a * a;
+    float NdotH  = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH * NdotH;
+	
+    float num = a2;
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
+	
+    return num / denom;
 }
 
-// Schlick-Beckmann Geometry Shadowing function
-float G1(float alpha, vec3 nrm, vec3 x)
+float GeometrySchlickGGX(float NdotV, float roughness)
 {
-	float NdotX = max(dot(nrm, x), 0.0);
-	float numerator = NdotX;
+    float r = (roughness + 1.0);
+    float k = (r * r) / 8.0;
 
-	float k = alpha * 0.5;
-	float denominator = NdotX * (1.0 - k) + k;
-	denominator = max(denominator, 0.000001);
-
-	return numerator / denominator;
+    float num = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+	
+    return num / denom;
 }
 
-float G(float alpha, vec3 nrm, vec3 view, vec3 light)
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 {
-	return G1(alpha, nrm, view) * G1(alpha, nrm, light);
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    float ggx2 = GeometrySchlickGGX(NdotV, roughness);
+    float ggx1 = GeometrySchlickGGX(NdotL, roughness);
+	
+    return ggx1 * ggx2;
 }
 
-vec3 fresnel(vec3 f0, vec3 view, vec3 halfway, float fresnelPow)
+vec3 fresnel(float cosTheta, vec3 f0, float fresnelPow)
 {
-	return f0 + (vec3(1.0) - f0) * pow(1 - max(dot(view, halfway), 0.0), fresnelPow);
+	return f0 + (1.0 - f0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), fresnelPow);
 }
 
 // pbr lighting calculation
 vec3 calculateLighting(vec3 V, vec3 N, vec3 L, vec3 H, vec3 albedo, vec4 lightColor)
 {
 	vec3 F0 = vec3(0.04); // can vary per material, but leaving as a constant value for now
-	float LdotN = max(dot(L, N), 0.0);
+	float NdotL = max(dot(N, L), 0.0);
+	float intensity = lightColor.w;
 
-	float attenuation = 1.0 / dot(L, L); // dist sq
-	vec3 radiance = lightColor.xyz * attenuation;
+	vec3 radiance = lightColor.xyz * attenuation * intensity;
 
-	vec3 Ks = fresnel(F0, V, H, 5.0);
+	float NDF = DistributionGGX(N, H, roughness);
+	float G = GeometrySmith(N, V, L, roughness);
+
+	vec3 Ks = fresnel(max(dot(H, V), 0.0), F0, 5.0);
 	vec3 Kd = vec3(1.0) - Ks;
 
-	vec3 lambert = albedo / PI;
+	vec3 numerator = NDF * G * Ks;
+	float denominator = 4.0 * max(dot(N, V), 0.0) * NdotL + 0.0001;
+	vec3 specular = numerator / denominator;
 
-	vec3 cookTorranceNumerator = normalDisribution(roughness, N, H) * G(roughness, N, V, L) * Ks;
-	float cookTorrenceDenominator = 4.0 * max(dot(V, N), 0.0) * LdotN;
-	vec3 cookTorrence = cookTorranceNumerator / cookTorrenceDenominator;
-
-	vec3 BRDF = Kd * lambert + cookTorrence;
-	vec3 outgoingLight = radiance + BRDF * lightColor.xyz * LdotN;
+	vec3 outgoingLight = (Kd * albedo / PI + specular) * radiance * NdotL;
 
 	return outgoingLight;
 }
@@ -132,7 +138,7 @@ vec3 calculateNormal(vec2 uv)
 	vec3 bitangent = normalize(fragBitangent);
 
 	// sample normal map and bring range to [-1.0, 1.0]
-	vec3 normalMapNormal = normalize(texture(normalMap, uv).xyz * 2.0 - 1.0);
+	vec3 normalMapNormal = texture(normalMap, uv).xyz * 2.0 - 1.0;
 
 	// construct TBN matrix
 	mat3 TBN = mat3(tangent, bitangent, normal);
@@ -188,29 +194,52 @@ void main()
 {
 	vec2 uv = texCoord;
 
-	vec3 cameraPosWorld = ubo.invView[3].xyz;
+	vec3 cameraPosWorld = inverse(ubo.view)[3].xyz;
 
 	vec3 N = calculateNormal(uv);
 	vec3 V = normalize(cameraPosWorld - fragPosWorld); // view vector
 	vec3 L = vec3(0.0); // light vector
 	vec3 H = vec3(0.0); // halfway vector
 
-	albedo = texture(diffuseMap, uv).rgb;
+	albedo = pow(texture(diffuseMap, uv).rgb, vec3(2.2));
 	roughness = texture(roughnessMap, uv).r;
 	float ao = texture(aoMap, uv).r;
 
 	vec3 Lo = vec3(0.0);
+
+	// point lights
 	for(int i = 0; i < ubo.numLights; i++)
 	{
 		PointLight pointLight = ubo.pointLights[i];
-		L = normalize(pointLight.position.xyz - fragPosWorld);
+		L = pointLight.position.xyz - fragPosWorld;
+		attenuation = 1.0 / dot(L, L); // dist sq
+		L = normalize(L);
 		H = normalize(V + L);
 		Lo += calculateLighting(V, N, L, H, albedo, pointLight.color);
 	}
 
-	//vec3 ambient = vec3(0.03) * albedo * ao;
-	//vec3 color = ambient + diffuse;
+	// spot lights
+	for(int j = 0; j < ubo.numSpotLights; j++)
+	{
+		SpotLight spotLight = ubo.spotLights[j];
+		L = spotLight.position.xyz - fragPosWorld;
+		float theta = dot(normalize(L), normalize(-spotLight.direction.xyz));
 
-	//outColor = vec4(color, 1.0);
-	outColor = vec4(Lo, 1.0);
+		if(theta > spotLight.direction.w)
+		{
+			float epsilon = spotLight.direction.w - spotLight.outerCutoff;
+			float spotFadeIntensity = clamp((theta - spotLight.outerCutoff) / epsilon, 0.0, 1.0);
+			
+			attenuation = 1.0 / dot(L, L);
+			L = normalize(L);
+			H = normalize(V + L);
+
+			Lo += calculateLighting(V, N, L, H, albedo, spotLight.color);
+		}
+	}
+
+	vec3 ambient = vec3(0.03) * albedo * ao;
+	vec3 color = ambient + Lo;
+
+	outColor = vec4(color, 1.0);
 }

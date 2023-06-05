@@ -156,7 +156,6 @@ void main()
 		calculateBlinnPongLighting(dirToLight, surfaceNormal, viewDirection, pointLight.color);
 	}
 
-	float f;
 	for(int j = 0; j < ubo.numSpotLights; j++)
 	{
 		SpotLight spotLight = ubo.spotLights[j];

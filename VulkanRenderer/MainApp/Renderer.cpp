@@ -293,18 +293,19 @@ void Renderer::loadGameObjects()
 	{
 		GameObject pointLight = GameObject::makePointLight();
 		pointLight.color = lightColors[i];
+		pointLight.pointLight->intensity = 5.0f;
 		glm::mat4 lightRot = glm::rotate(glm::mat4(1.0f), (i * glm::two_pi<float>()) / lightColors.size(), {0.0f, 0.0f, 1.0f});
 		pointLight.transform.translation = glm::vec3(lightRot * glm::vec4(0.0f, 1.5f, 1.5f, 1.0f));
 		pointLight.setObjectName("PointLight" + std::to_string(i));
 		gameObjects.emplace(pointLight.getID(), std::move(pointLight));
 	}
 
-	GameObject spotLight = GameObject::makeSpotLight(1.0f, 15.0f, glm::vec3(0.1f, 1.0f, 0.1f));
+	GameObject spotLight = GameObject::makeSpotLight(10.0f, 15.0f, glm::vec3(0.1f, 1.0f, 0.1f));
 	spotLight.transform.translation = {2.0f, -2.0f, 1.0f};
 	spotLight.setObjectName("SpotLight");
 	gameObjects.emplace(spotLight.getID(), std::move(spotLight));
 
-	spotLight = GameObject::makeSpotLight(1.0f, 25.0f, glm::vec3(1.0f, 1.0f, 0.0f));
+	spotLight = GameObject::makeSpotLight(10.0f, 25.0f, glm::vec3(1.0f, 1.0f, 0.0f));
 	spotLight.transform.translation = { -2.0f, -2.0f, 1.0f };
 	spotLight.setObjectName("SpotLight2");
 	gameObjects.emplace(spotLight.getID(), std::move(spotLight));
@@ -336,7 +337,7 @@ void Renderer::loadTextures(DescriptorSetLayout& layout)
 
 	Texture stoneFloorNrm;
 	stoneFloorNrm.setTextureFormat(VK_FORMAT_R8G8B8A8_UNORM);
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_normal_directx_1k.png", stoneFloorNrm, VK_FORMAT_R8G8B8A8_UNORM);
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_normal_opengl_1k.png", stoneFloorNrm, VK_FORMAT_R8G8B8A8_UNORM);
 	stoneFloorNrm.createTextureImageView(mDevice);
 	stoneFloorNrm.createTextureSampler(mDevice);
 	loadedTextures["stoneFloor_nrm"] = stoneFloorNrm;
