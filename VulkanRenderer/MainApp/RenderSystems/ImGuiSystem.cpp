@@ -133,13 +133,14 @@ void ImGuiSystem::drawSceneInfo(FrameInfo& frameInfo)
 				if (obj.pointLight)
 				{
 					DrawFloatControl("Intensity", obj.pointLight->intensity, 1.0f, 120.0f, 0.0f, 20.0f, true);
-					ImGui::NewLine();
+					DrawColor3Control("Color", obj.color, 0.0f, 120.0f);
 				}
 
 				if(obj.spotLight)
 				{
 					DrawFloatControl("Intensity", obj.spotLight->intensity, 1.0f, 120.0f, 0.0f, 20.0f, true);
 					DrawFloatControl("Cutoff Angle", obj.spotLight->cutoffAngle, 0.0f, 120.0f, 0.0f, 90.0f, true);
+					DrawColor3Control("Color", obj.color, 0.0f, 120.0f);
 					ImGui::NewLine();
 				}
 
@@ -373,6 +374,32 @@ void ImGuiSystem::DrawFloatControl(const char* label, float& value, float resetV
 	ImGui::PopItemWidth();
 
 	ImGui::PopItemWidth();
+	ImGui::PopStyleVar();
+
+	ImGui::Columns(1);
+	ImGui::PopID();
+}
+
+void ImGuiSystem::DrawColor3Control(const char* label, glm::vec3& values, float resetValue /*= 0.0f*/, float columnWidth /*= 100.0f*/)
+{
+	ImGui::PushID(label);
+
+	ImGui::Columns(2);
+
+	ImGui::SetColumnWidth(0, columnWidth);
+	ImGui::Text(label);
+	ImGui::NextColumn();
+
+	//ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+
+	float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+	ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+
+	ImVec4 color = { values.r, values.g, values.b, 0.0 };
+	ImGui::ColorEdit3("Color", (float*)&color, ImGuiColorEditFlags_HDR);
+	values = {color.x, color.y, color.z};
+
 	ImGui::PopStyleVar();
 
 	ImGui::Columns(1);
