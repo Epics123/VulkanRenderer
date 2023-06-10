@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "imgui.h"
 
 void Camera::updatePositon(int key, float speed)
 {
@@ -46,7 +47,8 @@ void Camera::updateFOV(double yOffset)
 
 void Camera::zoomCamera(double yOffset)
 {
-	position += (zoomScale * (float)yOffset) * forward;
+	if(canScroll)
+		position += (zoomScale * (float)yOffset) * forward;
 }
 
 void Camera::updateModel(float dt)

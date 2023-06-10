@@ -72,6 +72,7 @@ public:
 	VkCommandBuffer beginFrame();
 	void drawFrame(float dt);
 	void endFrame();
+	VkResult submit(std::vector<VkCommandBuffer> commadBuffers);
 	void beginSwapChainRenderPass(VkCommandBuffer commandBuffer);
 	void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
 

@@ -53,6 +53,8 @@ struct Camera
 
 	float sensitivity = 0.5f;
 	float smoothing = 0.00001f;
+
+	bool canScroll = true;
 };
 
 

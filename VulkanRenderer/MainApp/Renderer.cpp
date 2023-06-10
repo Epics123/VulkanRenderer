@@ -502,8 +502,8 @@ void Renderer::endFrame()
 		throw std::runtime_error("Failed to record command buffer!");
 	}
 
-	VkResult res;
-	res = mSwapChain->submitCommandBuffers(&commandBuffer, &currentImageIndex);
+	std::vector<VkCommandBuffer> submitBuffers { commandBuffer };
+	VkResult res = submit(submitBuffers);
 
 	// Was window just resized
 	if (res == VK_ERROR_OUT_OF_DATE_KHR || res == VK_SUBOPTIMAL_KHR || window->wasWindowResized())
@@ -518,6 +518,11 @@ void Renderer::endFrame()
 
 	frameStarted = false;
 	currentFrameIndex = (currentFrameIndex + 1) % SwapChain::MAX_FRAMES_IN_FLIGHT;
+}
+
+VkResult Renderer::submit(std::vector<VkCommandBuffer> commadBuffers)
+{
+	return mSwapChain->submitCommandBuffers(commadBuffers.data(), &currentImageIndex);
 }
 
 void Renderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer)

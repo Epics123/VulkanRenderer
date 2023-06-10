@@ -11,6 +11,8 @@
 #include "../Camera.h"
 #include "../Utils.h"
 
+#include <iostream>
+
 ImGuiSystem::ImGuiSystem(Device& device)
 	:device {device}
 {
@@ -32,6 +34,9 @@ void ImGuiSystem::drawImGui(FrameInfo& frameInfo)
 	ImGui::NewFrame();
 
 	//drawViewport();
+
+	ImGuiIO& io = ImGui::GetIO();
+	frameInfo.camera.canScroll = !io.WantCaptureMouse;
 
 	drawDebugWindow();
 	drawFrameInfo(frameInfo.framerate, frameInfo.frameTime);
