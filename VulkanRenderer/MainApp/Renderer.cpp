@@ -380,6 +380,7 @@ void Renderer::loadTextures(DescriptorSetLayout& layout)
 		DescriptorWriter(layout, *globalDescriptorPool).build(textureDescriptorSets[i]);
 	}
 
+	// TODO: Move texture overwrite into render system, store textures on game object or material (ideally material)
 	for(int i = 0; i < textures.size(); i++)
 	{
 		VkDescriptorImageInfo imageInfo{};

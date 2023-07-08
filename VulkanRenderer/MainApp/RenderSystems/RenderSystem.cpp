@@ -34,6 +34,8 @@ void RenderSystem::render(FrameInfo& frameInfo)
 		if (!obj.model)
 			continue;
 
+		//TODO: Overwrite texture descriptor set here
+
 		SimplePushConstantData push{};
 		push.modelMatrix = obj.transform.getTransform();
 		push.normalMatrix = obj.transform.getNormalMatrix();
