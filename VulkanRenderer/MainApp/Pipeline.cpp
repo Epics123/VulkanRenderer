@@ -7,16 +7,29 @@
 #include <fstream>
 #include <cassert>
 
-Pipeline::Pipeline(Device& device, const std::string& vertFilePath, const std::string& fragFilePath, const PipelineConfigInfo& configInfo)
+Pipeline::Pipeline(Device& device, const std::string& vertFilePath, const std::string& fragFilePath, const PipelineConfigInfo& configInfo, PipelineType type)
 	:device(device)
 {
-	createGraphicsPipeline(configInfo, vertFilePath, fragFilePath);
+	switch (type)
+	{
+	case PIPELINE_TYPE_DEFAULT:
+		createGraphicsPipeline(configInfo, vertFilePath, fragFilePath);
+		break;
+	case PIPELINE_TYPE_DEPTH:
+		createDepthPipeline(configInfo, vertFilePath);
+		break;
+	default:
+		break;
+	}
+	
 }
 
 Pipeline::~Pipeline()
 {
-	vkDestroyShaderModule(device.getDevice(), vertShaderModule, nullptr);
-	vkDestroyShaderModule(device.getDevice(), fragShaderModule, nullptr);
+	if(vertShaderModule != VK_NULL_HANDLE)
+		vkDestroyShaderModule(device.getDevice(), vertShaderModule, nullptr);
+	if(fragShaderModule != VK_NULL_HANDLE)
+		vkDestroyShaderModule(device.getDevice(), fragShaderModule, nullptr);
 	vkDestroyPipeline(device.getDevice(), graphicsPipeline, nullptr);
 }
 
@@ -59,6 +72,61 @@ void Pipeline::createGraphicsPipeline(const PipelineConfigInfo& configInfo, cons
 	VkGraphicsPipelineCreateInfo pipelineInfo{};
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 	pipelineInfo.stageCount = 2;
+	pipelineInfo.pStages = shaderStages;
+	pipelineInfo.pVertexInputState = &vertexInputInfo;
+	pipelineInfo.pInputAssemblyState = &configInfo.inputAssemblyInfo;
+	pipelineInfo.pViewportState = &configInfo.viewportInfo;
+	pipelineInfo.pRasterizationState = &configInfo.rasterizationInfo;
+	pipelineInfo.pMultisampleState = &configInfo.multisampleInfo;
+	pipelineInfo.pColorBlendState = &configInfo.colorBlendInfo;
+	pipelineInfo.pDepthStencilState = &configInfo.depthStencilInfo;
+	pipelineInfo.pDynamicState = &configInfo.dynamicStateInfo;
+
+	pipelineInfo.layout = configInfo.pipelineLayout;
+	pipelineInfo.renderPass = configInfo.renderPass;
+	pipelineInfo.subpass = configInfo.subpass;
+
+	pipelineInfo.basePipelineIndex = -1;
+	pipelineInfo.basePipelineHandle = nullptr;
+
+	VkResult result = vkCreateGraphicsPipelines(device.getDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline);
+
+	if (result != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to create graphics pipeline!");
+	}
+}
+
+void Pipeline::createDepthPipeline(const PipelineConfigInfo& configInfo, const std::string& vertFilePath)
+{
+	assert(configInfo.pipelineLayout != VK_NULL_HANDLE && "Cannot create graphics pipeline: no pipelineLayout provided in configInfo");
+	assert(configInfo.renderPass != VK_NULL_HANDLE && "Cannot create graphics pipeline: no renderPass provided in configInfo");
+
+	std::vector<char> vertShaderCode = readFile(vertFilePath);
+
+	createShaderModule(vertShaderCode, &vertShaderModule);
+
+	VkPipelineShaderStageCreateInfo shaderStages[1];
+	shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	shaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+	shaderStages[0].module = vertShaderModule;
+	shaderStages[0].pName = "main";
+	shaderStages[0].flags = 0;
+	shaderStages[0].pNext = nullptr;
+	shaderStages[0].pSpecializationInfo = nullptr;
+
+	std::vector<VkVertexInputBindingDescription> bindingDescriptions = configInfo.bindingDescriptions;
+	std::vector<VkVertexInputAttributeDescription> attributeDescriptions = configInfo.attributeDescriptions;
+	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+	vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescriptions.size());;
+	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+	vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
+
+	VkGraphicsPipelineCreateInfo pipelineInfo{};
+	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+	pipelineInfo.stageCount = 1;
 	pipelineInfo.pStages = shaderStages;
 	pipelineInfo.pVertexInputState = &vertexInputInfo;
 	pipelineInfo.pInputAssemblyState = &configInfo.inputAssemblyInfo;

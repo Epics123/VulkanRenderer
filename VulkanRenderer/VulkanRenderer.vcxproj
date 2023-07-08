@@ -128,6 +128,7 @@
     <ClInclude Include="MainApp\RenderSystems\PointLightSystem.h" />
     <ClInclude Include="MainApp\RenderSystems\RenderSystem.h" />
     <ClInclude Include="MainApp\RenderSystems\RenderSystemBase.h" />
+    <ClInclude Include="MainApp\RenderSystems\ShadowSystem.h" />
     <ClInclude Include="MainApp\RenderSystems\SpotLightSystem.h" />
     <ClInclude Include="MainApp\RenderSystems\UnlitSystem.h" />
     <ClInclude Include="MainApp\RenderSystems\WireframeSystem.h" />
@@ -172,6 +173,7 @@
     <ClCompile Include="MainApp\RenderSystems\PointLightSystem.cpp" />
     <ClCompile Include="MainApp\RenderSystems\RenderSystem.cpp" />
     <ClCompile Include="MainApp\RenderSystems\RenderSystemBase.cpp" />
+    <ClCompile Include="MainApp\RenderSystems\ShadowSystem.cpp" />
     <ClCompile Include="MainApp\RenderSystems\SpotLightSystem.cpp" />
     <ClCompile Include="MainApp\RenderSystems\UnlitSystem.cpp" />
     <ClCompile Include="MainApp\RenderSystems\WireframeSystem.cpp" />
@@ -192,6 +194,8 @@
     <None Include="MainApp\resources\vulkan\shaders\PBR.vert" />
     <None Include="MainApp\resources\vulkan\shaders\PointLight.frag" />
     <None Include="MainApp\resources\vulkan\shaders\PointLight.vert" />
+    <None Include="MainApp\resources\vulkan\shaders\Shadows.frag" />
+    <None Include="MainApp\resources\vulkan\shaders\Shadows.vert" />
     <None Include="MainApp\resources\vulkan\shaders\SpotLight.frag" />
     <None Include="MainApp\resources\vulkan\shaders\SpotLight.vert" />
     <None Include="MainApp\resources\vulkan\shaders\Test.frag" />

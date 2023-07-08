@@ -35,6 +35,7 @@
 #include "RenderSystems/UnlitSystem.h"
 #include "RenderSystems/WorldGridSystem.h"
 #include "RenderSystems/SpotLightSystem.h"
+#include "RenderSystems/ShadowSystem.h"
 
 class Renderer
 {
@@ -133,6 +134,8 @@ private:
 	std::vector<std::unique_ptr<Buffer>> uboBuffers;
 	GameObject::Map gameObjects;
 
+	DepthPass depthPass;
+
 	RenderSystem renderSystem {mDevice};
 	PointLightSystem pointLightSystem {mDevice};
 	WireframeSystem wireframeSystem {mDevice};
@@ -140,6 +143,7 @@ private:
 	UnlitSystem unlitSystem {mDevice};
 	WorldGridSystem gridSystem {mDevice};
 	SpotLightSystem spotLightSystem {mDevice};
+	ShadowSystem shadowSystem {mDevice};
 
 	RenderMode renderMode = DEFAULT_LIT;
 

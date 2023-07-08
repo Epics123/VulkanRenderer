@@ -168,6 +168,9 @@
     <ClInclude Include="MainApp\RenderSystems\RenderSystemBase.h">
       <Filter>MainApp\RenderSystems</Filter>
     </ClInclude>
+    <ClInclude Include="MainApp\RenderSystems\ShadowSystem.h">
+      <Filter>MainApp\RenderSystems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Libraries\ImGui\ImGuizmo\GraphEditor.cpp">
@@ -296,6 +299,9 @@
     <ClCompile Include="MainApp\RenderSystems\RenderSystemBase.cpp">
       <Filter>MainApp\RenderSystems</Filter>
     </ClCompile>
+    <ClCompile Include="MainApp\RenderSystems\ShadowSystem.cpp">
+      <Filter>MainApp\RenderSystems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="MainApp\resources\vulkan\shaders\BasicUnlit.frag">
@@ -338,6 +344,12 @@
       <Filter>MainApp\resources\vulkan\shaders</Filter>
     </None>
     <None Include="MainApp\resources\vulkan\shaders\PBR.frag">
+      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    </None>
+    <None Include="MainApp\resources\vulkan\shaders\Shadows.vert">
+      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    </None>
+    <None Include="MainApp\resources\vulkan\shaders\Shadows.frag">
       <Filter>MainApp\resources\vulkan\shaders</Filter>
     </None>
   </ItemGroup>

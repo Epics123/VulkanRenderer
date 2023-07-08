@@ -121,6 +121,7 @@ void Renderer::init()
 	unlitSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout(), textureSetLayout->getDescriptorSetLayout());
 	gridSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
 	spotLightSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
+	shadowSystem.init(depthPass.renderPass, globalSetLayout->getDescriptorSetLayout());
 
 	createCommandBuffers();
 
@@ -232,16 +233,21 @@ void Renderer::recreateSwapChain()
 		glfwWaitEvents();
 	}
 
+	if(depthPass.renderPass)
+		depthPass.cleanup(mDevice);
+
 	vkDeviceWaitIdle(mDevice.getDevice());
 	mSwapChain = nullptr;
 	if (mSwapChain == nullptr)
 	{
 		mSwapChain = std::make_unique<SwapChain>(mDevice, extent);
+		depthPass.createRenderPass(mDevice, mSwapChain->getWidth(), mSwapChain->getHeight());
 	}
 	else
 	{
 		std::shared_ptr<SwapChain> oldSwapChain = std::move(mSwapChain); // std::move makes a copy of ptr and sets mSwapChain to nullptr
 		mSwapChain = std::make_unique<SwapChain>(mDevice, extent, oldSwapChain); 
+		depthPass.createRenderPass(mDevice, mSwapChain->getWidth(), mSwapChain->getHeight());
 
 		if (!oldSwapChain->compareSwapFormats(*mSwapChain.get()))
 		{
@@ -488,6 +494,11 @@ void Renderer::drawFrame(float dt)
 		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
 
 		endSwapChainRenderPass(commandBuffer);
+
+		depthPass.begin(commandBuffer);
+		shadowSystem.render(frameInfo);
+		depthPass.end(commandBuffer);
+
 		endFrame();
 	}
 }
@@ -550,6 +561,7 @@ void Renderer::drawImGui(FrameInfo& frameInfo)
 void Renderer::cleanup()
 {
 	cleanupTextures();
+	depthPass.cleanup(mDevice);
 
 	freeCommandBuffers();
 	window->cleanupWindow();

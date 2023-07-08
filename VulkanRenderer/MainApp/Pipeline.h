@@ -10,6 +10,12 @@
 
 #include "Device.h"
 
+enum PipelineType
+{
+	PIPELINE_TYPE_DEFAULT,
+	PIPELINE_TYPE_DEPTH
+};
+
 struct PipelineConfigInfo
 {
 	PipelineConfigInfo() = default;
@@ -39,7 +45,7 @@ public:
 	Pipeline() = delete;
 
 	//Pipeline(VkDevice device);
-	Pipeline(Device& device, const std::string& vertFilePath, const std::string& fragFilePath, const PipelineConfigInfo& configInfo);
+	Pipeline(Device& device, const std::string& vertFilePath, const std::string& fragFilePath, const PipelineConfigInfo& configInfo, PipelineType type = PIPELINE_TYPE_DEFAULT);
 
 	~Pipeline();
 
@@ -47,6 +53,7 @@ public:
 	Pipeline& operator=(const Pipeline&) = delete;
 
 	void createGraphicsPipeline(const PipelineConfigInfo& configInfo, const std::string& vertFilePath, const std::string& fragFilePath);
+	void createDepthPipeline(const PipelineConfigInfo& configInfo, const std::string& vertFilePath);
 
 	void createShaderModule(const std::vector<char>& code,  VkShaderModule* shaderModule);
 
@@ -69,8 +76,8 @@ private:
 	Device& device;
 	VkPipeline graphicsPipeline;
 
-	VkShaderModule vertShaderModule;
-	VkShaderModule fragShaderModule;
+	VkShaderModule vertShaderModule = VK_NULL_HANDLE;
+	VkShaderModule fragShaderModule = VK_NULL_HANDLE;
 	//
 
 };
