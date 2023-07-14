@@ -328,6 +328,24 @@ void Renderer::loadTextures(DescriptorSetLayout& layout)
 	bricksNrm.createTextureSampler(mDevice);
 	loadedTextures["bricks_nrm"] = bricksNrm;
 
+	Texture bricksRoughness;
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_roughness.png", bricksRoughness);
+	bricksRoughness.createTextureImageView(mDevice);
+	bricksRoughness.createTextureSampler(mDevice);
+	loadedTextures["bricks_roughness"] = bricksRoughness;
+
+	Texture bricksAO;
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_ambientocclusion.png", bricksAO);
+	bricksAO.createTextureImageView(mDevice);
+	bricksAO.createTextureSampler(mDevice);
+	loadedTextures["bricks_ao"] = bricksAO;
+
+	Texture bricksHeight;
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_height.png", bricksHeight);
+	bricksHeight.createTextureImageView(mDevice);
+	bricksHeight.createTextureSampler(mDevice);
+	loadedTextures["bricks_height"] = bricksHeight;
+
 	Texture stoneFloor;
 	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_color_1k.jpg", stoneFloor);
 	stoneFloor.createTextureImageView(mDevice);
