@@ -84,6 +84,7 @@ public:
 
 	DescriptorWriter& writeBuffer(uint32_t binding, VkDescriptorBufferInfo* bufferInfo);
 	DescriptorWriter& writeImage(uint32_t binding, VkDescriptorImageInfo* imageInfo);
+	DescriptorWriter& writeImageAtIndex(uint32_t binding, uint32_t index, VkDescriptorImageInfo* imageInfo);
 
 	bool build(VkDescriptorSet& set);
 	void overwrite(VkDescriptorSet& set);

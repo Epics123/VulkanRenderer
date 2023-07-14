@@ -168,6 +168,24 @@ DescriptorWriter& DescriptorWriter::writeImage(uint32_t binding, VkDescriptorIma
 	return *this;
 }
 
+DescriptorWriter& DescriptorWriter::writeImageAtIndex(uint32_t binding, uint32_t index, VkDescriptorImageInfo* imageInfo)
+{
+	assert(setLayout.bindings.count(binding) == 1 && "Layout does not contain specified binding");
+
+	auto& bindingDescription = setLayout.bindings[binding];
+
+	VkWriteDescriptorSet write{};
+	write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	write.descriptorType = bindingDescription.descriptorType;
+	write.dstBinding = binding;
+	write.dstArrayElement = index;
+	write.pImageInfo = imageInfo;
+	write.descriptorCount = 1;
+
+	writes.push_back(write);
+	return *this;
+}
+
 bool DescriptorWriter::build(VkDescriptorSet& set)
 {
 	bool success = pool.allocateDescriptorSet(setLayout.getDescriptorSetLayout(), set);
