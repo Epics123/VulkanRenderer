@@ -34,11 +34,10 @@ void RenderSystem::render(FrameInfo& frameInfo)
 		if (!obj.model)
 			continue;
 
-		//TODO: Overwrite texture descriptor set here
-
 		SimplePushConstantData push{};
 		push.modelMatrix = obj.transform.getTransform();
 		push.normalMatrix = obj.transform.getNormalMatrix();
+		push.textureIndex = obj.material->textureIndex;
 
 		vkCmdPushConstants(frameInfo.commandBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
 

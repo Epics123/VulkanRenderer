@@ -21,6 +21,9 @@ public:
 
 	void cleanup(Device& device);
 
+	std::string& getNameInternal() { return nameInternal; }
+	void setNameInternal(std::string name) { nameInternal = name; }
+
 private:
 	VkImage textureImage;
 	VkDeviceMemory textureImageMemory;
@@ -30,4 +33,6 @@ private:
 
 	uint32_t id;
 	uint32_t mipLevel = 0;
+
+	std::string nameInternal = "";
 };

@@ -15,14 +15,14 @@ public:
 		Builder(Device& device) : mDevice{ device } {}
 
 		Builder& addBinding(uint32_t binding, VkDescriptorType descriptorType, VkShaderStageFlags stageFlags, uint32_t count = 1);
-		std::unique_ptr<DescriptorSetLayout> build() const;
+		std::unique_ptr<DescriptorSetLayout> build(bool unbound = false) const;
 
 	private:
 		Device& mDevice;
 		std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings{};
 	};
 
-	DescriptorSetLayout(Device& device, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings);
+	DescriptorSetLayout(Device& device, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings, bool unbound = false);
 	~DescriptorSetLayout();
 	DescriptorSetLayout(const DescriptorSetLayout&) = delete;
 	DescriptorSetLayout& operator=(const DescriptorSetLayout&) = delete;

@@ -46,6 +46,11 @@ struct SpotLightComponent : PointLightComponent
 	float outerCutoffAngle;
 };
 
+struct MaterialComponent
+{
+	uint32_t textureIndex = 0;
+};
+
 class GameObject
 {
 public:
@@ -74,6 +79,8 @@ public:
 	void setPointLightColor(glm::vec3& color);
 	void setSpotLightColor(glm::vec3& color);
 
+	void setMaterial(uint32_t textureIndex); // TODO: replace with actual material
+
 	glm::vec3 getForwardVector() { return transform.forward; }
 	glm::vec3 getUpVector() { return transform.up; }
 	glm::vec3 getRightVector() { return transform.right; }
@@ -83,6 +90,7 @@ public:
 
 	// optional components
 	std::shared_ptr<Model> model{};
+	std::unique_ptr<MaterialComponent> material{};
 	std::unique_ptr<PointLightComponent> pointLight = nullptr;
 	std::unique_ptr<SpotLightComponent> spotLight = nullptr;
 

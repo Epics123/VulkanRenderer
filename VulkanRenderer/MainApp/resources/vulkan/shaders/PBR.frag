@@ -1,5 +1,6 @@
 #version 450
 #extension GL_KHR_vulkan_glsl:enable
+#extension GL_EXT_nonuniform_qualifier:enable
 
 //PBR lighting from https://learnopengl.com/PBR/Lighting and https://www.youtube.com/watch?v=RRE-F57fbXw
 
@@ -40,16 +41,17 @@ layout (set = 0, binding = 0) uniform GlobalUbo
 } ubo;
 
 //TODO: Add metalic map
-layout(set = 1, binding = 0) uniform sampler2D diffuseMap;
-layout(set = 1, binding = 1) uniform sampler2D normalMap;
-layout(set = 1, binding = 2) uniform sampler2D roughnessMap;
-layout(set = 1, binding = 3) uniform sampler2D aoMap;
-layout(set = 1, binding = 4) uniform sampler2D heightMap;
+layout(set = 1, binding = 0) uniform sampler2D diffuseMap[];
+layout(set = 1, binding = 1) uniform sampler2D normalMap[];
+layout(set = 1, binding = 2) uniform sampler2D roughnessMap[];
+layout(set = 1, binding = 3) uniform sampler2D aoMap[];
+layout(set = 1, binding = 4) uniform sampler2D heightMap[];
 
 layout (push_constant) uniform Push
 { 
 	mat4 modelMatrix;
 	mat4 normalMatrix;
+	uint textureIndex;
 }push;
 
 const float SPECULAR_POWER = 512.0;
@@ -138,7 +140,7 @@ vec3 calculateNormal(vec2 uv)
 	vec3 bitangent = normalize(fragBitangent);
 
 	// sample normal map and bring range to [-1.0, 1.0]
-	vec3 normalMapNormal = texture(normalMap, uv).xyz * 2.0 - 1.0;
+	vec3 normalMapNormal = texture(normalMap[push.textureIndex], uv).xyz * 2.0 - 1.0;
 
 	// construct TBN matrix
 	mat3 TBN = mat3(tangent, bitangent, normal);
@@ -164,7 +166,7 @@ vec2 calculateParalaxTexCoords(vec2 uv, vec3 viewDir)
 	vec2 S = viewDir.xy * heightScale;
 	vec2 deltaUV = S / numLayers;
 
-	float currentDepthMapValue = 1.0 - texture(heightMap, uv).r;
+	float currentDepthMapValue = 1.0 - texture(heightMap[push.textureIndex], uv).r;
 
 	vec2 UVs = uv;
 
@@ -172,14 +174,14 @@ vec2 calculateParalaxTexCoords(vec2 uv, vec3 viewDir)
 	while(currentLayerDepth < currentDepthMapValue)
 	{
 		UVs -= deltaUV;
-		currentDepthMapValue = 1.0 - texture(heightMap, UVs).r;
+		currentDepthMapValue = 1.0 - texture(heightMap[push.textureIndex], UVs).r;
 		currentLayerDepth += layerDepth;
 	}
 
 	// Apply occlusion (interpolate w/ prev uvs)
 	vec2 prevUVs = UVs + deltaUV;
 	float afterDepth = currentDepthMapValue - currentLayerDepth;
-	float beforeDepth = 1.0 - texture(heightMap, prevUVs).r - currentLayerDepth + layerDepth;
+	float beforeDepth = 1.0 - texture(heightMap[push.textureIndex], prevUVs).r - currentLayerDepth + layerDepth;
 	float weight = afterDepth / (afterDepth - beforeDepth);
 	UVs = prevUVs * weight + UVs * (1.0 - weight);
 
@@ -201,9 +203,9 @@ void main()
 	vec3 L = vec3(0.0); // light vector
 	vec3 H = vec3(0.0); // halfway vector
 
-	albedo = pow(texture(diffuseMap, uv).rgb, vec3(2.2));
-	roughness = texture(roughnessMap, uv).r;
-	float ao = texture(aoMap, uv).r;
+	albedo = pow(texture(diffuseMap[push.textureIndex], uv).rgb, vec3(2.2));
+	roughness = texture(roughnessMap[push.textureIndex], uv).r;
+	float ao = texture(aoMap[push.textureIndex], uv).r;
 
 	vec3 Lo = vec3(0.0);
 

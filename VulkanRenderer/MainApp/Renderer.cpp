@@ -95,12 +95,12 @@ void Renderer::init()
 														   .build();
 
 	std::unique_ptr<DescriptorSetLayout> textureSetLayout = DescriptorSetLayout::Builder(mDevice)
-															.addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-															.addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-															.addBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-															.addBinding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-															.addBinding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-															.addBinding(5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+															.addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
+															.addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
+															.addBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
+															.addBinding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
+															.addBinding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
+															//.addBinding(5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
 															.build();
 
 	globalDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -121,7 +121,7 @@ void Renderer::init()
 	unlitSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout(), textureSetLayout->getDescriptorSetLayout());
 	gridSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
 	spotLightSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
-	shadowSystem.init(depthPass.renderPass, globalSetLayout->getDescriptorSetLayout());
+	//shadowSystem.init(depthPass.renderPass, globalSetLayout->getDescriptorSetLayout());
 
 	createCommandBuffers();
 
@@ -262,6 +262,7 @@ void Renderer::loadGameObjects()
 	std::shared_ptr<Model> model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/teapot/downScaledPot.obj");
 	GameObject teapot = GameObject::createGameObject();
 	teapot.model = model;
+	teapot.setMaterial(0);
 	teapot.transform.translation = {-0.5f, 0.0f, 0.0f};
 	teapot.transform.rotation = {0.0f, 0.0f, 0.0f};
 	teapot.transform.scale = {1.0f, 1.0f, 1.0f};
@@ -271,6 +272,7 @@ void Renderer::loadGameObjects()
 	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/smoothVase/smooth_vase.obj");
 	GameObject smoothVase = GameObject::createGameObject();
 	smoothVase.model = model;
+	smoothVase.setMaterial(1);
 	smoothVase.transform.translation = { 0.5f, 0.0f, 0.0f };
 	smoothVase.transform.rotation = { 0.0f, 0.0f, 0.0f };
 	smoothVase.transform.scale = { 3.0f, 3.0f, 3.0f };
@@ -280,6 +282,7 @@ void Renderer::loadGameObjects()
 	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/quad/quad.obj");
 	GameObject floor = GameObject::createGameObject();
 	floor.model = model;
+	floor.setMaterial(0);
 	floor.transform.translation = { 0.0f, 0.0f, -0.3f };
 	floor.transform.rotation = { 0.0f, 0.0f, 0.0f };
 	floor.transform.scale = { 3.0f, 3.0f, 1.0f };
@@ -325,37 +328,48 @@ void Renderer::loadTextures(DescriptorSetLayout& layout)
 	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png", bricks);
 	bricks.createTextureImageView(mDevice);
 	bricks.createTextureSampler(mDevice);
+	bricks.setNameInternal("bricks_basecolor");
 	loadedTextures["bricks_basecolor"] = bricks;
+	textures.push_back(bricks);
 
 	Texture bricksNrm;
 	bricksNrm.setTextureFormat(VK_FORMAT_R8G8B8A8_UNORM);
 	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_normal.png", bricksNrm, VK_FORMAT_R8G8B8A8_UNORM);
 	bricksNrm.createTextureImageView(mDevice);
 	bricksNrm.createTextureSampler(mDevice);
+	bricksNrm.setNameInternal("bricks_nrm");
 	loadedTextures["bricks_nrm"] = bricksNrm;
+	textures.push_back(bricksNrm);
 
 	Texture bricksRoughness;
 	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_roughness.png", bricksRoughness);
 	bricksRoughness.createTextureImageView(mDevice);
 	bricksRoughness.createTextureSampler(mDevice);
+	bricksRoughness.setNameInternal("bricks_roughness");
 	loadedTextures["bricks_roughness"] = bricksRoughness;
+	textures.push_back(bricksRoughness);
 
 	Texture bricksAO;
 	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_ambientocclusion.png", bricksAO);
 	bricksAO.createTextureImageView(mDevice);
 	bricksAO.createTextureSampler(mDevice);
+	bricksAO.setNameInternal("bricks_ao");
 	loadedTextures["bricks_ao"] = bricksAO;
+	textures.push_back(bricksAO);
 
 	Texture bricksHeight;
 	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_height.png", bricksHeight);
 	bricksHeight.createTextureImageView(mDevice);
 	bricksHeight.createTextureSampler(mDevice);
+	bricksHeight.setNameInternal("bricks_height");
 	loadedTextures["bricks_height"] = bricksHeight;
+	textures.push_back(bricksHeight);
 
 	Texture stoneFloor;
 	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_color_1k.jpg", stoneFloor);
 	stoneFloor.createTextureImageView(mDevice);
 	stoneFloor.createTextureSampler(mDevice);
+	stoneFloor.setNameInternal("stoneFloor_basecolor");
 	loadedTextures["stoneFloor_basecolor"] = stoneFloor;
 	textures.push_back(stoneFloor);
 
@@ -364,6 +378,7 @@ void Renderer::loadTextures(DescriptorSetLayout& layout)
 	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_normal_opengl_1k.png", stoneFloorNrm, VK_FORMAT_R8G8B8A8_UNORM);
 	stoneFloorNrm.createTextureImageView(mDevice);
 	stoneFloorNrm.createTextureSampler(mDevice);
+	stoneFloorNrm.setNameInternal("stoneFloor_nrm");
 	loadedTextures["stoneFloor_nrm"] = stoneFloorNrm;
 	textures.push_back(stoneFloorNrm);
 
@@ -371,6 +386,7 @@ void Renderer::loadTextures(DescriptorSetLayout& layout)
 	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_roughness_1k.jpg", stoneFloorRoughness);
 	stoneFloorRoughness.createTextureImageView(mDevice);
 	stoneFloorRoughness.createTextureSampler(mDevice);
+	stoneFloorRoughness.setNameInternal("stoneFloor_roughness");
 	loadedTextures["stoneFloor_roughness"] = stoneFloorRoughness;
 	textures.push_back(stoneFloorRoughness);
 
@@ -378,6 +394,7 @@ void Renderer::loadTextures(DescriptorSetLayout& layout)
 	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_ao_1k.jpg", stoneFloorAO);
 	stoneFloorAO.createTextureImageView(mDevice);
 	stoneFloorAO.createTextureSampler(mDevice);
+	stoneFloorAO.setNameInternal("stoneFloor_ao");
 	loadedTextures["stoneFloor_ao"] = stoneFloorAO;
 	textures.push_back(stoneFloorAO);
 
@@ -385,6 +402,7 @@ void Renderer::loadTextures(DescriptorSetLayout& layout)
 	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_height_1k.png", stoneFloorHeight);
 	stoneFloorHeight.createTextureImageView(mDevice);
 	stoneFloorHeight.createTextureSampler(mDevice);
+	stoneFloorHeight.setNameInternal("stoneFloor_height");
 	loadedTextures["stoneFloor_height"] = stoneFloorHeight;
 	textures.push_back(stoneFloorHeight);
 
@@ -393,22 +411,38 @@ void Renderer::loadTextures(DescriptorSetLayout& layout)
 	imageInfo.imageView = stoneFloor.getTextureImageView();
 	imageInfo.sampler = stoneFloor.getTextureSampler();
 
-	for (int i = 0; i < textureDescriptorSets.size(); i++)
+	for (uint32_t i = 0; i < textureDescriptorSets.size(); i++)
 	{
 		DescriptorWriter(layout, *globalDescriptorPool).build(textureDescriptorSets[i]);
 	}
 
-	// TODO: Move texture overwrite into render system, store textures on game object or material (ideally material)
-	for(int i = 0; i < textures.size(); i++)
+	uint32_t n = textures.size() / MAX_TEXTURE_BINDINGS;
+	uint32_t textureIndex = 0;
+	int k = 0;
+	for(uint32_t i = 0; i < textures.size(); i++)
 	{
+		Texture& texture = textures[i];
+
 		VkDescriptorImageInfo imageInfo{};
 		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		imageInfo.imageView = textures[i].getTextureImageView();
-		imageInfo.sampler = textures[i].getTextureSampler();
+		imageInfo.imageView = texture.getTextureImageView();
+		imageInfo.sampler = texture.getTextureSampler();
 
-		for(int j = 0; j < textureDescriptorSets.size(); j++)
+		uint32_t binding = i % n;//(n + 1);
+
+		if(k == n)
 		{
-			DescriptorWriter(layout, *globalDescriptorPool).writeImage(i, &imageInfo).overwrite(textureDescriptorSets[j]);
+			textureIndex++;
+			k = 0;
+		}
+		else
+		{
+			k++;
+		}
+		
+		for(uint32_t j = 0; j < textureDescriptorSets.size(); j++)
+		{
+			DescriptorWriter(layout, *globalDescriptorPool).writeImageAtIndex(binding, textureIndex, &imageInfo).overwrite(textureDescriptorSets[j]);
 		}
 	}
 }
@@ -514,9 +548,9 @@ void Renderer::drawFrame(float dt)
 
 		endSwapChainRenderPass(commandBuffer);
 
-		depthPass.begin(commandBuffer);
-		shadowSystem.render(frameInfo);
-		depthPass.end(commandBuffer);
+		//depthPass.begin(commandBuffer);
+		//shadowSystem.render(frameInfo);
+		//depthPass.end(commandBuffer);
 
 		endFrame();
 	}

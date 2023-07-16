@@ -169,6 +169,7 @@ private:
 	VkImageView depthImageView;
 
 	std::unordered_map<std::string, Texture> loadedTextures;
+	const uint32_t MAX_TEXTURE_BINDINGS = 2;
 };
 
 #endif // !RENDERER_H

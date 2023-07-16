@@ -67,3 +67,14 @@ void GameObject::setSpotLightColor(glm::vec3& color)
 	if(spotLight)
 		color = color;
 }
+
+void GameObject::setMaterial(uint32_t textureIndex)
+{
+	if(material)
+		material->textureIndex = textureIndex;
+	else
+	{
+		material = std::make_unique<MaterialComponent>();
+		material->textureIndex = textureIndex;
+	}
+}

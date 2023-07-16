@@ -18,15 +18,15 @@ DescriptorSetLayout::Builder& DescriptorSetLayout::Builder::addBinding(uint32_t 
 	return *this;
 }
 
-std::unique_ptr<DescriptorSetLayout> DescriptorSetLayout::Builder::build() const
+std::unique_ptr<DescriptorSetLayout> DescriptorSetLayout::Builder::build(bool unbound) const
 {
-	return std::make_unique<DescriptorSetLayout>(mDevice, bindings);
+	return std::make_unique<DescriptorSetLayout>(mDevice, bindings, unbound);
 }
 
 
 // *************** Descriptor Set Layout *********************
 
-DescriptorSetLayout::DescriptorSetLayout(Device& device, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings)
+DescriptorSetLayout::DescriptorSetLayout(Device& device, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings, bool unbound)
 	: mDevice{ device }, bindings{ bindings } 
 {
 	std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings{};
@@ -39,6 +39,21 @@ DescriptorSetLayout::DescriptorSetLayout(Device& device, std::unordered_map<uint
 	descriptorSetLayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 	descriptorSetLayoutInfo.bindingCount = static_cast<uint32_t>(setLayoutBindings.size());
 	descriptorSetLayoutInfo.pBindings = setLayoutBindings.data();
+	/*if (unbound)
+	{
+		std::vector<VkDescriptorBindingFlags> flags;
+		flags.resize(setLayoutBindings.size());
+		for(size_t i = 0; i < flags.size(); i++)
+		{
+			flags[i] = VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT;
+		}
+
+		VkDescriptorSetLayoutBindingFlagsCreateInfo bindingFlags{};
+		bindingFlags.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO;
+		bindingFlags.bindingCount = static_cast<uint32_t>(setLayoutBindings.size());
+		bindingFlags.pBindingFlags = flags.data();
+		descriptorSetLayoutInfo.pNext = &bindingFlags;
+	}*/
 
 	if (vkCreateDescriptorSetLayout(mDevice.getDevice(), &descriptorSetLayoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS)
 	{
