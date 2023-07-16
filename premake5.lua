@@ -38,7 +38,8 @@ project "VulkanRenderer"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.ObjLoader}",
-		"%{IncludeDir.ImgLoader}"
+		"%{IncludeDir.ImgLoader}",
+		"%{IncludeDir.spdlog}"
 	}
 
 	libdirs

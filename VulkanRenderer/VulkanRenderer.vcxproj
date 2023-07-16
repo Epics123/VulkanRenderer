@@ -22,13 +22,13 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -58,7 +58,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.189.2\Include;Libraries\glfw\include;Libraries\glm;Libraries\ImGui;Libraries\ObjLoader;Libraries\ImgLoader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.189.2\Include;Libraries\glfw\include;Libraries\glm;Libraries\ImGui;Libraries\ObjLoader;Libraries\ImgLoader;Libraries\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -75,7 +75,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.189.2\Include;Libraries\glfw\include;Libraries\glm;Libraries\ImGui;Libraries\ObjLoader;Libraries\ImgLoader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.189.2\Include;Libraries\glfw\include;Libraries\glm;Libraries\ImGui;Libraries\ObjLoader;Libraries\ImgLoader;Libraries\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -119,6 +119,7 @@
     <ClInclude Include="MainApp\GameObject.h" />
     <ClInclude Include="MainApp\Image.h" />
     <ClInclude Include="MainApp\Light.h" />
+    <ClInclude Include="MainApp\Log.h" />
     <ClInclude Include="MainApp\Material.h" />
     <ClInclude Include="MainApp\Mesh.h" />
     <ClInclude Include="MainApp\Model.h" />
@@ -164,6 +165,7 @@
     <ClCompile Include="MainApp\GameObject.cpp" />
     <ClCompile Include="MainApp\Image.cpp" />
     <ClCompile Include="MainApp\Light.cpp" />
+    <ClCompile Include="MainApp\Log.cpp" />
     <ClCompile Include="MainApp\Main.cpp" />
     <ClCompile Include="MainApp\Mesh.cpp" />
     <ClCompile Include="MainApp\Model.cpp" />

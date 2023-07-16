@@ -1,6 +1,7 @@
 #include "Model.h"
 
 #include "Utils.h"
+#include "Log.h"
 
 #include <cassert>
 #include <unordered_map>
@@ -42,7 +43,7 @@ std::unique_ptr<Model> Model::createModelFromFile(Device& device, const std::str
 	Builder builder{};
 	builder.loadModel(filepath);
 
-	printf("Vertex Count: %u\n", builder.vertices.size());
+	CORE_INFO("Vertex Count: {0}", builder.vertices.size())
 
 	return std::make_unique<Model>(device, builder);
 }

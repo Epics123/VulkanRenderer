@@ -20,8 +20,6 @@
 #include "Camera.h"
 #include "Mesh.h"
 #include "SwapChain.h"
-#include "Model.h"
-#include "GameObject.h"
 #include "Buffer.h"
 #include "Descriptors.h"
 #include "Enums.h"
@@ -132,7 +130,7 @@ private:
 	std::vector<VkDescriptorSet> globalDescriptorSets;
 	std::vector<VkDescriptorSet> textureDescriptorSets;
 	std::vector<std::unique_ptr<Buffer>> uboBuffers;
-	GameObject::Map gameObjects;
+	class GameObject::Map gameObjects;
 
 	DepthPass depthPass;
 

@@ -1,4 +1,5 @@
 #include "Device.h"
+#include "Log.h"
 
 #include <cstring>
 #include <iostream>
@@ -12,7 +13,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
     const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
     void* pUserData)
 {
-    std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
+    CORE_ERROR("Validaiton Layer: {0}", pCallbackData->pMessage)
 
     return VK_FALSE;
 }
@@ -129,7 +130,7 @@ void Device::pickPhysicalDevice()
     {
         throw std::runtime_error("failed to find GPUs with Vulkan support!");
     }
-    std::cout << "Device count: " << deviceCount << std::endl;
+    CORE_INFO("Device Count: {0}", deviceCount)
     std::vector<VkPhysicalDevice> devices(deviceCount);
     vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
@@ -148,7 +149,7 @@ void Device::pickPhysicalDevice()
     }
 
     vkGetPhysicalDeviceProperties(physicalDevice, &properties);
-    std::cout << "physical device: " << properties.deviceName << std::endl;
+    CORE_INFO("Physical Device: {0}", properties.deviceName)
 }
 
 void Device::createLogicalDevice()
@@ -193,7 +194,7 @@ void Device::createLogicalDevice()
     createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
     createInfo.pQueueCreateInfos = queueCreateInfos.data();
 
-    createInfo.pEnabledFeatures = &deviceFeatures;
+    //createInfo.pEnabledFeatures = &deviceFeatures;
     createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
     createInfo.ppEnabledExtensionNames = deviceExtensions.data();
     createInfo.pNext = &deviceFeatures2;
@@ -335,19 +336,19 @@ void Device::hasGflwRequiredInstanceExtensions()
     std::vector<VkExtensionProperties> extensions(extensionCount);
     vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
 
-    std::cout << "available extensions:" << std::endl;
+    CORE_INFO("Available Extensions:")
     std::unordered_set<std::string> available;
     for (const auto& extension : extensions)
     {
-        std::cout << "\t" << extension.extensionName << std::endl;
+        CORE_INFO("\t{0}", extension.extensionName)
         available.insert(extension.extensionName);
     }
 
-    std::cout << "required extensions:" << std::endl;
+    CORE_WARN("Required Extensions:")
     auto requiredExtensions = getRequiredExtensions();
     for (const auto& required : requiredExtensions)
     {
-        std::cout << "\t" << required << std::endl;
+        CORE_WARN("\t{0}", required)
         if (available.find(required) == available.end())
         {
             throw std::runtime_error("Missing required glfw extension");

@@ -1,4 +1,5 @@
 #include "SwapChain.h"
+#include "Log.h"
 
 #include <array>
 #include <cstdlib>
@@ -252,7 +253,7 @@ VkPresentModeKHR SwapChain::chooseSwapPresentMode(
         }
     }*/
 
-    std::cout << "Present mode: V-Sync" << std::endl;
+    CORE_INFO("Present Mode: V-Sync")
     return VK_PRESENT_MODE_FIFO_KHR;
 }
 

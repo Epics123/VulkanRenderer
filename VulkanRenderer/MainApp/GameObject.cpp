@@ -39,7 +39,7 @@ GameObject GameObject::makePointLight(float intensity, float radius, glm::vec3 c
 	obj.transform.scale.x = radius;
 	obj.pointLight = std::make_unique<PointLightComponent>();
 	obj.pointLight->intensity = intensity;
-	obj.pointLight->lightType = LightType::POINT;
+	obj.pointLight->lightType = LightType::Point;
 
 	return obj;
 }
@@ -51,7 +51,7 @@ GameObject GameObject::makeSpotLight(float intensity, float cutoffAngle, glm::ve
 	obj.spotLight = std::make_unique<SpotLightComponent>();
 	obj.spotLight->intensity = intensity;
 	obj.spotLight->cutoffAngle = cutoffAngle;
-	obj.spotLight->lightType = LightType::SPOT;
+	obj.spotLight->lightType = LightType::Spot;
 
 	return obj;
 }

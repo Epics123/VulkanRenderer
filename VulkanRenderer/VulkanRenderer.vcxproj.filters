@@ -105,6 +105,9 @@
     <ClInclude Include="MainApp\Light.h">
       <Filter>MainApp</Filter>
     </ClInclude>
+    <ClInclude Include="MainApp\Log.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
     <ClInclude Include="MainApp\Material.h">
       <Filter>MainApp</Filter>
     </ClInclude>
@@ -127,6 +130,15 @@
       <Filter>MainApp\RenderSystems</Filter>
     </ClInclude>
     <ClInclude Include="MainApp\RenderSystems\RenderSystem.h">
+      <Filter>MainApp\RenderSystems</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\RenderSystems\RenderSystemBase.h">
+      <Filter>MainApp\RenderSystems</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\RenderSystems\ShadowSystem.h">
+      <Filter>MainApp\RenderSystems</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\RenderSystems\SpotLightSystem.h">
       <Filter>MainApp\RenderSystems</Filter>
     </ClInclude>
     <ClInclude Include="MainApp\RenderSystems\UnlitSystem.h">
@@ -161,15 +173,6 @@
     </ClInclude>
     <ClInclude Include="MainApp\Window.h">
       <Filter>MainApp</Filter>
-    </ClInclude>
-    <ClInclude Include="MainApp\RenderSystems\SpotLightSystem.h">
-      <Filter>MainApp\RenderSystems</Filter>
-    </ClInclude>
-    <ClInclude Include="MainApp\RenderSystems\RenderSystemBase.h">
-      <Filter>MainApp\RenderSystems</Filter>
-    </ClInclude>
-    <ClInclude Include="MainApp\RenderSystems\ShadowSystem.h">
-      <Filter>MainApp\RenderSystems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -236,6 +239,9 @@
     <ClCompile Include="MainApp\Light.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
+    <ClCompile Include="MainApp\Log.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
     <ClCompile Include="MainApp\Main.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
@@ -258,6 +264,15 @@
       <Filter>MainApp\RenderSystems</Filter>
     </ClCompile>
     <ClCompile Include="MainApp\RenderSystems\RenderSystem.cpp">
+      <Filter>MainApp\RenderSystems</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\RenderSystems\RenderSystemBase.cpp">
+      <Filter>MainApp\RenderSystems</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\RenderSystems\ShadowSystem.cpp">
+      <Filter>MainApp\RenderSystems</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\RenderSystems\SpotLightSystem.cpp">
       <Filter>MainApp\RenderSystems</Filter>
     </ClCompile>
     <ClCompile Include="MainApp\RenderSystems\UnlitSystem.cpp">
@@ -293,15 +308,6 @@
     <ClCompile Include="MainApp\Window.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\RenderSystems\SpotLightSystem.cpp">
-      <Filter>MainApp\RenderSystems</Filter>
-    </ClCompile>
-    <ClCompile Include="MainApp\RenderSystems\RenderSystemBase.cpp">
-      <Filter>MainApp\RenderSystems</Filter>
-    </ClCompile>
-    <ClCompile Include="MainApp\RenderSystems\ShadowSystem.cpp">
-      <Filter>MainApp\RenderSystems</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="MainApp\resources\vulkan\shaders\BasicUnlit.frag">
@@ -310,10 +316,28 @@
     <None Include="MainApp\resources\vulkan\shaders\BasicUnlit.vert">
       <Filter>MainApp\resources\vulkan\shaders</Filter>
     </None>
+    <None Include="MainApp\resources\vulkan\shaders\PBR.frag">
+      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    </None>
+    <None Include="MainApp\resources\vulkan\shaders\PBR.vert">
+      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    </None>
     <None Include="MainApp\resources\vulkan\shaders\PointLight.frag">
       <Filter>MainApp\resources\vulkan\shaders</Filter>
     </None>
     <None Include="MainApp\resources\vulkan\shaders\PointLight.vert">
+      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    </None>
+    <None Include="MainApp\resources\vulkan\shaders\Shadows.frag">
+      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    </None>
+    <None Include="MainApp\resources\vulkan\shaders\Shadows.vert">
+      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    </None>
+    <None Include="MainApp\resources\vulkan\shaders\SpotLight.frag">
+      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    </None>
+    <None Include="MainApp\resources\vulkan\shaders\SpotLight.vert">
       <Filter>MainApp\resources\vulkan\shaders</Filter>
     </None>
     <None Include="MainApp\resources\vulkan\shaders\Test.frag">
@@ -332,24 +356,6 @@
       <Filter>MainApp\resources\vulkan\shaders</Filter>
     </None>
     <None Include="MainApp\resources\vulkan\shaders\WorldGrid.vert">
-      <Filter>MainApp\resources\vulkan\shaders</Filter>
-    </None>
-    <None Include="MainApp\resources\vulkan\shaders\SpotLight.vert">
-      <Filter>MainApp\resources\vulkan\shaders</Filter>
-    </None>
-    <None Include="MainApp\resources\vulkan\shaders\SpotLight.frag">
-      <Filter>MainApp\resources\vulkan\shaders</Filter>
-    </None>
-    <None Include="MainApp\resources\vulkan\shaders\PBR.vert">
-      <Filter>MainApp\resources\vulkan\shaders</Filter>
-    </None>
-    <None Include="MainApp\resources\vulkan\shaders\PBR.frag">
-      <Filter>MainApp\resources\vulkan\shaders</Filter>
-    </None>
-    <None Include="MainApp\resources\vulkan\shaders\Shadows.vert">
-      <Filter>MainApp\resources\vulkan\shaders</Filter>
-    </None>
-    <None Include="MainApp\resources\vulkan\shaders\Shadows.frag">
       <Filter>MainApp\resources\vulkan\shaders</Filter>
     </None>
   </ItemGroup>

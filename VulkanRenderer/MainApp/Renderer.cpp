@@ -1,4 +1,6 @@
 #include "Renderer.h"
+#include "Log.h"
+#include "GameObject.h"
 
 #include <set>
 #include <algorithm>
@@ -27,6 +29,9 @@ Renderer* Renderer::rendererInstance = nullptr;
 
 Renderer* Renderer::initInstance(Window* window)
 {
+	Log::init();
+	CORE_WARN("Log initialized!");
+
 	if (!Renderer::rendererInstance)
 	{
 		Renderer::rendererInstance = new Renderer(window);
@@ -51,15 +56,6 @@ void Renderer::cleanupInstance()
 Renderer::Renderer(Window* appWindow)
 	:window(appWindow)
 {
-	modelPath = "MainApp/resources/vulkan/models/teapot/downScaledPot.obj";
-	//modelPath = "MainApp/resources/vulkan/models/debug/defCube.obj";
-	//modelPath = "MainApp/resources/vulkan/models/debug/tri.obj";
-	//modelPath = "MainApp/resources/vulkan/models/room/room.obj";
-	texturePath = "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png";
-	//texturePath = "MainApp/resources/vulkan/textures/room/viking_room.png";
-
-	//window = appWindow;
-	//mDevice = Device(window);
 	compileShaders();
 	init();
 }
@@ -113,7 +109,9 @@ void Renderer::init()
 	}
 
 	textureDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+	CORE_WARN("Loading Textures...")
 	loadTextures(*textureSetLayout);
+	CORE_WARN("Texture Load Finished!")
 
 	renderSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout(), textureSetLayout->getDescriptorSetLayout());
 	pointLightSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
@@ -125,7 +123,9 @@ void Renderer::init()
 
 	createCommandBuffers();
 
+	CORE_WARN("Loading Game Objects...")
 	loadGameObjects();
+	CORE_WARN("Game Object Load Complete!")
 
 	mainCamera = Camera();
 	mainCamera.updateModel(0.0f);
@@ -179,7 +179,9 @@ void Renderer::setRenderMode(RenderMode mode)
 void Renderer::compileShaders()
 {
 	// TODO: Shift this to the actual proper API call
+	CORE_WARN("Compiling Shaders:")
 	system("CompileShaders.bat");
+	CORE_WARN("Shader Compilation Complete!")
 }
 
 std::vector<char> Renderer::readBinaryFile(const std::string& filename)
