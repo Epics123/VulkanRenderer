@@ -14,6 +14,7 @@ struct SimplePushConstantData
 	glm::mat4 modelMatrix{ 1.0f };
 	glm::mat4 normalMatrix{ 1.0f };
 	uint32_t textureIndex = 0;
+	uint32_t toggleTexture = 0;
 };
 
 class RenderSystem : public RenderSystemBase

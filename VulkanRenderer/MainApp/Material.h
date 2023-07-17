@@ -11,7 +11,7 @@ struct ShaderParameters
 	uint32_t toggleTexture;
 
 	ShaderParameters();
-	ShaderParameters(uint32_t texIndex, glm::vec4 albedo = glm::vec4{1.0f}, float roughness = 1.0f, float ao = 1.0f, float toggleTex = 0.0f);
+	ShaderParameters(uint32_t texIndex, glm::vec4 albedo = glm::vec4{1.0f}, float roughness = 1.0f, float ao = 1.0f, uint32_t toggleTex = 0);
 };
 
 class Material

@@ -19,7 +19,7 @@ void Material::setShaderParameters(ShaderParameters params)
 	shaderParams.toggleTexture = params.toggleTexture;
 }
 
-ShaderParameters::ShaderParameters(uint32_t texIndex, glm::vec4 albedo, float roughness, float ao, float toggleTex)
+ShaderParameters::ShaderParameters(uint32_t texIndex, glm::vec4 albedo, float roughness, float ao, uint32_t toggleTex)
 	:textureIndex(texIndex), albedo(albedo), roughness(roughness), ambientOcclusion(ao), toggleTexture(toggleTex)
 {
 

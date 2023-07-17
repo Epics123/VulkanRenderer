@@ -29,7 +29,6 @@ struct MaterialUbo
 	glm::vec4 albedo;
 	float roughness;
 	float ambientOcclusion;
-	uint32_t toggleTexture;
 };
 
 struct FrameInfo

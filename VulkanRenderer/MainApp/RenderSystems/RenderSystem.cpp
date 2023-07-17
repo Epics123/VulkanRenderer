@@ -38,7 +38,6 @@ void RenderSystem::update(FrameInfo& frameInfo, Buffer* buffer)
 		ubo.albedo = shaderParams.albedo;
 		ubo.ambientOcclusion = shaderParams.ambientOcclusion;
 		ubo.roughness = shaderParams.roughness;
-		ubo.toggleTexture = shaderParams.toggleTexture;
 
 		buffer->writeToBuffer(&ubo);
 		buffer->flush();
@@ -68,6 +67,7 @@ void RenderSystem::render(FrameInfo& frameInfo)
 		push.modelMatrix = obj.transform.getTransform();
 		push.normalMatrix = obj.transform.getNormalMatrix();
 		push.textureIndex = shaderParams.textureIndex;
+		push.toggleTexture = shaderParams.toggleTexture;
 
 		vkCmdPushConstants(frameInfo.commandBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
 

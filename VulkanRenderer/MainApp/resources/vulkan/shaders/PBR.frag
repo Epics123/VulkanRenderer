@@ -45,7 +45,6 @@ layout (set = 1, binding = 5) uniform MaterialUbo
 	vec4 albedo;
 	float roughness;
 	float ambientOcclusion;
-	uint toggleTexture;
 } matUbo;
 
 //TODO: Add metalic map
@@ -60,6 +59,7 @@ layout (push_constant) uniform Push
 	mat4 modelMatrix;
 	mat4 normalMatrix;
 	uint textureIndex;
+	uint toggleTexture;
 }push;
 
 const float SPECULAR_POWER = 512.0;
@@ -71,6 +71,7 @@ vec3 spec;
 
 vec3 albedo;
 float roughness;
+float ao;
 float attenuation;
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
@@ -208,14 +209,27 @@ void main()
 
 	vec3 cameraPosWorld = inverse(ubo.view)[3].xyz;
 
-	vec3 N = calculateNormal(uv);
+	vec3 N;
 	vec3 V = normalize(cameraPosWorld - fragPosWorld); // view vector
 	vec3 L = vec3(0.0); // light vector
 	vec3 H = vec3(0.0); // halfway vector
 
-	albedo = pow(texture(diffuseMap[push.textureIndex], uv).rgb, vec3(2.2));
-	roughness = texture(roughnessMap[push.textureIndex], uv).r;
-	float ao = texture(aoMap[push.textureIndex], uv).r;
+	if(push.toggleTexture == 1)
+	{
+		albedo = pow(texture(diffuseMap[push.textureIndex], uv).rgb, vec3(2.2));
+		roughness = texture(roughnessMap[push.textureIndex], uv).r;
+		ao = texture(aoMap[push.textureIndex], uv).r;
+
+		N = calculateNormal(uv);
+	}
+	else
+	{
+		albedo = matUbo.albedo.xyz;
+		roughness = matUbo.roughness;
+		ao = matUbo.ambientOcclusion;
+
+		N = fragNormalWorld;
+	}
 
 	vec3 Lo = vec3(0.0);
 

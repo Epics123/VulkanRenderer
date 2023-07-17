@@ -47,7 +47,6 @@ layout (set = 1, binding = 5) uniform MaterialUbo
 	vec4 albedo;
 	float roughness;
 	float ambientOcclusion;
-	uint toggleTexture;
 } matUbo;
 
 layout (push_constant) uniform Push
@@ -55,6 +54,7 @@ layout (push_constant) uniform Push
 	mat4 modelMatrix;
 	mat4 normalMatrix;
 	uint textureIndex;
+	uint toggleTexture;
 }push;
 
 void main()
