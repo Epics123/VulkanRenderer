@@ -6,6 +6,11 @@ RenderSystem::RenderSystem(Device& device)
 {
 }
 
+RenderSystem::~RenderSystem()
+{
+	RenderSystemBase::~RenderSystemBase();
+}
+
 void RenderSystem::init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout additionalLayout)
 {
 	textureDescriptorSets.resize(maxDescriptorSets);

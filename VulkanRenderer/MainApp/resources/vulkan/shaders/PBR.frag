@@ -194,6 +194,8 @@ vec2 calculateParalaxTexCoords(vec2 uv, vec3 viewDir)
 
 void main()
 {
+	//TODO: Toggle texture map usage w/ uniform int (i.e 0 = no texture, 1 = texture)
+
 	vec2 uv = texCoord;
 
 	vec3 cameraPosWorld = inverse(ubo.view)[3].xyz;

@@ -618,6 +618,10 @@ void Renderer::cleanup()
 	cleanupTextures();
 	depthPass.cleanup(mDevice);
 
+	renderSystem.cleanup();
+	unlitSystem.cleanup();
+	wireframeSystem.cleanup();
+
 	freeCommandBuffers();
 	window->cleanupWindow();
 	globalDescriptorPool = nullptr;

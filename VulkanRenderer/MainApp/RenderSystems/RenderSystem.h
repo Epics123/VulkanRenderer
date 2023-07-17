@@ -20,6 +20,7 @@ class RenderSystem : public RenderSystemBase
 {
 public:
 	RenderSystem(Device& device);
+	~RenderSystem();
 
 	virtual void init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout additionalLayout = VK_NULL_HANDLE) override;
 	virtual void render(FrameInfo& frameInfo) override;

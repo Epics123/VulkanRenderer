@@ -18,6 +18,7 @@ public:
 
 	virtual void init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout additionalLayout = VK_NULL_HANDLE);
 	virtual void render(FrameInfo& frameInfo) = 0;
+	virtual void cleanup();
 
 	void setVertShaderFilepath(std::string& name) { vertFilePath = name; }
 	void setFragShaderFilepath(std::string& name) { fragFilePath = name; }
