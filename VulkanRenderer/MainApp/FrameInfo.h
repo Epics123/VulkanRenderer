@@ -16,11 +16,20 @@ struct GlobalUbo
 	glm::mat4 view{1.0f};
 	glm::mat4 inverseView{1.0f};
 
+	// TODO: Move light info to separate UBO
 	glm::vec4 abmientColor{ 1.0f, 1.0f, 1.0f, 0.1f };
 	PointLight pointLights[MAX_LIGHTS];
 	SpotLight spotLights[MAX_LIGHTS];
 	uint32_t numLights;
 	uint32_t numSpotLights;
+};
+
+struct MaterialUbo
+{
+	glm::vec4 albedo;
+	float roughness;
+	float ambientOcclusion;
+	uint32_t toggleTexture;
 };
 
 struct FrameInfo

@@ -308,6 +308,9 @@
     <ClCompile Include="MainApp\Window.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
+    <ClCompile Include="MainApp\Material.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="MainApp\resources\vulkan\shaders\BasicUnlit.frag">

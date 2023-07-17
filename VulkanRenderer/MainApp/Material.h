@@ -1,43 +1,17 @@
 #pragma once
-
-#include "Texture.h"
-#include "Pipeline.h"
-
-struct ShaderEffect
-{
-	VkPipelineLayout builtLayout;
-	std::vector<VkDescriptorSetLayout> setLayouts;
-
-	struct ShaderStage
-	{
-		VkShaderModule* shaderModule;
-		VkShaderStageFlagBits stage;
-	};
-
-	std::vector<ShaderStage> stages;
-};
-
-struct ShaderPass
-{
-	ShaderEffect* effect {nullptr};
-	Pipeline* pipeline = nullptr;
-};
+#include "glm/glm.hpp"
 
 // Ubo for a given material
 struct ShaderParameters
 {
-	
-};
+	uint32_t textureIndex;
+	glm::vec4 albedo;
+	float roughness;
+	float ambientOcclusion;
+	uint32_t toggleTexture;
 
-struct EffectTemplate
-{
-	std::vector<ShaderPass*> passShaders;
-
-};
-
-struct MaterialData
-{
-	Texture texture;
+	ShaderParameters();
+	ShaderParameters(uint32_t texIndex, glm::vec4 albedo = glm::vec4{1.0f}, float roughness = 1.0f, float ao = 1.0f, float toggleTex = 0.0f);
 };
 
 class Material
@@ -46,9 +20,10 @@ public:
 	Material();
 	~Material();
 
-	MaterialData& getMaterialData() { return data; }
+	ShaderParameters& getShaderParameters() { return shaderParams; }
+	void setShaderParameters(ShaderParameters params);
 
 private:
-	MaterialData data;
+	ShaderParameters shaderParams;
 
 };

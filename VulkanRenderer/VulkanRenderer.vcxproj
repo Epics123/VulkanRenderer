@@ -167,6 +167,7 @@
     <ClCompile Include="MainApp\Light.cpp" />
     <ClCompile Include="MainApp\Log.cpp" />
     <ClCompile Include="MainApp\Main.cpp" />
+    <ClCompile Include="MainApp\Material.cpp" />
     <ClCompile Include="MainApp\Mesh.cpp" />
     <ClCompile Include="MainApp\Model.cpp" />
     <ClCompile Include="MainApp\Pipeline.cpp" />

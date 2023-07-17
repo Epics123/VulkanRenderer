@@ -128,8 +128,9 @@ private:
 	std::unique_ptr<DescriptorPool> globalDescriptorPool{};
 	std::unique_ptr<DescriptorPool> imguiDescriptorPool{};
 	std::vector<VkDescriptorSet> globalDescriptorSets;
-	std::vector<VkDescriptorSet> textureDescriptorSets;
+	std::vector<VkDescriptorSet> materialDescriptorSets;
 	std::vector<std::unique_ptr<Buffer>> uboBuffers;
+	std::vector<std::unique_ptr<Buffer>> materialUboBuffers;
 	class GameObject::Map gameObjects;
 
 	DepthPass depthPass;

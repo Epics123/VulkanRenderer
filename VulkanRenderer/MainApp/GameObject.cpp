@@ -68,13 +68,13 @@ void GameObject::setSpotLightColor(glm::vec3& color)
 		color = color;
 }
 
-void GameObject::setMaterial(uint32_t textureIndex)
+void GameObject::setMaterial(ShaderParameters params)
 {
-	if(material)
-		material->textureIndex = textureIndex;
+	if(materialComp)
+		materialComp->material.setShaderParameters(params);
 	else
 	{
-		material = std::make_unique<MaterialComponent>();
-		material->textureIndex = textureIndex;
+		materialComp = std::make_unique<MaterialComponent>();
+		materialComp->material.setShaderParameters(params);
 	}
 }

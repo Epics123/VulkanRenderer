@@ -84,19 +84,25 @@ void Renderer::init()
 		uboBuffers[i] = std::make_unique<Buffer>(mDevice, sizeof(GlobalUbo), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		uboBuffers[i]->map();
 	}
+	materialUboBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+	for(size_t i = 0; i < materialUboBuffers.size(); i++)
+	{
+		materialUboBuffers[i] = std::make_unique<Buffer>(mDevice, sizeof(MaterialUbo), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+		materialUboBuffers[i]->map();
+	}
 
 	// highest set common to all shaders
 	std::unique_ptr<DescriptorSetLayout> globalSetLayout = DescriptorSetLayout::Builder(mDevice)
 														   .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
 														   .build();
 
-	std::unique_ptr<DescriptorSetLayout> textureSetLayout = DescriptorSetLayout::Builder(mDevice)
+	std::unique_ptr<DescriptorSetLayout> materialSetLayout = DescriptorSetLayout::Builder(mDevice)
 															.addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
 															.addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
 															.addBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
 															.addBinding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
 															.addBinding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
-															//.addBinding(5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
+															.addBinding(5, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS) // per material ubo
 															.build();
 
 	globalDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -108,15 +114,15 @@ void Renderer::init()
 			.build(globalDescriptorSets[i]);
 	}
 
-	textureDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+	materialDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 	CORE_WARN("Loading Textures...")
-	loadTextures(*textureSetLayout);
+	loadTextures(*materialSetLayout);
 	CORE_WARN("Texture Load Finished!")
 
-	renderSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout(), textureSetLayout->getDescriptorSetLayout());
+	renderSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout(), materialSetLayout->getDescriptorSetLayout());
 	pointLightSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
 	wireframeSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
-	unlitSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout(), textureSetLayout->getDescriptorSetLayout());
+	unlitSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout(), materialSetLayout->getDescriptorSetLayout());
 	gridSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
 	spotLightSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
 	//shadowSystem.init(depthPass.renderPass, globalSetLayout->getDescriptorSetLayout());
@@ -260,11 +266,10 @@ void Renderer::recreateSwapChain()
 
 void Renderer::loadGameObjects()
 {
-	// Rework test
 	std::shared_ptr<Model> model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/teapot/downScaledPot.obj");
 	GameObject teapot = GameObject::createGameObject();
 	teapot.model = model;
-	teapot.setMaterial(0);
+	teapot.setMaterial(ShaderParameters{0});
 	teapot.transform.translation = {-0.5f, 0.0f, 0.0f};
 	teapot.transform.rotation = {0.0f, 0.0f, 0.0f};
 	teapot.transform.scale = {1.0f, 1.0f, 1.0f};
@@ -274,7 +279,7 @@ void Renderer::loadGameObjects()
 	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/smoothVase/smooth_vase.obj");
 	GameObject smoothVase = GameObject::createGameObject();
 	smoothVase.model = model;
-	smoothVase.setMaterial(1);
+	smoothVase.setMaterial(ShaderParameters{1});
 	smoothVase.transform.translation = { 0.5f, 0.0f, 0.0f };
 	smoothVase.transform.rotation = { 0.0f, 0.0f, 0.0f };
 	smoothVase.transform.scale = { 3.0f, 3.0f, 3.0f };
@@ -284,7 +289,7 @@ void Renderer::loadGameObjects()
 	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/quad/quad.obj");
 	GameObject floor = GameObject::createGameObject();
 	floor.model = model;
-	floor.setMaterial(0);
+	floor.setMaterial(ShaderParameters{0});
 	floor.transform.translation = { 0.0f, 0.0f, -0.3f };
 	floor.transform.rotation = { 0.0f, 0.0f, 0.0f };
 	floor.transform.scale = { 3.0f, 3.0f, 1.0f };
@@ -413,9 +418,10 @@ void Renderer::loadTextures(DescriptorSetLayout& layout)
 	imageInfo.imageView = stoneFloor.getTextureImageView();
 	imageInfo.sampler = stoneFloor.getTextureSampler();
 
-	for (uint32_t i = 0; i < textureDescriptorSets.size(); i++)
+	for (uint32_t i = 0; i < materialDescriptorSets.size(); i++)
 	{
-		DescriptorWriter(layout, *globalDescriptorPool).build(textureDescriptorSets[i]);
+		VkDescriptorBufferInfo bufferInfo = materialUboBuffers[i]->descriptorInfo();
+		DescriptorWriter(layout, *globalDescriptorPool).writeBuffer(5, &bufferInfo).build(materialDescriptorSets[i]);
 	}
 
 	uint32_t n = textures.size() / MAX_TEXTURE_BINDINGS;
@@ -442,9 +448,9 @@ void Renderer::loadTextures(DescriptorSetLayout& layout)
 			k++;
 		}
 		
-		for(uint32_t j = 0; j < textureDescriptorSets.size(); j++)
+		for(uint32_t j = 0; j < materialDescriptorSets.size(); j++)
 		{
-			DescriptorWriter(layout, *globalDescriptorPool).writeImageAtIndex(binding, textureIndex, &imageInfo).overwrite(textureDescriptorSets[j]);
+			DescriptorWriter(layout, *globalDescriptorPool).writeImageAtIndex(binding, textureIndex, &imageInfo).overwrite(materialDescriptorSets[j]);
 		}
 	}
 }
@@ -507,7 +513,7 @@ void Renderer::drawFrame(float dt)
 		{ 
 			frameIndex, currentFrametime, currentFramerate, dt, 
 			showGrid, renderMode, commandBuffer, mainCamera, 
-			globalDescriptorSets[frameIndex], textureDescriptorSets[frameIndex], gameObjects
+			globalDescriptorSets[frameIndex], materialDescriptorSets[frameIndex], gameObjects
 		};
 		
 		// update ubos

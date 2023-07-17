@@ -39,10 +39,12 @@ void RenderSystem::render(FrameInfo& frameInfo)
 		if (!obj.model)
 			continue;
 
+		ShaderParameters shaderParams = obj.materialComp->material.getShaderParameters();
+
 		SimplePushConstantData push{};
 		push.modelMatrix = obj.transform.getTransform();
 		push.normalMatrix = obj.transform.getNormalMatrix();
-		push.textureIndex = obj.material->textureIndex;
+		push.textureIndex = shaderParams.textureIndex;
 
 		vkCmdPushConstants(frameInfo.commandBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
 
