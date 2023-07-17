@@ -1,5 +1,7 @@
 #include "Material.h"
 
+#include "Buffer.h"
+
 Material::Material()
 {
 

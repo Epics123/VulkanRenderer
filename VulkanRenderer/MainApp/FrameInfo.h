@@ -27,7 +27,7 @@ struct GlobalUbo
 struct MaterialUbo
 {
 	glm::vec4 albedo;
-	float roughness;
+	alignas(16) float roughness;
 	float ambientOcclusion;
 };
 

@@ -1,5 +1,7 @@
 #pragma once
+
 #include "glm/glm.hpp"
+#include <memory>
 
 // Ubo for a given material
 struct ShaderParameters
@@ -25,5 +27,6 @@ public:
 
 private:
 	ShaderParameters shaderParams;
-
+	//TODO: Add a Buffer that can be bound per material: see https://developer.nvidia.com/vulkan-shader-resource-binding
+	std::unique_ptr<class Buffer> uniformBuffer;
 };

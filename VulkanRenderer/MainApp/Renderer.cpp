@@ -279,7 +279,7 @@ void Renderer::loadGameObjects()
 	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/smoothVase/smooth_vase.obj");
 	GameObject smoothVase = GameObject::createGameObject();
 	smoothVase.model = model;
-	smoothVase.setMaterial(ShaderParameters{1, glm::vec4(1.0f), 1.0f, 1.0f, 1});
+	smoothVase.setMaterial(ShaderParameters{1, glm::vec4(1.0f), 1.0f, 1.0f, 0});
 	smoothVase.transform.translation = { 0.5f, 0.0f, 0.0f };
 	smoothVase.transform.rotation = { 0.0f, 0.0f, 0.0f };
 	smoothVase.transform.scale = { 3.0f, 3.0f, 3.0f };
@@ -289,7 +289,7 @@ void Renderer::loadGameObjects()
 	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/quad/quad.obj");
 	GameObject floor = GameObject::createGameObject();
 	floor.model = model;
-	floor.setMaterial(ShaderParameters{0, glm::vec4(1.0f), 1.0f, 1.0f, 1});
+	floor.setMaterial(ShaderParameters{0, glm::vec4{0.2f, 0.1f, 1.0f, 1.0f}, 0.2f, 1.0f, 1});
 	floor.transform.translation = { 0.0f, 0.0f, -0.3f };
 	floor.transform.rotation = { 0.0f, 0.0f, 0.0f };
 	floor.transform.scale = { 3.0f, 3.0f, 1.0f };
