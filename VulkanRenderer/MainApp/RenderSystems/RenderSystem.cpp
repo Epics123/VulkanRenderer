@@ -22,14 +22,37 @@ void RenderSystem::init(VkRenderPass renderPass, VkDescriptorSetLayout globalSet
 	RenderSystemBase::init(renderPass, globalSetLayout, additionalLayout);
 }
 
+void RenderSystem::update(FrameInfo& frameInfo, Buffer* buffer)
+{
+	// TODO: Probably shouldn't iterate through every game object a second time but can't think of a better solution atm
+	for (auto& keyValue : frameInfo.gameObjects)
+	{
+		GameObject& obj = keyValue.second;
+
+		if (!obj.model)
+			continue;
+
+		ShaderParameters shaderParams = obj.materialComp->material.getShaderParameters();
+
+		MaterialUbo ubo{};
+		ubo.albedo = shaderParams.albedo;
+		ubo.ambientOcclusion = shaderParams.ambientOcclusion;
+		ubo.roughness = shaderParams.roughness;
+		ubo.toggleTexture = shaderParams.toggleTexture;
+
+		buffer->writeToBuffer(&ubo);
+		buffer->flush();
+	}
+}
+
 void RenderSystem::render(FrameInfo& frameInfo)
 {
 	pipeline->bind(frameInfo.commandBuffer);
 
 	vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &frameInfo.globalDescriptorSet, 0, nullptr);
-	if (frameInfo.textureDescriptorSet)
+	if (frameInfo.materialDescriptorSet)
 	{
-		vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, &frameInfo.textureDescriptorSet, 0, nullptr);
+		vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, &frameInfo.materialDescriptorSet, 0, nullptr);
 	}
 
 	for (auto& keyValue : frameInfo.gameObjects)

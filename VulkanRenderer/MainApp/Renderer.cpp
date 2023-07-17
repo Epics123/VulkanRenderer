@@ -67,7 +67,7 @@ void Renderer::init()
 	globalDescriptorPool =
 		DescriptorPool::Builder(mDevice)
 		.setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT * 2)
-		.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
+		.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT * 2)
 		.addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 6)
 		.build();
 
@@ -525,6 +525,8 @@ void Renderer::drawFrame(float dt)
 		spotLightSystem.update(frameInfo, ubo);
 		uboBuffers[frameIndex]->writeToBuffer(&ubo);
 		uboBuffers[frameIndex]->flush();
+
+		renderSystem.update(frameInfo, materialUboBuffers[frameIndex].get());
 
 		// render
 		beginSwapChainRenderPass(commandBuffer);

@@ -42,6 +42,14 @@ layout (set = 0, binding = 0) uniform GlobalUbo
 	int numSpotLights;
 } ubo;
 
+layout (set = 1, binding = 5) uniform MaterialUbo
+{
+	vec4 albedo;
+	float roughness;
+	float ambientOcclusion;
+	uint toggleTexture;
+} matUbo;
+
 layout (push_constant) uniform Push
 { 
 	mat4 modelMatrix;

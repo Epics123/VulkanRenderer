@@ -17,6 +17,7 @@ public:
 	RenderSystemBase& operator=(const RenderSystemBase&) = delete;
 
 	virtual void init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout additionalLayout = VK_NULL_HANDLE);
+	virtual void update(FrameInfo& frameInfo, Buffer* buffer);
 	virtual void render(FrameInfo& frameInfo) = 0;
 	virtual void cleanup();
 

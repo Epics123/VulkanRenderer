@@ -23,6 +23,7 @@ public:
 	~RenderSystem();
 
 	virtual void init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout additionalLayout = VK_NULL_HANDLE) override;
+	virtual void update(FrameInfo& frameInfo, Buffer* buffer) override;
 	virtual void render(FrameInfo& frameInfo) override;
 
 protected:

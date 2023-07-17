@@ -14,6 +14,11 @@ void RenderSystemBase::init(VkRenderPass renderPass, VkDescriptorSetLayout globa
 	createPipeline(renderPass);
 }
 
+void RenderSystemBase::update(FrameInfo& frameInfo, Buffer* buffer)
+{
+
+}
+
 void RenderSystemBase::cleanup()
 {
 	vkDestroyPipelineLayout(device.getDevice(), pipelineLayout, nullptr);

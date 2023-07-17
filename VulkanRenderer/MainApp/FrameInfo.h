@@ -43,6 +43,6 @@ struct FrameInfo
 	VkCommandBuffer commandBuffer;
 	Camera& camera;
 	VkDescriptorSet globalDescriptorSet;
-	VkDescriptorSet textureDescriptorSet;
+	VkDescriptorSet materialDescriptorSet;
 	GameObject::Map &gameObjects;
 };
