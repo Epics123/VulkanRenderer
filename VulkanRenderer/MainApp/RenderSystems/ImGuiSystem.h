@@ -37,6 +37,8 @@ public:
 	void drawShowGridText(FrameInfo& frameInfo);
 	void drawGizmos(FrameInfo& frameInfo);
 
+	void drawMaterialEditor(GameObject& obj);
+
 	GameObject& getSelectedObject(FrameInfo& frameInfo);
 
 	void setViewportInfo(float x, float y, float width, float height);

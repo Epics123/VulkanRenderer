@@ -10,6 +10,7 @@
 #include "../Pipeline.h"
 #include "../Camera.h"
 #include "../Utils.h"
+#include "../Material.h"
 
 #include <iostream>
 
@@ -34,6 +35,7 @@ void ImGuiSystem::drawImGui(FrameInfo& frameInfo)
 	ImGui::NewFrame();
 
 	//drawViewport();
+	//ImGui::ShowDemoWindow();
 
 	ImGuiIO& io = ImGui::GetIO();
 	frameInfo.camera.canScroll = !io.WantCaptureMouse;
@@ -57,6 +59,7 @@ void ImGuiSystem::drawImGui(FrameInfo& frameInfo)
 	drawSceneInfo(frameInfo);
 
 	//drawGizmos(frameInfo);
+	//ImGui::Image(frameInfo.tex.getDescriptorSet(), ImVec2(150.0f, 150.0f));
 
 	ImGui::End();
 	ImGui::Render();
@@ -130,6 +133,8 @@ void ImGuiSystem::drawSceneInfo(FrameInfo& frameInfo)
 				DrawVec3Control("Rotation", obj.transform.rotation, 0.0f, 120.0f, true);
 				DrawVec3Control("Scale", obj.transform.scale, 1.0f, 120.0f);
 
+				drawMaterialEditor(obj);
+
 				if (obj.pointLight)
 				{
 					DrawFloatControl("Intensity", obj.pointLight->intensity, 1.0f, 120.0f, 0.0f, 20.0f, true);
@@ -184,6 +189,56 @@ void ImGuiSystem::drawGizmos(FrameInfo& frameInfo)
 		glm::mat4 transform = selectedObject.transform.getTransform();
 
 		ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection), ImGuizmo::OPERATION::TRANSLATE, IMGUIZMO_NAMESPACE::LOCAL, glm::value_ptr(transform));
+	}
+}
+
+void ImGuiSystem::drawMaterialEditor(GameObject& obj)
+{
+	if (obj.model)
+	{
+		if (ImGui::Button("Edit Material"))
+		{
+			ImGui::OpenPopup("Material Editor");
+		}
+		if (ImGui::BeginPopupModal("Material Editor", NULL, ImGuiWindowFlags_MenuBar))
+		{
+			if (ImGui::BeginMenuBar())
+			{
+				if (ImGui::BeginMenu("File"))
+				{
+					if (ImGui::MenuItem("Some menu item"))
+					{
+					}
+					ImGui::EndMenu();
+				}
+				ImGui::EndMenuBar();
+			}
+			ImGui::GetStyle().Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
+
+			if(obj.materialComp)
+			{
+				ShaderParameters shaderParams = obj.materialComp->material.getShaderParameters();
+
+				glm::vec3 albedo = (glm::vec3)shaderParams.albedo;
+				DrawColor3Control("Albedo", albedo, 0.0f, 120.0f);
+				shaderParams.albedo = glm::vec4(albedo, 1.0f);
+
+				float roughness = shaderParams.roughness;
+				DrawFloatControl("Roughness", roughness, 1.0f, 120.0f, 0.01f, 1.0f, true);
+				shaderParams.roughness = roughness;
+
+				float ambientOcclusion = shaderParams.ambientOcclusion;
+				DrawFloatControl("Ambient Occlusion", ambientOcclusion, 1.0f, 120.0f, 0.0f, 1.0f, true);
+				shaderParams.ambientOcclusion = ambientOcclusion;
+
+				obj.materialComp->material.setShaderParameters(shaderParams);
+			}
+			
+
+			if (ImGui::Button("Close"))
+				ImGui::CloseCurrentPopup();
+			ImGui::EndPopup();
+		}
 	}
 }
 

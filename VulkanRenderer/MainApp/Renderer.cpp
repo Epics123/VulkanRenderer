@@ -117,9 +117,6 @@ void Renderer::init()
 	}
 
 	materialDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
-	CORE_WARN("Loading Textures...")
-	loadTextures(*materialSetLayout);
-	CORE_WARN("Texture Load Finished!")
 
 	renderSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout(), materialSetLayout->getDescriptorSetLayout());
 	pointLightSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
@@ -131,6 +128,12 @@ void Renderer::init()
 
 	createCommandBuffers();
 
+	imguiInit();
+
+	CORE_WARN("Loading Textures...")
+	loadTextures(*materialSetLayout);
+	CORE_WARN("Texture Load Finished!")
+
 	CORE_WARN("Loading Game Objects...")
 	loadGameObjects();
 	CORE_WARN("Game Object Load Complete!")
@@ -138,8 +141,6 @@ void Renderer::init()
 	mainCamera = Camera();
 	mainCamera.updateModel(0.0f);
 	mainCamera.setPerspectiveProjection(mainCamera.fov, mSwapChain->extentAspectRatio(), 0.1f, 50.0f);
-
-	imguiInit();
 }
 
 void Renderer::imguiInit()
@@ -281,7 +282,7 @@ void Renderer::loadGameObjects()
 	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/smoothVase/smooth_vase.obj");
 	GameObject smoothVase = GameObject::createGameObject();
 	smoothVase.model = model;
-	smoothVase.setMaterial(ShaderParameters{1, 0, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), 0.5f, 1.0f});
+	smoothVase.setMaterial(ShaderParameters{ 1, 0, glm::vec4(0.0f, 0.1f, 1.0f, 1.0f), 0.2f, 0.5f });
 	smoothVase.transform.translation = { 0.5f, 0.0f, 0.0f };
 	smoothVase.transform.rotation = { 0.0f, 0.0f, 0.0f };
 	smoothVase.transform.scale = { 3.0f, 3.0f, 3.0f };
@@ -291,8 +292,7 @@ void Renderer::loadGameObjects()
 	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/quad/quad.obj");
 	GameObject floor = GameObject::createGameObject();
 	floor.model = model;
-	//floor.setMaterial(ShaderParameters{0, 1});
-	floor.setMaterial(ShaderParameters{ 1, 0, glm::vec4(0.0f, 0.2f, 1.0f, 1.0f), 0.2f, 0.5f });
+	floor.setMaterial(ShaderParameters{0, 1});
 	floor.transform.translation = { 0.0f, 0.0f, -0.3f };
 	floor.transform.rotation = { 0.0f, 0.0f, 0.0f };
 	floor.transform.scale = { 3.0f, 3.0f, 1.0f };
@@ -332,8 +332,6 @@ void Renderer::loadGameObjects()
 
 void Renderer::loadTextures(DescriptorSetLayout& layout)
 {
-	std::vector<Texture> textures;
-
 	Texture bricks;
 	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png", bricks);
 	bricks.createTextureImageView(mDevice);
@@ -516,7 +514,8 @@ void Renderer::drawFrame(float dt)
 		{ 
 			frameIndex, currentFrametime, currentFramerate, dt, 
 			showGrid, renderMode, commandBuffer, mainCamera, 
-			globalDescriptorSets[frameIndex], materialDescriptorSets[frameIndex], gameObjects
+			globalDescriptorSets[frameIndex], materialDescriptorSets[frameIndex], gameObjects,
+			0, 0, textures[0]
 		};
 
 		frameInfo.numObjs = TOTAL_OBJECTS;

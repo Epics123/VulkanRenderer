@@ -19,6 +19,8 @@ public:
 
 	void setTextureFormat(VkFormat format) { textureFormat = format; }
 
+	VkDescriptorSet getDescriptorSet() { return descriptorSet; }
+
 	void cleanup(Device& device);
 
 	std::string& getNameInternal() { return nameInternal; }
@@ -30,6 +32,8 @@ private:
 	VkImageView textureImageView;
 	VkSampler textureSampler;
 	VkFormat textureFormat = VK_FORMAT_R8G8B8A8_SRGB;
+
+	VkDescriptorSet descriptorSet;
 
 	uint32_t id;
 	uint32_t mipLevel = 0;

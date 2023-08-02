@@ -41,7 +41,7 @@ public:
 	static Renderer* rendererInstance;
 
 	static Renderer* initInstance(Window* window);
-
+	static Renderer* getInstance(){ return rendererInstance; }
 	static void cleanupInstance();
 
 	Renderer() = delete;
@@ -168,6 +168,7 @@ private:
 	VkImageView depthImageView;
 
 	std::unordered_map<std::string, Texture> loadedTextures;
+	std::vector<Texture> textures;
 	size_t minUboAlignment;
 	const uint32_t MAX_TEXTURE_BINDINGS = 2;
 	const uint32_t TOTAL_OBJECTS = 3; // TODO: should eventually get the # of objs dynamically

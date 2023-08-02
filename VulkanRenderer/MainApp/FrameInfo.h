@@ -4,6 +4,7 @@
 #include "GameObject.h"
 #include "Enums.h"
 #include "Light.h"
+#include "Texture.h"
 
 #include <vulkan/vulkan.h>
 
@@ -46,4 +47,5 @@ struct FrameInfo
 	GameObject::Map &gameObjects;
 	VkDeviceSize dynamicOffset;
 	uint32_t numObjs;
+	Texture& tex;
 };

@@ -1,5 +1,8 @@
 #include "Texture.h"
 
+#include "imgui_impl_vulkan.h"
+#include "imgui_internal.h"
+
 #include <stb_image.h>
 #include <iostream>
 #include <stdexcept>
@@ -72,6 +75,8 @@ void Texture::createTextureSampler(Device& device)
 	{
 		throw std::runtime_error("Failed to create texture sampler");
 	}
+
+	descriptorSet = ImGui_ImplVulkan_AddTexture(textureSampler, textureImageView, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 void Texture::cleanup(Device& device)
