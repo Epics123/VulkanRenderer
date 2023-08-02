@@ -18,4 +18,4 @@ private:
 #define CORE_INFO(...)  ::Log::getCoreLogger()->info(__VA_ARGS__);
 #define CORE_WARN(...)  ::Log::getCoreLogger()->warn(__VA_ARGS__);
 #define CORE_ERROR(...) ::Log::getCoreLogger()->error(__VA_ARGS__);
-#define CORE_FATAL(...) ::Log::getCoreLogger()->fatal(__VA_ARGS__);
+#define CORE_CRITICAL(...) ::Log::getCoreLogger()->critical(__VA_ARGS__);

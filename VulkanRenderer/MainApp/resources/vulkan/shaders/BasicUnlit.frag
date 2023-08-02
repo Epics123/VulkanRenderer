@@ -12,11 +12,22 @@ layout (push_constant) uniform Push
 	mat4 modelMatrix;
 	mat4 normalMatrix;
 	uint textureIndex;
+	uint toggleTexture;
 }push;
 
 layout(set = 1, binding = 0) uniform sampler2D texSampler[];
 
+layout (set = 1, binding = 5) uniform MaterialUbo
+{
+	vec4 albedo;
+	float roughness;
+	float ambientOcclusion;
+} matUbo;
+
 void main()
 {
-	outColor = vec4(fragColor * texture(texSampler[push.textureIndex], texCoord).rgb, 1.0);
+	if(push.toggleTexture == 1)
+		outColor = vec4(fragColor * texture(texSampler[push.textureIndex], texCoord).rgb, 1.0);
+	else
+		outColor = matUbo.albedo;
 }

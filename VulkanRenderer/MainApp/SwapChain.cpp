@@ -97,6 +97,7 @@ VkResult SwapChain::submitCommandBuffers(
     if (vkQueueSubmit(device.graphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]) !=
         VK_SUCCESS)
     {
+        CORE_CRITICAL("Failed to submit draw command buffer!")
         throw std::runtime_error("failed to submit draw command buffer!");
     }
 

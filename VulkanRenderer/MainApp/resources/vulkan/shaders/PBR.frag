@@ -40,19 +40,19 @@ layout (set = 0, binding = 0) uniform GlobalUbo
 	int numSpotLights;
 } ubo;
 
-layout (set = 1, binding = 5) uniform MaterialUbo
-{
-	vec4 albedo;
-	float roughness;
-	float ambientOcclusion;
-} matUbo;
-
 //TODO: Add metalic map
 layout(set = 1, binding = 0) uniform sampler2D diffuseMap[];
 layout(set = 1, binding = 1) uniform sampler2D normalMap[];
 layout(set = 1, binding = 2) uniform sampler2D roughnessMap[];
 layout(set = 1, binding = 3) uniform sampler2D aoMap[];
 layout(set = 1, binding = 4) uniform sampler2D heightMap[];
+
+layout (set = 1, binding = 5) uniform MaterialUbo
+{
+	vec4 albedo;
+	float roughness;
+	float ambientOcclusion;
+} matUbo;
 
 layout (push_constant) uniform Push
 { 

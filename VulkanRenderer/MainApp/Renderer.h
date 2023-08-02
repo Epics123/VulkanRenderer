@@ -168,7 +168,9 @@ private:
 	VkImageView depthImageView;
 
 	std::unordered_map<std::string, Texture> loadedTextures;
+	size_t minUboAlignment;
 	const uint32_t MAX_TEXTURE_BINDINGS = 2;
+	const uint32_t TOTAL_OBJECTS = 3; // TODO: should eventually get the # of objs dynamically
 };
 
 #endif // !RENDERER_H

@@ -44,4 +44,6 @@ struct FrameInfo
 	VkDescriptorSet globalDescriptorSet;
 	VkDescriptorSet materialDescriptorSet;
 	GameObject::Map &gameObjects;
+	VkDeviceSize dynamicOffset;
+	uint32_t numObjs;
 };

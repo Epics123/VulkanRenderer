@@ -33,4 +33,7 @@ protected:
 
 public:
 	std::vector<VkDescriptorSet> textureDescriptorSets;
+
+private:
+	uint32_t dynamicOffset;
 };

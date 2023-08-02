@@ -24,6 +24,7 @@ void RenderSystem::init(VkRenderPass renderPass, VkDescriptorSetLayout globalSet
 
 void RenderSystem::update(FrameInfo& frameInfo, Buffer* buffer)
 {
+	uint32_t i = 0;
 	// TODO: Probably shouldn't iterate through every game object a second time but can't think of a better solution atm
 	for (auto& keyValue : frameInfo.gameObjects)
 	{
@@ -39,8 +40,10 @@ void RenderSystem::update(FrameInfo& frameInfo, Buffer* buffer)
 		ubo.ambientOcclusion = shaderParams.ambientOcclusion;
 		ubo.roughness = shaderParams.roughness;
 
-		buffer->writeToBuffer(&ubo);
-		buffer->flush();
+		VkDeviceSize dynamicOffset = static_cast<VkDeviceSize>(i) * frameInfo.dynamicOffset;
+		buffer->writeToBuffer(&ubo, buffer->getAlignmentSize(), dynamicOffset);
+		buffer->flush(buffer->getBufferSize());
+		i++;
 	}
 }
 
@@ -49,11 +52,8 @@ void RenderSystem::render(FrameInfo& frameInfo)
 	pipeline->bind(frameInfo.commandBuffer);
 
 	vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &frameInfo.globalDescriptorSet, 0, nullptr);
-	if (frameInfo.materialDescriptorSet)
-	{
-		vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, &frameInfo.materialDescriptorSet, 0, nullptr);
-	}
-
+	
+	uint32_t i = 0;
 	for (auto& keyValue : frameInfo.gameObjects)
 	{
 		GameObject& obj = keyValue.second;
@@ -71,8 +71,16 @@ void RenderSystem::render(FrameInfo& frameInfo)
 
 		vkCmdPushConstants(frameInfo.commandBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
 
+		if (frameInfo.materialDescriptorSet)
+		{
+			uint32_t dynamicOffset = static_cast<uint32_t>(i * frameInfo.dynamicOffset);
+			vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, &frameInfo.materialDescriptorSet, 1, &dynamicOffset);
+		}
+
 		obj.model->bind(frameInfo.commandBuffer);
 		obj.model->draw(frameInfo.commandBuffer);
+
+		i++;
 	}
 }
 

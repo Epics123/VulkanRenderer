@@ -67,8 +67,9 @@ void Renderer::init()
 	globalDescriptorPool =
 		DescriptorPool::Builder(mDevice)
 		.setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT * 2)
-		.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT * 2)
+		.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
 		.addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 6)
+		.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, SwapChain::MAX_FRAMES_IN_FLIGHT)
 		.build();
 
 	imguiDescriptorPool =
@@ -85,10 +86,11 @@ void Renderer::init()
 		uboBuffers[i]->map();
 	}
 	materialUboBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+	minUboAlignment = mDevice.properties.limits.minUniformBufferOffsetAlignment;
 	for(size_t i = 0; i < materialUboBuffers.size(); i++)
 	{
-		materialUboBuffers[i] = std::make_unique<Buffer>(mDevice, sizeof(MaterialUbo), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-		materialUboBuffers[i]->map();
+		materialUboBuffers[i] = std::make_unique<Buffer>(mDevice, sizeof(MaterialUbo), TOTAL_OBJECTS, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, minUboAlignment);
+		materialUboBuffers[i]->map(materialUboBuffers[i]->getBufferSize());
 	}
 
 	// highest set common to all shaders
@@ -102,7 +104,7 @@ void Renderer::init()
 															.addBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
 															.addBinding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
 															.addBinding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
-															.addBinding(5, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS) // per material ubo
+															.addBinding(5, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, VK_SHADER_STAGE_ALL_GRAPHICS) // per material ubo
 															.build();
 
 	globalDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -269,7 +271,7 @@ void Renderer::loadGameObjects()
 	std::shared_ptr<Model> model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/teapot/downScaledPot.obj");
 	GameObject teapot = GameObject::createGameObject();
 	teapot.model = model;
-	teapot.setMaterial(ShaderParameters{0, glm::vec4{0.2f, 0.1f, 1.0f, 1.0f}, 0.5f, 1.0f, 1});
+	teapot.setMaterial(ShaderParameters{0, 1});
 	teapot.transform.translation = {-0.5f, 0.0f, 0.0f};
 	teapot.transform.rotation = {0.0f, 0.0f, 0.0f};
 	teapot.transform.scale = {1.0f, 1.0f, 1.0f};
@@ -279,7 +281,7 @@ void Renderer::loadGameObjects()
 	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/smoothVase/smooth_vase.obj");
 	GameObject smoothVase = GameObject::createGameObject();
 	smoothVase.model = model;
-	smoothVase.setMaterial(ShaderParameters{1, glm::vec4(1.0f), 1.0f, 1.0f, 0});
+	smoothVase.setMaterial(ShaderParameters{1, 0, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), 0.5f, 1.0f});
 	smoothVase.transform.translation = { 0.5f, 0.0f, 0.0f };
 	smoothVase.transform.rotation = { 0.0f, 0.0f, 0.0f };
 	smoothVase.transform.scale = { 3.0f, 3.0f, 3.0f };
@@ -289,7 +291,8 @@ void Renderer::loadGameObjects()
 	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/quad/quad.obj");
 	GameObject floor = GameObject::createGameObject();
 	floor.model = model;
-	floor.setMaterial(ShaderParameters{0, glm::vec4{0.2f, 0.1f, 1.0f, 1.0f}, 0.2f, 1.0f, 1});
+	//floor.setMaterial(ShaderParameters{0, 1});
+	floor.setMaterial(ShaderParameters{ 1, 0, glm::vec4(0.0f, 0.2f, 1.0f, 1.0f), 0.2f, 0.5f });
 	floor.transform.translation = { 0.0f, 0.0f, -0.3f };
 	floor.transform.rotation = { 0.0f, 0.0f, 0.0f };
 	floor.transform.scale = { 3.0f, 3.0f, 1.0f };
@@ -420,7 +423,7 @@ void Renderer::loadTextures(DescriptorSetLayout& layout)
 
 	for (uint32_t i = 0; i < materialDescriptorSets.size(); i++)
 	{
-		VkDescriptorBufferInfo bufferInfo = materialUboBuffers[i]->descriptorInfo();
+		VkDescriptorBufferInfo bufferInfo = materialUboBuffers[i]->descriptorInfo(materialUboBuffers[i]->getAlignmentSize());
 		DescriptorWriter(layout, *globalDescriptorPool).writeBuffer(5, &bufferInfo).build(materialDescriptorSets[i]);
 	}
 
@@ -515,6 +518,9 @@ void Renderer::drawFrame(float dt)
 			showGrid, renderMode, commandBuffer, mainCamera, 
 			globalDescriptorSets[frameIndex], materialDescriptorSets[frameIndex], gameObjects
 		};
+
+		frameInfo.numObjs = TOTAL_OBJECTS;
+		frameInfo.dynamicOffset = materialUboBuffers[frameIndex]->getAlignmentSize();
 		
 		// update ubos
 		GlobalUbo ubo{};
@@ -526,8 +532,6 @@ void Renderer::drawFrame(float dt)
 		uboBuffers[frameIndex]->writeToBuffer(&ubo);
 		uboBuffers[frameIndex]->flush();
 
-		renderSystem.update(frameInfo, materialUboBuffers[frameIndex].get());
-
 		// render
 		beginSwapChainRenderPass(commandBuffer);
 		mainCamera.updateModel(dt);
@@ -536,6 +540,7 @@ void Renderer::drawFrame(float dt)
 		{
 		case DEFAULT_LIT:
 			// order matters for transparency
+			renderSystem.update(frameInfo, materialUboBuffers[frameIndex].get());
 			renderSystem.render(frameInfo);
 			pointLightSystem.render(frameInfo, ubo);
 			spotLightSystem.render(frameInfo, ubo);
@@ -544,6 +549,7 @@ void Renderer::drawFrame(float dt)
 			wireframeSystem.render(frameInfo);
 			break;
 		case UNLIT:
+			unlitSystem.update(frameInfo, materialUboBuffers[frameIndex].get());
 			unlitSystem.render(frameInfo);
 			break;
 		default:
