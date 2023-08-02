@@ -243,7 +243,7 @@ void main()
 		H = normalize(V + L);
 		Lo += calculateLighting(V, N, L, H, albedo, pointLight.color);
 	}
-
+	vec3 ambient = vec3(0.03) * albedo * ao;
 	// spot lights
 	for(int j = 0; j < ubo.numSpotLights; j++)
 	{
@@ -262,9 +262,11 @@ void main()
 
 			Lo += calculateLighting(V, N, L, H, albedo, spotLight.color);
 		}
+		else
+			Lo += ambient;
 	}
 
-	vec3 ambient = vec3(0.03) * albedo * ao;
+	
 	vec3 color = ambient + Lo;
 
 	outColor = vec4(color, 1.0);

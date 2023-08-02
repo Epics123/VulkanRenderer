@@ -85,11 +85,16 @@ void Renderer::init()
 		uboBuffers[i] = std::make_unique<Buffer>(mDevice, sizeof(GlobalUbo), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		uboBuffers[i]->map();
 	}
+
+	CORE_WARN("Loading Game Objects...")
+	loadGameObjects();
+	CORE_WARN("Game Object Load Complete!")
+
 	materialUboBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 	minUboAlignment = mDevice.properties.limits.minUniformBufferOffsetAlignment;
 	for(size_t i = 0; i < materialUboBuffers.size(); i++)
 	{
-		materialUboBuffers[i] = std::make_unique<Buffer>(mDevice, sizeof(MaterialUbo), TOTAL_OBJECTS, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, minUboAlignment);
+		materialUboBuffers[i] = std::make_unique<Buffer>(mDevice, sizeof(MaterialUbo), totalObjects, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, minUboAlignment);
 		materialUboBuffers[i]->map(materialUboBuffers[i]->getBufferSize());
 	}
 
@@ -133,10 +138,6 @@ void Renderer::init()
 	CORE_WARN("Loading Textures...")
 	loadTextures(*materialSetLayout);
 	CORE_WARN("Texture Load Finished!")
-
-	CORE_WARN("Loading Game Objects...")
-	loadGameObjects();
-	CORE_WARN("Game Object Load Complete!")
 
 	mainCamera = Camera();
 	mainCamera.updateModel(0.0f);
@@ -289,6 +290,26 @@ void Renderer::loadGameObjects()
 	smoothVase.setObjectName("SmoothVase");
 	gameObjects.emplace(smoothVase.getID(), std::move(smoothVase));
 
+	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/cube/cube.obj");
+	GameObject cube = GameObject::createGameObject();
+	cube.model = model;
+	cube.setMaterial(ShaderParameters{ 1, 0, glm::vec4(1.0f, 0.8f, 0.0f, 1.0f), 1.0f, 0.5f });
+	cube.transform.translation = { 0.5f, 1.4f, 0.0f };
+	cube.transform.rotation = { 0.0f, 0.0f, 0.0f };
+	cube.transform.scale = { 0.5f, 0.5f, 0.5f };
+	cube.setObjectName("Cube");
+	gameObjects.emplace(cube.getID(), std::move(cube));
+
+	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/sphere/sphere.obj");
+	GameObject sphere = GameObject::createGameObject();
+	sphere.model = model;
+	sphere.setMaterial(ShaderParameters{ 1, 1 });
+	sphere.transform.translation = { 2.5f, 0.0f, 0.0f };
+	sphere.transform.rotation = { 0.0f, 0.0f, 0.0f };
+	sphere.transform.scale = { 1.0f, 1.0f, 1.0f };
+	sphere.setObjectName("Sphere");
+	gameObjects.emplace(sphere.getID(), std::move(sphere));
+
 	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/quad/quad.obj");
 	GameObject floor = GameObject::createGameObject();
 	floor.model = model;
@@ -298,6 +319,17 @@ void Renderer::loadGameObjects()
 	floor.transform.scale = { 3.0f, 3.0f, 1.0f };
 	floor.setObjectName("Floor");
 	gameObjects.emplace(floor.getID(), std::move(floor));
+
+	GameObject floor2 = GameObject::createGameObject();
+	floor2.model = model;
+	floor2.setMaterial(ShaderParameters{ 1, 1 });
+	floor2.transform.translation = { 1.5f, 0.0f, -0.3f };
+	floor2.transform.rotation = { 0.0f, 0.0f, 0.0f };
+	floor2.transform.scale = { 3.0f, 3.0f, 1.0f };
+	floor2.setObjectName("Floor2");
+	gameObjects.emplace(floor2.getID(), std::move(floor2));
+
+	totalObjects = static_cast<uint32_t>(gameObjects.size());
 
 	std::vector<glm::vec3> lightColors{
 	 {1.f, .1f, .1f},
@@ -319,13 +351,13 @@ void Renderer::loadGameObjects()
 		gameObjects.emplace(pointLight.getID(), std::move(pointLight));
 	}
 
-	GameObject spotLight = GameObject::makeSpotLight(10.0f, 15.0f, glm::vec3(0.1f, 1.0f, 0.1f));
-	spotLight.transform.translation = {2.0f, -2.0f, 1.0f};
+	GameObject spotLight = GameObject::makeSpotLight(20.0f, 45.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+	spotLight.transform.translation = {5.7f, 0.0f, 1.5f};
 	spotLight.setObjectName("SpotLight");
 	gameObjects.emplace(spotLight.getID(), std::move(spotLight));
 
 	spotLight = GameObject::makeSpotLight(10.0f, 25.0f, glm::vec3(1.0f, 1.0f, 0.0f));
-	spotLight.transform.translation = { -2.0f, -2.0f, 1.0f };
+	spotLight.transform.translation = { 8.1f, 2.1f, 1.0f };
 	spotLight.setObjectName("SpotLight2");
 	gameObjects.emplace(spotLight.getID(), std::move(spotLight));
 }
@@ -518,7 +550,7 @@ void Renderer::drawFrame(float dt)
 			0, 0, textures[0]
 		};
 
-		frameInfo.numObjs = TOTAL_OBJECTS;
+		frameInfo.numObjs = totalObjects;
 		frameInfo.dynamicOffset = materialUboBuffers[frameIndex]->getAlignmentSize();
 		
 		// update ubos
