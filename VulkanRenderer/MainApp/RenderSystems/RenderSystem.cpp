@@ -39,6 +39,7 @@ void RenderSystem::update(FrameInfo& frameInfo, Buffer* buffer)
 		ubo.albedo = shaderParams.albedo;
 		ubo.ambientOcclusion = shaderParams.ambientOcclusion;
 		ubo.roughness = shaderParams.roughness;
+		ubo.metalic = shaderParams.metallic;
 
 		VkDeviceSize dynamicOffset = static_cast<VkDeviceSize>(i) * frameInfo.dynamicOffset;
 		buffer->writeToBuffer(&ubo, buffer->getAlignmentSize(), dynamicOffset);

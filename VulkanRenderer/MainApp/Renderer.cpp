@@ -109,7 +109,8 @@ void Renderer::init()
 															.addBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
 															.addBinding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
 															.addBinding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
-															.addBinding(5, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, VK_SHADER_STAGE_ALL_GRAPHICS) // per material ubo
+															.addBinding(5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
+															.addBinding(6, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, VK_SHADER_STAGE_ALL_GRAPHICS) // per material ubo
 															.build();
 
 	globalDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -273,9 +274,9 @@ void Renderer::loadGameObjects()
 	std::shared_ptr<Model> model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/teapot/downScaledPot.obj");
 	GameObject teapot = GameObject::createGameObject();
 	teapot.model = model;
-	teapot.setMaterial(ShaderParameters{0, 1});
+	teapot.setMaterial(ShaderParameters{1, 1});
 	teapot.transform.translation = {-0.5f, 0.0f, 0.0f};
-	teapot.transform.rotation = {0.0f, 0.0f, 0.0f};
+	teapot.transform.rotation = {0.0f, 0.0f, 90.0f};
 	teapot.transform.scale = {1.0f, 1.0f, 1.0f};
 	teapot.setObjectName("Teapot");
 	gameObjects.emplace(teapot.getID(), std::move(teapot));
@@ -290,25 +291,24 @@ void Renderer::loadGameObjects()
 	smoothVase.setObjectName("SmoothVase");
 	gameObjects.emplace(smoothVase.getID(), std::move(smoothVase));
 
-	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/cube/cube.obj");
-	GameObject cube = GameObject::createGameObject();
-	cube.model = model;
-	cube.setMaterial(ShaderParameters{ 1, 0, glm::vec4(1.0f, 0.8f, 0.0f, 1.0f), 1.0f, 0.5f });
-	cube.transform.translation = { 0.5f, 1.4f, 0.0f };
-	cube.transform.rotation = { 0.0f, 0.0f, 0.0f };
-	cube.transform.scale = { 0.5f, 0.5f, 0.5f };
-	cube.setObjectName("Cube");
-	gameObjects.emplace(cube.getID(), std::move(cube));
-
 	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/sphere/sphere.obj");
 	GameObject sphere = GameObject::createGameObject();
 	sphere.model = model;
-	sphere.setMaterial(ShaderParameters{ 1, 1 });
-	sphere.transform.translation = { 2.5f, 0.0f, 0.0f };
+	sphere.setMaterial(ShaderParameters{ 1, 0, glm::vec4(1.0f, 0.8f, 0.0f, 1.0f), 0.6f, 0.0f, 1.0f });
+	sphere.transform.translation = { 0.5f, 1.4f, 0.0f };
 	sphere.transform.rotation = { 0.0f, 0.0f, 0.0f };
 	sphere.transform.scale = { 1.0f, 1.0f, 1.0f };
 	sphere.setObjectName("Sphere");
 	gameObjects.emplace(sphere.getID(), std::move(sphere));
+	
+	GameObject sphere2 = GameObject::createGameObject();
+	sphere2.model = model;
+	sphere2.setMaterial(ShaderParameters{ 1, 1 });
+	sphere2.transform.translation = { 2.5f, 0.0f, 0.0f };
+	sphere2.transform.rotation = { 0.0f, 0.0f, 0.0f };
+	sphere2.transform.scale = { 1.0f, 1.0f, 1.0f };
+	sphere2.setObjectName("Sphere2");
+	gameObjects.emplace(sphere2.getID(), std::move(sphere2));
 
 	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/quad/quad.obj");
 	GameObject floor = GameObject::createGameObject();
@@ -405,7 +405,15 @@ void Renderer::loadTextures(DescriptorSetLayout& layout)
 	loadedTextures["bricks_height"] = bricksHeight;
 	textures.push_back(bricksHeight);
 
-	Texture stoneFloor;
+	Texture bricksMetallic;
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_metallic.png", bricksMetallic);
+	bricksMetallic.createTextureImageView(mDevice);
+	bricksMetallic.createTextureSampler(mDevice);
+	bricksMetallic.setNameInternal("bricks_metallic");
+	loadedTextures["bricks_metallic"] = bricksMetallic;
+	textures.push_back(bricksMetallic);
+
+	/*Texture stoneFloor;
 	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_color_1k.jpg", stoneFloor);
 	stoneFloor.createTextureImageView(mDevice);
 	stoneFloor.createTextureSampler(mDevice);
@@ -446,15 +454,67 @@ void Renderer::loadTextures(DescriptorSetLayout& layout)
 	loadedTextures["stoneFloor_height"] = stoneFloorHeight;
 	textures.push_back(stoneFloorHeight);
 
-	VkDescriptorImageInfo imageInfo{};
-	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-	imageInfo.imageView = stoneFloor.getTextureImageView();
-	imageInfo.sampler = stoneFloor.getTextureSampler();
+	Texture stoneFloorMetallic;
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_metallic_1k.png", stoneFloorMetallic);
+	stoneFloorMetallic.createTextureImageView(mDevice);
+	stoneFloorMetallic.createTextureSampler(mDevice);
+	stoneFloorMetallic.setNameInternal("stoneFloor_metallic");
+	loadedTextures["stoneFloor_metallic"] = stoneFloorMetallic;
+	textures.push_back(stoneFloorMetallic);*/
+
+	Texture dullBrass;
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/dull_brass/dull-brass_albedo.png", dullBrass);
+	dullBrass.createTextureImageView(mDevice);
+	dullBrass.createTextureSampler(mDevice);
+	dullBrass.setNameInternal("lightGold_basecolor");
+	loadedTextures["lightGold_basecolor"] = dullBrass;
+	textures.push_back(dullBrass);
+
+	Texture dullBrassNrm;
+	dullBrassNrm.setTextureFormat(VK_FORMAT_R8G8B8A8_UNORM);
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/dull_brass/dull-brass_normal-dx.png", dullBrassNrm, VK_FORMAT_R8G8B8A8_UNORM);
+	dullBrassNrm.createTextureImageView(mDevice);
+	dullBrassNrm.createTextureSampler(mDevice);
+	dullBrassNrm.setNameInternal("lightGold_nrm");
+	loadedTextures["lightGold_nrm"] = dullBrassNrm;
+	textures.push_back(dullBrassNrm);
+
+	Texture dullBrassRoughness;
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/dull_brass/dull-brass_roughness.png", dullBrassRoughness);
+	dullBrassRoughness.createTextureImageView(mDevice);
+	dullBrassRoughness.createTextureSampler(mDevice);
+	dullBrassRoughness.setNameInternal("lightGold_roughness");
+	loadedTextures["lightGold_roughness"] = dullBrassRoughness;
+	textures.push_back(dullBrassRoughness);
+
+	Texture dullBrassAO;
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/dull_brass/dull-brass_ao.png", dullBrassAO);
+	dullBrassAO.createTextureImageView(mDevice);
+	dullBrassAO.createTextureSampler(mDevice);
+	dullBrassAO.setNameInternal("lightGold_ao");
+	loadedTextures["lightGold_ao"] = dullBrassAO;
+	textures.push_back(dullBrassAO);
+
+	Texture dullBrassHeight;
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/dull_brass/dull-brass_height.png", dullBrassHeight);
+	dullBrassHeight.createTextureImageView(mDevice);
+	dullBrassHeight.createTextureSampler(mDevice);
+	dullBrassHeight.setNameInternal("lightGold_height");
+	loadedTextures["lightGold_height"] = dullBrassHeight;
+	textures.push_back(dullBrassHeight);
+
+	Texture dullBrassMetallic;
+	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/dull_brass/dull-brass_metallic.png", dullBrassMetallic);
+	dullBrassMetallic.createTextureImageView(mDevice);
+	dullBrassMetallic.createTextureSampler(mDevice);
+	dullBrassMetallic.setNameInternal("lightGold_metallic");
+	loadedTextures["lightGold_metallic"] = dullBrassMetallic;
+	textures.push_back(dullBrassMetallic);
 
 	for (uint32_t i = 0; i < materialDescriptorSets.size(); i++)
 	{
 		VkDescriptorBufferInfo bufferInfo = materialUboBuffers[i]->descriptorInfo(materialUboBuffers[i]->getAlignmentSize());
-		DescriptorWriter(layout, *globalDescriptorPool).writeBuffer(5, &bufferInfo).build(materialDescriptorSets[i]);
+		DescriptorWriter(layout, *globalDescriptorPool).writeBuffer(6, &bufferInfo).build(materialDescriptorSets[i]);
 	}
 
 	uint32_t n = textures.size() / MAX_TEXTURE_BINDINGS;

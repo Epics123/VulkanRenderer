@@ -110,6 +110,8 @@ public:
 	float currentFramerate;
 	float currentFrametime;
 
+	std::vector<Texture> textures;
+
 private:
 	Renderer(Window* appWindow);
 
@@ -168,7 +170,6 @@ private:
 	VkImageView depthImageView;
 
 	std::unordered_map<std::string, Texture> loadedTextures;
-	std::vector<Texture> textures;
 	size_t minUboAlignment;
 	const uint32_t MAX_TEXTURE_BINDINGS = 2;
 	uint32_t totalObjects = 0;

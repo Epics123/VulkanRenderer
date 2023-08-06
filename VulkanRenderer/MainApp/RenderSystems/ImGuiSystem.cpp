@@ -11,6 +11,7 @@
 #include "../Camera.h"
 #include "../Utils.h"
 #include "../Material.h"
+#include "../Renderer.h"
 
 #include <iostream>
 
@@ -35,7 +36,7 @@ void ImGuiSystem::drawImGui(FrameInfo& frameInfo)
 	ImGui::NewFrame();
 
 	//drawViewport();
-	//ImGui::ShowDemoWindow();
+	ImGui::ShowDemoWindow();
 
 	ImGuiIO& io = ImGui::GetIO();
 	frameInfo.camera.canScroll = !io.WantCaptureMouse;
@@ -219,17 +220,46 @@ void ImGuiSystem::drawMaterialEditor(GameObject& obj)
 			{
 				ShaderParameters shaderParams = obj.materialComp->material.getShaderParameters();
 
-				glm::vec3 albedo = (glm::vec3)shaderParams.albedo;
-				DrawColor3Control("Albedo", albedo, 0.0f, 120.0f);
-				shaderParams.albedo = glm::vec4(albedo, 1.0f);
+				if(shaderParams.toggleTexture == 0)
+				{
+					glm::vec3 albedo = (glm::vec3)shaderParams.albedo;
+					DrawColor3Control("Albedo", albedo, 0.0f, 120.0f);
+					shaderParams.albedo = glm::vec4(albedo, 1.0f);
 
-				float roughness = shaderParams.roughness;
-				DrawFloatControl("Roughness", roughness, 1.0f, 120.0f, 0.01f, 1.0f, true);
-				shaderParams.roughness = roughness;
+					float roughness = shaderParams.roughness;
+					DrawFloatControl("Roughness", roughness, 1.0f, 120.0f, 0.1f, 1.0f, true);
+					shaderParams.roughness = roughness;
 
-				float ambientOcclusion = shaderParams.ambientOcclusion;
-				DrawFloatControl("Ambient Occlusion", ambientOcclusion, 1.0f, 120.0f, 0.0f, 1.0f, true);
-				shaderParams.ambientOcclusion = ambientOcclusion;
+					float ambientOcclusion = shaderParams.ambientOcclusion;
+					DrawFloatControl("Ambient Occlusion", ambientOcclusion, 1.0f, 120.0f, 0.0f, 1.0f, true);
+					shaderParams.ambientOcclusion = ambientOcclusion;
+
+					float metallic = shaderParams.metallic;
+					DrawFloatControl("Metallic", metallic, 1.0f, 120.0f, 0.0f, 1.0f, true);
+					shaderParams.metallic = metallic;
+				}
+				else
+				{
+					ImVec2 imageSize(200, 200);
+					ImGuiStyle& style = ImGui::GetStyle();
+					int imageCount = 6;
+					float windowVisibleX2 = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
+					
+					uint32_t start = shaderParams.textureIndex * imageCount;
+					uint32_t n = 0;
+					for(uint32_t i = start; i < (start + imageCount); i ++)
+					{
+						ImGui::PushID(n);
+						Texture tex = Renderer::getInstance()->textures[i];
+						ImGui::Image(tex.getDescriptorSet(), imageSize);
+						float lastImageX2 = ImGui::GetItemRectMax().x;
+						float nextImageX2 = lastImageX2 + style.ItemSpacing.x + imageSize.x; // Expected position if next button was on same line
+						if (n + 1 < imageCount && nextImageX2 < windowVisibleX2)
+							ImGui::SameLine();
+						ImGui::PopID();
+						n++;
+					}
+				}
 
 				obj.materialComp->material.setShaderParameters(shaderParams);
 			}

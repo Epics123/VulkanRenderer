@@ -30,6 +30,7 @@ struct MaterialUbo
 	glm::vec4 albedo;
 	alignas(16) float roughness;
 	float ambientOcclusion;
+	float metalic;
 };
 
 struct FrameInfo

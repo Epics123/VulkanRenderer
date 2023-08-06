@@ -17,12 +17,13 @@ void Material::setShaderParameters(ShaderParameters params)
 	shaderParams.albedo = params.albedo;
 	shaderParams.ambientOcclusion = params.ambientOcclusion;
 	shaderParams.roughness = params.roughness;
+	shaderParams.metallic = params.metallic;
 	shaderParams.textureIndex = params.textureIndex;
 	shaderParams.toggleTexture = params.toggleTexture;
 }
 
-ShaderParameters::ShaderParameters(uint32_t texIndex, uint32_t toggleTex, glm::vec4 albedo, float roughness, float ao)
-	:textureIndex(texIndex), albedo(albedo), roughness(roughness), ambientOcclusion(ao), toggleTexture(toggleTex)
+ShaderParameters::ShaderParameters(uint32_t texIndex, uint32_t toggleTex, glm::vec4 albedo, float roughness, float ao, float metallic)
+	:textureIndex(texIndex), albedo(albedo), roughness(roughness), ambientOcclusion(ao), metallic(metallic), toggleTexture(toggleTex)
 {
 
 }
@@ -32,6 +33,7 @@ ShaderParameters::ShaderParameters()
 	albedo = glm::vec4{1.0f};
 	ambientOcclusion = 1.0f;
 	roughness = 1.0f;
+	metallic = 0.0f;
 	textureIndex = 0;
 	toggleTexture = 0;
 }

@@ -46,12 +46,14 @@ layout(set = 1, binding = 1) uniform sampler2D normalMap[];
 layout(set = 1, binding = 2) uniform sampler2D roughnessMap[];
 layout(set = 1, binding = 3) uniform sampler2D aoMap[];
 layout(set = 1, binding = 4) uniform sampler2D heightMap[];
+layout(set = 1, binding = 5) uniform sampler2D metallicMap[];
 
-layout (set = 1, binding = 5) uniform MaterialUbo
+layout (set = 1, binding = 6) uniform MaterialUbo
 {
 	vec4 albedo;
 	float roughness;
 	float ambientOcclusion;
+	float metallic;
 } matUbo;
 
 layout (push_constant) uniform Push
@@ -73,6 +75,7 @@ vec3 albedo;
 float roughness;
 float ao;
 float attenuation;
+float metallic = 0.0;
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
@@ -84,6 +87,7 @@ float DistributionGGX(vec3 N, vec3 H, float roughness)
     float num = a2;
     float denom = (NdotH2 * (a2 - 1.0) + 1.0);
     denom = PI * denom * denom;
+	denom = max(denom, 0.000001);
 	
     return num / denom;
 }
@@ -95,6 +99,7 @@ float GeometrySchlickGGX(float NdotV, float roughness)
 
     float num = NdotV;
     float denom = NdotV * (1.0 - k) + k;
+	denom = max(denom, 0.000001);
 	
     return num / denom;
 }
@@ -118,6 +123,7 @@ vec3 fresnel(float cosTheta, vec3 f0, float fresnelPow)
 vec3 calculateLighting(vec3 V, vec3 N, vec3 L, vec3 H, vec3 albedo, vec4 lightColor)
 {
 	vec3 F0 = vec3(0.04); // can vary per material, but leaving as a constant value for now
+	F0 = mix(F0, albedo, metallic);
 	float NdotL = max(dot(N, L), 0.0);
 	float intensity = lightColor.w;
 
@@ -127,7 +133,7 @@ vec3 calculateLighting(vec3 V, vec3 N, vec3 L, vec3 H, vec3 albedo, vec4 lightCo
 	float G = GeometrySmith(N, V, L, roughness);
 
 	vec3 Ks = fresnel(max(dot(H, V), 0.0), F0, 5.0);
-	vec3 Kd = vec3(1.0) - Ks;
+	vec3 Kd = (vec3(1.0) - Ks);
 
 	vec3 numerator = NDF * G * Ks;
 	float denominator = 4.0 * max(dot(N, V), 0.0) * NdotL + 0.0001;
@@ -219,6 +225,7 @@ void main()
 		albedo = pow(texture(diffuseMap[push.textureIndex], uv).rgb, vec3(2.2));
 		roughness = texture(roughnessMap[push.textureIndex], uv).r;
 		ao = texture(aoMap[push.textureIndex], uv).r;
+		metallic = texture(metallicMap[push.textureIndex], uv).r;
 
 		N = calculateNormal(uv);
 	}
@@ -227,6 +234,7 @@ void main()
 		albedo = matUbo.albedo.xyz;
 		roughness = matUbo.roughness;
 		ao = matUbo.ambientOcclusion;
+		metallic = matUbo.metallic;
 
 		N = fragNormalWorld;
 	}

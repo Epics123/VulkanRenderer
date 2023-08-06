@@ -17,11 +17,12 @@ layout (push_constant) uniform Push
 
 layout(set = 1, binding = 0) uniform sampler2D texSampler[];
 
-layout (set = 1, binding = 5) uniform MaterialUbo
+layout (set = 1, binding = 6) uniform MaterialUbo
 {
 	vec4 albedo;
 	float roughness;
 	float ambientOcclusion;
+	float metallic;
 } matUbo;
 
 void main()
