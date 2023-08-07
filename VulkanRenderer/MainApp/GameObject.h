@@ -87,6 +87,7 @@ public:
 	void setSpotLightColor(glm::vec3& color);
 
 	void setMaterial(ShaderParameters params); // TODO: replace with actual material
+	void setMaterial(Material& mat);
 
 	glm::vec3 getForwardVector() { return transform.forward; }
 	glm::vec3 getUpVector() { return transform.up; }

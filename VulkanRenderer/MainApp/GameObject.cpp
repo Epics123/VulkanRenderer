@@ -78,3 +78,14 @@ void GameObject::setMaterial(ShaderParameters params)
 		materialComp->material.setShaderParameters(params);
 	}
 }
+
+void GameObject::setMaterial(Material& mat)
+{
+	if(materialComp)
+		materialComp->material = mat;
+	else
+	{
+		materialComp = std::make_unique<MaterialComponent>();
+		materialComp->material = mat;
+	}
+}

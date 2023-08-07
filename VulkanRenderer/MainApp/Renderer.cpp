@@ -271,6 +271,9 @@ void Renderer::recreateSwapChain()
 
 void Renderer::loadGameObjects()
 {
+	MaterialBuilder builder;
+	Material mat = builder.buildMaterial("MainApp/resources/vulkan/materials/PBR_Untextured.mat");
+
 	std::shared_ptr<Model> model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/teapot/downScaledPot.obj");
 	GameObject teapot = GameObject::createGameObject();
 	teapot.model = model;
@@ -284,7 +287,8 @@ void Renderer::loadGameObjects()
 	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/smoothVase/smooth_vase.obj");
 	GameObject smoothVase = GameObject::createGameObject();
 	smoothVase.model = model;
-	smoothVase.setMaterial(ShaderParameters{ 1, 0, glm::vec4(0.0f, 0.1f, 1.0f, 1.0f), 0.2f, 0.5f });
+	//smoothVase.setMaterial(ShaderParameters{ 1, 0, glm::vec4(0.0f, 0.1f, 1.0f, 1.0f), 0.2f, 0.5f });
+	smoothVase.setMaterial(mat);
 	smoothVase.transform.translation = { 0.5f, 0.0f, 0.0f };
 	smoothVase.transform.rotation = { 0.0f, 0.0f, 0.0f };
 	smoothVase.transform.scale = { 3.0f, 3.0f, 3.0f };
