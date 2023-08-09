@@ -56,13 +56,14 @@ public:
 	void createCommandBuffers();
 	void freeCommandBuffers();
 
+	Device& getDevice() { return mDevice; }
 
 	void recreateSwapChain();
 	RenderPass getSwapChainRenderPass() const { return mSwapChain->getRenderPass(); }
 
 	void loadGameObjects();
 
-	void loadTextures(DescriptorSetLayout& layout);
+	void loadMaterials(DescriptorSetLayout& layout);
 	void cleanupTextures();
 
 	bool hasStencilComponent(VkFormat format);
@@ -169,9 +170,9 @@ private:
 	VkDeviceMemory depthImageMemory;
 	VkImageView depthImageView;
 
-	std::unordered_map<std::string, Texture> loadedTextures;
+	std::vector<Material> materials;
 	size_t minUboAlignment;
-	const uint32_t MAX_TEXTURE_BINDINGS = 2;
+	const uint32_t MAX_TEXTURE_BINDINGS = 3;
 	uint32_t totalObjects = 0;
 };
 

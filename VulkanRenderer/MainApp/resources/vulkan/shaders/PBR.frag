@@ -150,12 +150,12 @@ vec3 calculateNormal(vec2 uv)
 	vec3 result;
 
 	// get TBN basis vectors
-	vec3 normal = normalize(fragNormalWorld);
-	vec3 tangent = normalize(fragTangent);
-	vec3 bitangent = normalize(fragBitangent);
+	vec3 normal = fragNormalWorld;
+	vec3 tangent = fragTangent;
+	vec3 bitangent = fragBitangent;
 
 	// sample normal map and bring range to [-1.0, 1.0]
-	vec3 normalMapNormal = texture(normalMap[push.textureIndex], uv).xyz * 2.0 - 1.0;
+	vec3 normalMapNormal = 2.0 * texture(normalMap[push.textureIndex], uv).xyz - 1.0;
 
 	// construct TBN matrix
 	mat3 TBN = mat3(tangent, bitangent, normal);

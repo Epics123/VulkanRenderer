@@ -79,6 +79,10 @@ void Renderer::init()
 		.setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT)
 		.build();
 
+	createCommandBuffers();
+
+	imguiInit();
+
 	uboBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 	for (int i = 0; i < uboBuffers.size(); i++)
 	{
@@ -86,32 +90,20 @@ void Renderer::init()
 		uboBuffers[i]->map();
 	}
 
-	CORE_WARN("Loading Game Objects...")
-	loadGameObjects();
-	CORE_WARN("Game Object Load Complete!")
-
-	materialUboBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
-	minUboAlignment = mDevice.properties.limits.minUniformBufferOffsetAlignment;
-	for(size_t i = 0; i < materialUboBuffers.size(); i++)
-	{
-		materialUboBuffers[i] = std::make_unique<Buffer>(mDevice, sizeof(MaterialUbo), totalObjects, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, minUboAlignment);
-		materialUboBuffers[i]->map(materialUboBuffers[i]->getBufferSize());
-	}
-
 	// highest set common to all shaders
 	std::unique_ptr<DescriptorSetLayout> globalSetLayout = DescriptorSetLayout::Builder(mDevice)
-														   .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
-														   .build();
+		.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
+		.build();
 
 	std::unique_ptr<DescriptorSetLayout> materialSetLayout = DescriptorSetLayout::Builder(mDevice)
-															.addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
-															.addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
-															.addBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
-															.addBinding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
-															.addBinding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
-															.addBinding(5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
-															.addBinding(6, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, VK_SHADER_STAGE_ALL_GRAPHICS) // per material ubo
-															.build();
+		.addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
+		.addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
+		.addBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
+		.addBinding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
+		.addBinding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
+		.addBinding(5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
+		.addBinding(6, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, VK_SHADER_STAGE_ALL_GRAPHICS) // per material ubo
+		.build();
 
 	globalDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 	for (int i = 0; i < globalDescriptorSets.size(); i++)
@@ -124,6 +116,24 @@ void Renderer::init()
 
 	materialDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 
+	totalObjects = 6; // TODO: replace
+
+	materialUboBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+	minUboAlignment = mDevice.properties.limits.minUniformBufferOffsetAlignment;
+	for (size_t i = 0; i < materialUboBuffers.size(); i++)
+	{
+		materialUboBuffers[i] = std::make_unique<Buffer>(mDevice, sizeof(MaterialUbo), totalObjects, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, minUboAlignment);
+		materialUboBuffers[i]->map(materialUboBuffers[i]->getBufferSize());
+	}
+
+	CORE_WARN("Loading Materials...")
+	loadMaterials(*materialSetLayout);
+	CORE_WARN("Material Load Finished!")
+
+	CORE_WARN("Loading Game Objects...")
+	loadGameObjects();
+	CORE_WARN("Game Object Load Complete!")
+
 	renderSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout(), materialSetLayout->getDescriptorSetLayout());
 	pointLightSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
 	wireframeSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
@@ -131,14 +141,6 @@ void Renderer::init()
 	gridSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
 	spotLightSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
 	//shadowSystem.init(depthPass.renderPass, globalSetLayout->getDescriptorSetLayout());
-
-	createCommandBuffers();
-
-	imguiInit();
-
-	CORE_WARN("Loading Textures...")
-	loadTextures(*materialSetLayout);
-	CORE_WARN("Texture Load Finished!")
 
 	mainCamera = Camera();
 	mainCamera.updateModel(0.0f);
@@ -271,13 +273,10 @@ void Renderer::recreateSwapChain()
 
 void Renderer::loadGameObjects()
 {
-	MaterialBuilder builder;
-	Material mat = builder.buildMaterial("MainApp/resources/vulkan/materials/PBR_Untextured.mat");
-
 	std::shared_ptr<Model> model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/teapot/downScaledPot.obj");
 	GameObject teapot = GameObject::createGameObject();
 	teapot.model = model;
-	teapot.setMaterial(ShaderParameters{1, 1});
+	teapot.setMaterial(materials[2]);
 	teapot.transform.translation = {-0.5f, 0.0f, 0.0f};
 	teapot.transform.rotation = {0.0f, 0.0f, 90.0f};
 	teapot.transform.scale = {1.0f, 1.0f, 1.0f};
@@ -288,7 +287,7 @@ void Renderer::loadGameObjects()
 	GameObject smoothVase = GameObject::createGameObject();
 	smoothVase.model = model;
 	//smoothVase.setMaterial(ShaderParameters{ 1, 0, glm::vec4(0.0f, 0.1f, 1.0f, 1.0f), 0.2f, 0.5f });
-	smoothVase.setMaterial(mat);
+	smoothVase.setMaterial(materials[0]);
 	smoothVase.transform.translation = { 0.5f, 0.0f, 0.0f };
 	smoothVase.transform.rotation = { 0.0f, 0.0f, 0.0f };
 	smoothVase.transform.scale = { 3.0f, 3.0f, 3.0f };
@@ -307,7 +306,8 @@ void Renderer::loadGameObjects()
 	
 	GameObject sphere2 = GameObject::createGameObject();
 	sphere2.model = model;
-	sphere2.setMaterial(ShaderParameters{ 1, 1 });
+	//sphere2.setMaterial(ShaderParameters{ 1, 1 });
+	sphere2.setMaterial(materials[0]);
 	sphere2.transform.translation = { 2.5f, 0.0f, 0.0f };
 	sphere2.transform.rotation = { 0.0f, 0.0f, 0.0f };
 	sphere2.transform.scale = { 1.0f, 1.0f, 1.0f };
@@ -317,7 +317,8 @@ void Renderer::loadGameObjects()
 	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/quad/quad.obj");
 	GameObject floor = GameObject::createGameObject();
 	floor.model = model;
-	floor.setMaterial(ShaderParameters{0, 1});
+	//floor.setMaterial(ShaderParameters{1, 1});
+	floor.setMaterial(materials[1]);
 	floor.transform.translation = { 0.0f, 0.0f, -0.3f };
 	floor.transform.rotation = { 0.0f, 0.0f, 0.0f };
 	floor.transform.scale = { 3.0f, 3.0f, 1.0f };
@@ -326,7 +327,7 @@ void Renderer::loadGameObjects()
 
 	GameObject floor2 = GameObject::createGameObject();
 	floor2.model = model;
-	floor2.setMaterial(ShaderParameters{ 1, 1 });
+	floor2.setMaterial(materials[3]);
 	floor2.transform.translation = { 1.5f, 0.0f, -0.3f };
 	floor2.transform.rotation = { 0.0f, 0.0f, 0.0f };
 	floor2.transform.scale = { 3.0f, 3.0f, 1.0f };
@@ -366,197 +367,60 @@ void Renderer::loadGameObjects()
 	gameObjects.emplace(spotLight.getID(), std::move(spotLight));
 }
 
-void Renderer::loadTextures(DescriptorSetLayout& layout)
+void Renderer::loadMaterials(DescriptorSetLayout& layout)
 {
-	Texture bricks;
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_basecolor.png", bricks);
-	bricks.createTextureImageView(mDevice);
-	bricks.createTextureSampler(mDevice);
-	bricks.setNameInternal("bricks_basecolor");
-	loadedTextures["bricks_basecolor"] = bricks;
-	textures.push_back(bricks);
+	MaterialBuilder builder;
 
-	Texture bricksNrm;
-	bricksNrm.setTextureFormat(VK_FORMAT_R8G8B8A8_UNORM);
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_normal.png", bricksNrm, VK_FORMAT_R8G8B8A8_UNORM);
-	bricksNrm.createTextureImageView(mDevice);
-	bricksNrm.createTextureSampler(mDevice);
-	bricksNrm.setNameInternal("bricks_nrm");
-	loadedTextures["bricks_nrm"] = bricksNrm;
-	textures.push_back(bricksNrm);
+	Material mat = builder.buildMaterial("MainApp/resources/vulkan/materials/PBR_Untextured.mat", mDevice);
+	materials.push_back(mat);
 
-	Texture bricksRoughness;
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_roughness.png", bricksRoughness);
-	bricksRoughness.createTextureImageView(mDevice);
-	bricksRoughness.createTextureSampler(mDevice);
-	bricksRoughness.setNameInternal("bricks_roughness");
-	loadedTextures["bricks_roughness"] = bricksRoughness;
-	textures.push_back(bricksRoughness);
+	mat = builder.buildMaterial("MainApp/resources/vulkan/materials/BlackBrick.mat", mDevice);
+	materials.push_back(mat);
 
-	Texture bricksAO;
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_ambientocclusion.png", bricksAO);
-	bricksAO.createTextureImageView(mDevice);
-	bricksAO.createTextureSampler(mDevice);
-	bricksAO.setNameInternal("bricks_ao");
-	loadedTextures["bricks_ao"] = bricksAO;
-	textures.push_back(bricksAO);
+	mat = builder.buildMaterial("MainApp/resources/vulkan/materials/PBR_Textured.mat", mDevice);
+	materials.push_back(mat);
 
-	Texture bricksHeight;
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_height.png", bricksHeight);
-	bricksHeight.createTextureImageView(mDevice);
-	bricksHeight.createTextureSampler(mDevice);
-	bricksHeight.setNameInternal("bricks_height");
-	loadedTextures["bricks_height"] = bricksHeight;
-	textures.push_back(bricksHeight);
+	mat = builder.buildMaterial("MainApp/resources/vulkan/materials/StoneFloor.mat", mDevice);
+	materials.push_back(mat);
 
-	Texture bricksMetallic;
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/bricks/Bricks_metallic.png", bricksMetallic);
-	bricksMetallic.createTextureImageView(mDevice);
-	bricksMetallic.createTextureSampler(mDevice);
-	bricksMetallic.setNameInternal("bricks_metallic");
-	loadedTextures["bricks_metallic"] = bricksMetallic;
-	textures.push_back(bricksMetallic);
-
-	/*Texture stoneFloor;
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_color_1k.jpg", stoneFloor);
-	stoneFloor.createTextureImageView(mDevice);
-	stoneFloor.createTextureSampler(mDevice);
-	stoneFloor.setNameInternal("stoneFloor_basecolor");
-	loadedTextures["stoneFloor_basecolor"] = stoneFloor;
-	textures.push_back(stoneFloor);
-
-	Texture stoneFloorNrm;
-	stoneFloorNrm.setTextureFormat(VK_FORMAT_R8G8B8A8_UNORM);
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_normal_opengl_1k.png", stoneFloorNrm, VK_FORMAT_R8G8B8A8_UNORM);
-	stoneFloorNrm.createTextureImageView(mDevice);
-	stoneFloorNrm.createTextureSampler(mDevice);
-	stoneFloorNrm.setNameInternal("stoneFloor_nrm");
-	loadedTextures["stoneFloor_nrm"] = stoneFloorNrm;
-	textures.push_back(stoneFloorNrm);
-
-	Texture stoneFloorRoughness;
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_roughness_1k.jpg", stoneFloorRoughness);
-	stoneFloorRoughness.createTextureImageView(mDevice);
-	stoneFloorRoughness.createTextureSampler(mDevice);
-	stoneFloorRoughness.setNameInternal("stoneFloor_roughness");
-	loadedTextures["stoneFloor_roughness"] = stoneFloorRoughness;
-	textures.push_back(stoneFloorRoughness);
-
-	Texture stoneFloorAO;
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_ao_1k.jpg", stoneFloorAO);
-	stoneFloorAO.createTextureImageView(mDevice);
-	stoneFloorAO.createTextureSampler(mDevice);
-	stoneFloorAO.setNameInternal("stoneFloor_ao");
-	loadedTextures["stoneFloor_ao"] = stoneFloorAO;
-	textures.push_back(stoneFloorAO);
-
-	Texture stoneFloorHeight;
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_height_1k.png", stoneFloorHeight);
-	stoneFloorHeight.createTextureImageView(mDevice);
-	stoneFloorHeight.createTextureSampler(mDevice);
-	stoneFloorHeight.setNameInternal("stoneFloor_height");
-	loadedTextures["stoneFloor_height"] = stoneFloorHeight;
-	textures.push_back(stoneFloorHeight);
-
-	Texture stoneFloorMetallic;
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/stone_ground/ground_0042_metallic_1k.png", stoneFloorMetallic);
-	stoneFloorMetallic.createTextureImageView(mDevice);
-	stoneFloorMetallic.createTextureSampler(mDevice);
-	stoneFloorMetallic.setNameInternal("stoneFloor_metallic");
-	loadedTextures["stoneFloor_metallic"] = stoneFloorMetallic;
-	textures.push_back(stoneFloorMetallic);*/
-
-	Texture dullBrass;
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/dull_brass/dull-brass_albedo.png", dullBrass);
-	dullBrass.createTextureImageView(mDevice);
-	dullBrass.createTextureSampler(mDevice);
-	dullBrass.setNameInternal("lightGold_basecolor");
-	loadedTextures["lightGold_basecolor"] = dullBrass;
-	textures.push_back(dullBrass);
-
-	Texture dullBrassNrm;
-	dullBrassNrm.setTextureFormat(VK_FORMAT_R8G8B8A8_UNORM);
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/dull_brass/dull-brass_normal-dx.png", dullBrassNrm, VK_FORMAT_R8G8B8A8_UNORM);
-	dullBrassNrm.createTextureImageView(mDevice);
-	dullBrassNrm.createTextureSampler(mDevice);
-	dullBrassNrm.setNameInternal("lightGold_nrm");
-	loadedTextures["lightGold_nrm"] = dullBrassNrm;
-	textures.push_back(dullBrassNrm);
-
-	Texture dullBrassRoughness;
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/dull_brass/dull-brass_roughness.png", dullBrassRoughness);
-	dullBrassRoughness.createTextureImageView(mDevice);
-	dullBrassRoughness.createTextureSampler(mDevice);
-	dullBrassRoughness.setNameInternal("lightGold_roughness");
-	loadedTextures["lightGold_roughness"] = dullBrassRoughness;
-	textures.push_back(dullBrassRoughness);
-
-	Texture dullBrassAO;
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/dull_brass/dull-brass_ao.png", dullBrassAO);
-	dullBrassAO.createTextureImageView(mDevice);
-	dullBrassAO.createTextureSampler(mDevice);
-	dullBrassAO.setNameInternal("lightGold_ao");
-	loadedTextures["lightGold_ao"] = dullBrassAO;
-	textures.push_back(dullBrassAO);
-
-	Texture dullBrassHeight;
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/dull_brass/dull-brass_height.png", dullBrassHeight);
-	dullBrassHeight.createTextureImageView(mDevice);
-	dullBrassHeight.createTextureSampler(mDevice);
-	dullBrassHeight.setNameInternal("lightGold_height");
-	loadedTextures["lightGold_height"] = dullBrassHeight;
-	textures.push_back(dullBrassHeight);
-
-	Texture dullBrassMetallic;
-	Utils::loadImageFromFile(mDevice, "MainApp/resources/vulkan/textures/dull_brass/dull-brass_metallic.png", dullBrassMetallic);
-	dullBrassMetallic.createTextureImageView(mDevice);
-	dullBrassMetallic.createTextureSampler(mDevice);
-	dullBrassMetallic.setNameInternal("lightGold_metallic");
-	loadedTextures["lightGold_metallic"] = dullBrassMetallic;
-	textures.push_back(dullBrassMetallic);
-
-	for (uint32_t i = 0; i < materialDescriptorSets.size(); i++)
+	for (uint32_t i = 0; i < (uint32_t)materialDescriptorSets.size(); i++)
 	{
 		VkDescriptorBufferInfo bufferInfo = materialUboBuffers[i]->descriptorInfo(materialUboBuffers[i]->getAlignmentSize());
 		DescriptorWriter(layout, *globalDescriptorPool).writeBuffer(6, &bufferInfo).build(materialDescriptorSets[i]);
 	}
 
-	uint32_t n = textures.size() / MAX_TEXTURE_BINDINGS;
 	uint32_t textureIndex = 0;
-	int k = 0;
-	for(uint32_t i = 0; i < textures.size(); i++)
+	for (uint32_t i = 0; i < (uint32_t)materials.size(); i++)
 	{
-		Texture& texture = textures[i];
-
-		VkDescriptorImageInfo imageInfo{};
-		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		imageInfo.imageView = texture.getTextureImageView();
-		imageInfo.sampler = texture.getTextureSampler();
-
-		uint32_t binding = i % n;//(n + 1);
-
-		if(k == n)
+		ShaderParameters& params = materials[i].getShaderParameters();
+		if (params.toggleTexture)
 		{
+			for (std::pair<uint32_t, Texture> texture : params.materialTextures)
+			{
+				uint32_t binding = texture.first;
+				Texture& tex = texture.second;
+
+				VkDescriptorImageInfo imageInfo{};
+				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+				imageInfo.imageView = tex.getTextureImageView();
+				imageInfo.sampler = tex.getTextureSampler();
+
+				for (uint32_t j = 0; j < materialDescriptorSets.size(); j++)
+				{
+					DescriptorWriter(layout, *globalDescriptorPool).writeImageAtIndex(binding, textureIndex, &imageInfo).overwrite(materialDescriptorSets[j]);
+				}
+			}
+			params.textureIndex = textureIndex;
 			textureIndex++;
-			k = 0;
-		}
-		else
-		{
-			k++;
-		}
-		
-		for(uint32_t j = 0; j < materialDescriptorSets.size(); j++)
-		{
-			DescriptorWriter(layout, *globalDescriptorPool).writeImageAtIndex(binding, textureIndex, &imageInfo).overwrite(materialDescriptorSets[j]);
 		}
 	}
 }
 
 void Renderer::cleanupTextures()
 {
-	for(std::pair<std::string, Texture> texture : loadedTextures)
+	for(Material& mat : materials)
 	{
-		texture.second.cleanup(mDevice);
+		mat.cleanup(mDevice);
 	}
 }
 
@@ -611,7 +475,7 @@ void Renderer::drawFrame(float dt)
 			frameIndex, currentFrametime, currentFramerate, dt, 
 			showGrid, renderMode, commandBuffer, mainCamera, 
 			globalDescriptorSets[frameIndex], materialDescriptorSets[frameIndex], gameObjects,
-			0, 0, textures[0]
+			0, 0
 		};
 
 		frameInfo.numObjs = totalObjects;

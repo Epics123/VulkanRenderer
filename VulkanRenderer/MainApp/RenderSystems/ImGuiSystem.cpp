@@ -11,7 +11,6 @@
 #include "../Camera.h"
 #include "../Utils.h"
 #include "../Material.h"
-#include "../Renderer.h"
 
 #include <iostream>
 
@@ -247,10 +246,12 @@ void ImGuiSystem::drawMaterialEditor(GameObject& obj)
 					
 					uint32_t start = shaderParams.textureIndex * imageCount;
 					uint32_t n = 0;
-					for(uint32_t i = start; i < (start + imageCount); i ++)
+					ShaderParameters& params = obj.materialComp->material.getShaderParameters();
+
+					for(std::pair<uint32_t, Texture> texture : params.materialTextures)
 					{
 						ImGui::PushID(n);
-						Texture tex = Renderer::getInstance()->textures[i];
+						Texture tex = texture.second;
 						ImGui::Image(tex.getDescriptorSet(), imageSize);
 						float lastImageX2 = ImGui::GetItemRectMax().x;
 						float nextImageX2 = lastImageX2 + style.ItemSpacing.x + imageSize.x; // Expected position if next button was on same line

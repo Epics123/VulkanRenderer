@@ -1,8 +1,12 @@
 #include "Material.h"
 #include "Log.h"
+#include "Utils.h"
+#include "Device.h"
 
 #include <fstream>
 #include <sstream>
+#include <filesystem>
+#include <string>
 
 Material::Material()
 {
@@ -17,7 +21,7 @@ Material::Material(ShaderParameters& params)
 
 Material::~Material()
 {
-
+	
 }
 
 void Material::setShaderParameters(ShaderParameters params)
@@ -28,6 +32,17 @@ void Material::setShaderParameters(ShaderParameters params)
 	shaderParams.metallic = params.metallic;
 	shaderParams.textureIndex = params.textureIndex;
 	shaderParams.toggleTexture = params.toggleTexture;
+}
+
+void Material::cleanup(class Device& device)
+{
+	if (shaderParams.materialTextures.size() > 0)
+	{
+		for (std::pair<uint32_t, Texture> tex : shaderParams.materialTextures)
+		{
+			tex.second.cleanup(device);
+		}
+	}
 }
 
 ShaderParameters::ShaderParameters(uint32_t texIndex, uint32_t toggleTex, glm::vec4 albedo, float roughness, float ao, float metallic)
@@ -46,7 +61,7 @@ ShaderParameters::ShaderParameters()
 	toggleTexture = 0;
 }
 
-Material& MaterialBuilder::buildMaterial(std::string filepath)
+Material MaterialBuilder::buildMaterial(std::string filepath, Device& device)
 {
 	std::ifstream inFile;
 	inFile.open(filepath);
@@ -65,19 +80,60 @@ Material& MaterialBuilder::buildMaterial(std::string filepath)
 			{
 				std::getline(inFile, line);
 				name = line;
-				CORE_INFO(name);
 			}
 			if (line.compare("#toggleTexture") == 0)
 			{
 				std::getline(inFile, line);
 				params.toggleTexture = std::stoi(line);
-				usingTexture = false;
+				usingTexture = params.toggleTexture == 0 ? false : true;
 			}
 			if (line.compare("#params") == 0)
 			{
 				if(usingTexture)
 				{
+					std::getline(inFile, line);
 					//load textures relevant to this material
+					if(line.compare("#textureDir") == 0)
+					{
+						std::string textureDir;
+						std::getline(inFile, textureDir);
+
+						for(const auto& entry : std::filesystem::directory_iterator(textureDir))
+						{
+							std::filesystem::path path = entry.path();
+							std::string fileName = path.string();
+
+							//TODO: Handle case where multiple materials reference the same textures
+
+							Texture texture;
+
+							//Check if the texture we are loading is a normal map
+							if (path.stem().string().find(normalExtension) != std::string::npos)
+							{
+								//Set texture format for normal maps
+								texture.setTextureFormat(VK_FORMAT_R8G8B8A8_UNORM);
+								Utils::loadImageFromFile(device, fileName.c_str(), texture, VK_FORMAT_R8G8B8A8_UNORM);
+							}
+							// load texture with default format
+							else
+							{
+								Utils::loadImageFromFile(device, fileName.c_str(), texture);
+							}
+							texture.createTextureImageView(device);
+							texture.createTextureSampler(device);
+							texture.setNameInternal(path.stem().string());
+
+							int binding = getBindingFromFileName(path.stem().string());
+							if(binding < 0)
+							{
+								CORE_ERROR("Invalid file name to find binding: {0}", fileName)
+							}
+							else
+							{
+								params.materialTextures[(uint32_t)binding] = texture;
+							}
+						}
+					}
 				}
 				else
 				{
@@ -118,9 +174,41 @@ Material& MaterialBuilder::buildMaterial(std::string filepath)
 		}
 		inFile.close();
 
-		Material mat = Material(params);
-		return mat;
+		return Material(params);
 	}
 
+	CORE_ERROR("Failed to open file: {0}", filepath)
 	return Material();
+}
+
+int MaterialBuilder::getBindingFromFileName(const std::string& filename)
+{
+	int binding = -1;
+	size_t notFound = std::string::npos;
+	if(filename.find(albedoExtension) != notFound)
+	{
+		binding = 0;
+	}
+	else if(filename.find(normalExtension) != notFound)
+	{
+		binding = 1;
+	}
+	else if(filename.find(roughnessExtension) != notFound)
+	{
+		binding = 2;
+	}
+	else if (filename.find(aoExtension) != notFound)
+	{
+		binding = 3;
+	}
+	else if (filename.find(heightExtension) != notFound)
+	{
+		binding = 4;
+	}
+	else if (filename.find(metallicExtension) != notFound)
+	{
+		binding = 5;
+	}
+
+	return binding;
 }

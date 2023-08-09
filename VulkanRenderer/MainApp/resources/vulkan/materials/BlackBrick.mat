@@ -1,0 +1,9 @@
+#name
+pbr_textured
+
+#toggleTexture
+1
+
+#params
+#textureDir
+MainApp/resources/vulkan/textures/bricks/
