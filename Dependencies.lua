@@ -9,6 +9,7 @@ IncludeDir["ImGui"] = "%{wks.location}/%{prj.name}/Libraries/ImGui"
 IncludeDir["ObjLoader"] = "%{wks.location}/%{prj.name}/Libraries/ObjLoader"
 IncludeDir["ImgLoader"] = "%{wks.location}/%{prj.name}/Libraries/ImgLoader"
 IncludeDir["spdlog"] = "%{wks.location}/%{prj.name}/Libraries/spdlog/include"
+IncludeDir["yaml"] = "%{wks.location}/%{prj.name}/Libraries/yaml/include"
 IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
 
 LibraryDir = {}

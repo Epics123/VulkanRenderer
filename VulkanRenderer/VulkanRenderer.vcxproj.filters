@@ -10,6 +10,15 @@
     <Filter Include="Libraries\ImGui\ImGuizmo">
       <UniqueIdentifier>{8CDBB723-7800-07A4-A14B-EC338DCF05C2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Libraries\yaml">
+      <UniqueIdentifier>{E4CEE10E-D09C-D514-B930-463BA59DB179}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\yaml\src">
+      <UniqueIdentifier>{FB5E5237-E742-138D-50A3-0DE03CA6FD0E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\yaml\src\contrib">
+      <UniqueIdentifier>{FB71A380-E781-4F51-503B-B46F3C6A3EEA}</UniqueIdentifier>
+    </Filter>
     <Filter Include="MainApp">
       <UniqueIdentifier>{6BCAF114-D7A9-70B0-E0C1-FB864C20D711}</UniqueIdentifier>
     </Filter>
@@ -71,6 +80,72 @@
     </ClInclude>
     <ClInclude Include="Libraries\ImGui\imstb_truetype.h">
       <Filter>Libraries\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\yaml\src\collectionstack.h">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\yaml\src\contrib\graphbuilderadapter.h">
+      <Filter>Libraries\yaml\src\contrib</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\yaml\src\directives.h">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\yaml\src\emitterstate.h">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\yaml\src\emitterutils.h">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\yaml\src\exp.h">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\yaml\src\indentation.h">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\yaml\src\nodebuilder.h">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\yaml\src\nodeevents.h">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\yaml\src\ptr_vector.h">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\yaml\src\regex_yaml.h">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\yaml\src\regeximpl.h">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\yaml\src\scanner.h">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\yaml\src\scanscalar.h">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\yaml\src\scantag.h">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\yaml\src\setting.h">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\yaml\src\singledocparser.h">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\yaml\src\stream.h">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\yaml\src\streamcharsource.h">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\yaml\src\stringsource.h">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\yaml\src\tag.h">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Libraries\yaml\src\token.h">
+      <Filter>Libraries\yaml\src</Filter>
     </ClInclude>
     <ClInclude Include="MainApp\Application.h">
       <Filter>MainApp</Filter>
@@ -153,6 +228,9 @@
     <ClInclude Include="MainApp\Renderer.h">
       <Filter>MainApp</Filter>
     </ClInclude>
+    <ClInclude Include="MainApp\SceneSerializer.h">
+      <Filter>MainApp</Filter>
+    </ClInclude>
     <ClInclude Include="MainApp\SwapChain.h">
       <Filter>MainApp</Filter>
     </ClInclude>
@@ -212,6 +290,99 @@
     <ClCompile Include="Libraries\ImGui\imgui_widgets.cpp">
       <Filter>Libraries\ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\binary.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\contrib\graphbuilder.cpp">
+      <Filter>Libraries\yaml\src\contrib</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\contrib\graphbuilderadapter.cpp">
+      <Filter>Libraries\yaml\src\contrib</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\convert.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\depthguard.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\directives.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\emit.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\emitfromevents.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\emitter.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\emitterstate.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\emitterutils.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\exceptions.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\exp.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\memory.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\node.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\node_data.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\nodebuilder.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\nodeevents.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\null.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\ostream_wrapper.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\parse.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\parser.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\regex_yaml.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\scanner.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\scanscalar.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\scantag.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\scantoken.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\simplekey.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\singledocparser.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\stream.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Libraries\yaml\src\tag.cpp">
+      <Filter>Libraries\yaml\src</Filter>
+    </ClCompile>
     <ClCompile Include="MainApp\Application.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
@@ -243,6 +414,9 @@
       <Filter>MainApp</Filter>
     </ClCompile>
     <ClCompile Include="MainApp\Main.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\Material.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
     <ClCompile Include="MainApp\Mesh.cpp">
@@ -287,6 +461,9 @@
     <ClCompile Include="MainApp\Renderer.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
+    <ClCompile Include="MainApp\SceneSerializer.cpp">
+      <Filter>MainApp</Filter>
+    </ClCompile>
     <ClCompile Include="MainApp\SwapChain.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
@@ -306,9 +483,6 @@
       <Filter>MainApp</Filter>
     </ClCompile>
     <ClCompile Include="MainApp\Window.cpp">
-      <Filter>MainApp</Filter>
-    </ClCompile>
-    <ClCompile Include="MainApp\Material.cpp">
       <Filter>MainApp</Filter>
     </ClCompile>
   </ItemGroup>

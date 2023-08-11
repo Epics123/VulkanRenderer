@@ -45,7 +45,10 @@ std::unique_ptr<Model> Model::createModelFromFile(Device& device, const std::str
 
 	CORE_INFO("Vertex Count: {0}", builder.vertices.size())
 
-	return std::make_unique<Model>(device, builder);
+	std::unique_ptr<Model>modelPtr = std::make_unique<Model>(device, builder);
+	modelPtr->setModelPath(filepath);
+
+	return modelPtr;
 }
 
 void Model::bind(VkCommandBuffer commandBuffer)

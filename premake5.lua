@@ -27,6 +27,8 @@ project "VulkanRenderer"
 		"%{prj.name}/Libraries/ImGui/**.cpp",
 		"%{prj.name}/Libraries/ImGui/ImGuizmo/**.h",
 		"%{prj.name}/Libraries/ImGui/ImGuizmo/**.cpp",
+		"%{prj.name}/Libraries/yaml/src/**.h",
+		"%{prj.name}/Libraries/yaml/src/**.cpp",
 		"%{prj.name}/MainApp/resources/**.vert",
 		"%{prj.name}/MainApp/resources/**.frag",
 	}
@@ -39,7 +41,8 @@ project "VulkanRenderer"
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.ObjLoader}",
 		"%{IncludeDir.ImgLoader}",
-		"%{IncludeDir.spdlog}"
+		"%{IncludeDir.spdlog}",
+		"%{IncludeDir.yaml}"
 	}
 
 	libdirs

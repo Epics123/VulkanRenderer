@@ -51,6 +51,9 @@ public:
 	void bind(VkCommandBuffer commandBuffer);
 	void draw(VkCommandBuffer commandBuffer);
 
+	void setModelPath(const std::string& path) { modelPath = path; }
+	const std::string& getModelPath() { return modelPath; }
+
 private:
 	void createVertexBuffers(const std::vector<Vertex>& vertices);
 	void createIndexBuffers(const std::vector<uint32_t>& indicies);
@@ -63,4 +66,6 @@ private:
 	bool hasIndexBuffer = false;
 	std::unique_ptr<Buffer> indexBuffer;
 	uint32_t indexCount;
+
+	std::string modelPath;
 };

@@ -47,8 +47,12 @@ class MaterialBuilder
 public:
 	Material buildMaterial(std::string filepath, class Device& device);
 
+	const std::string& getMaterialFilePath() { return materialPath; }
+
 private:
 	int getBindingFromFileName(const std::string& filename);
+
+	const std::string materialPath = "MainApp/resources/vulkan/materials/";
 
 	const std::string albedoExtension = "_albedo";
 	const std::string normalExtension = "_normal";

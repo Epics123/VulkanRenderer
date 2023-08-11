@@ -1,0 +1,152 @@
+Scene: Untitled
+Objects:
+  - Object: 12345678
+    Tag:
+      Name: Teapot
+    Transform:
+      Translation: [-0.5, 0, 0]
+      Rotation: [0, 0, 90]
+      Scale: [1, 1, 1]
+    Model:
+      ModelPath: MainApp/resources/vulkan/models/teapot/downScaledPot.obj
+    Material:
+      MaterialFile: ""
+  - Object: 12345678
+    Tag:
+      Name: SmoothVase
+    Transform:
+      Translation: [0.5, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [3, 3, 3]
+    Model:
+      ModelPath: MainApp/resources/vulkan/models/smoothVase/smooth_vase.obj
+    Material:
+      MaterialFile: ""
+  - Object: 12345678
+    Tag:
+      Name: Sphere
+    Transform:
+      Translation: [0.5, 1.39999998, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Model:
+      ModelPath: MainApp/resources/vulkan/models/sphere/sphere.obj
+    Material:
+      MaterialFile: ""
+  - Object: 12345678
+    Tag:
+      Name: Sphere2
+    Transform:
+      Translation: [2.5, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    Model:
+      ModelPath: MainApp/resources/vulkan/models/sphere/sphere.obj
+    Material:
+      MaterialFile: ""
+  - Object: 12345678
+    Tag:
+      Name: Floor
+    Transform:
+      Translation: [0, 0, -0.300000012]
+      Rotation: [0, 0, 0]
+      Scale: [3, 3, 1]
+    Model:
+      ModelPath: MainApp/resources/vulkan/models/quad/quad.obj
+    Material:
+      MaterialFile: ""
+  - Object: 12345678
+    Tag:
+      Name: Floor2
+    Transform:
+      Translation: [1.5, 0, -0.300000012]
+      Rotation: [0, 0, 0]
+      Scale: [3, 3, 1]
+    Model:
+      ModelPath: MainApp/resources/vulkan/models/quad/quad.obj
+    Material:
+      MaterialFile: ""
+  - Object: 12345678
+    Tag:
+      Name: PointLight0
+    Transform:
+      Translation: [0, 1.5, 1.5]
+      Rotation: [0, 0, 0]
+      Scale: [0.100000001, 1, 1]
+    PointLightComponent:
+      LightType: Point
+      Intensity: 5
+  - Object: 12345678
+    Tag:
+      Name: PointLight1
+    Transform:
+      Translation: [-1.29903817, 0.74999994, 1.5]
+      Rotation: [0, 0, 0]
+      Scale: [0.100000001, 1, 1]
+    PointLightComponent:
+      LightType: Point
+      Intensity: 5
+  - Object: 12345678
+    Tag:
+      Name: PointLight2
+    Transform:
+      Translation: [-1.29903805, -0.750000119, 1.49999988]
+      Rotation: [0, 0, 0]
+      Scale: [0.100000001, 1, 1]
+    PointLightComponent:
+      LightType: Point
+      Intensity: 5
+  - Object: 12345678
+    Tag:
+      Name: PointLight3
+    Transform:
+      Translation: [1.31134158e-07, -1.5, 1.5]
+      Rotation: [0, 0, 0]
+      Scale: [0.100000001, 1, 1]
+    PointLightComponent:
+      LightType: Point
+      Intensity: 5
+  - Object: 12345678
+    Tag:
+      Name: PointLight4
+    Transform:
+      Translation: [1.29903817, -0.749999881, 1.5]
+      Rotation: [0, 0, 0]
+      Scale: [0.100000001, 1, 1]
+    PointLightComponent:
+      LightType: Point
+      Intensity: 5
+  - Object: 12345678
+    Tag:
+      Name: PointLight5
+    Transform:
+      Translation: [1.29903781, 0.750000536, 1.5]
+      Rotation: [0, 0, 0]
+      Scale: [0.100000001, 1, 1]
+    PointLightComponent:
+      LightType: Point
+      Intensity: 5
+  - Object: 12345678
+    Tag:
+      Name: SpotLight
+    Transform:
+      Translation: [5.69999981, 0, 1.5]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpotLightComponent:
+      LightType: Spot
+      Intensity: 20
+      CutoffAngle: 45
+      OuterCutoffAngle: 0
+  - Object: 12345678
+    Tag:
+      Name: SpotLight2
+    Transform:
+      Translation: [8.10000038, 2.0999999, 1]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpotLightComponent:
+      LightType: Spot
+      Intensity: 10
+      CutoffAngle: 25
+      OuterCutoffAngle: 0

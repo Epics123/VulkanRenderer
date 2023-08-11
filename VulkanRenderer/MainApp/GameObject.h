@@ -56,6 +56,7 @@ struct SpotLightComponent : PointLightComponent
 struct MaterialComponent
 {
 	Material material;
+	std::string materialFileName = "";
 };
 
 class GameObject

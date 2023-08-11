@@ -22,13 +22,13 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -58,7 +58,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.189.2\Include;Libraries\glfw\include;Libraries\glm;Libraries\ImGui;Libraries\ObjLoader;Libraries\ImgLoader;Libraries\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.189.2\Include;Libraries\glfw\include;Libraries\glm;Libraries\ImGui;Libraries\ObjLoader;Libraries\ImgLoader;Libraries\spdlog\include;Libraries\yaml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -75,7 +75,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.189.2\Include;Libraries\glfw\include;Libraries\glm;Libraries\ImGui;Libraries\ObjLoader;Libraries\ImgLoader;Libraries\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.189.2\Include;Libraries\glfw\include;Libraries\glm;Libraries\ImGui;Libraries\ObjLoader;Libraries\ImgLoader;Libraries\spdlog\include;Libraries\yaml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -108,6 +108,28 @@
     <ClInclude Include="Libraries\ImGui\imstb_rectpack.h" />
     <ClInclude Include="Libraries\ImGui\imstb_textedit.h" />
     <ClInclude Include="Libraries\ImGui\imstb_truetype.h" />
+    <ClInclude Include="Libraries\yaml\src\collectionstack.h" />
+    <ClInclude Include="Libraries\yaml\src\contrib\graphbuilderadapter.h" />
+    <ClInclude Include="Libraries\yaml\src\directives.h" />
+    <ClInclude Include="Libraries\yaml\src\emitterstate.h" />
+    <ClInclude Include="Libraries\yaml\src\emitterutils.h" />
+    <ClInclude Include="Libraries\yaml\src\exp.h" />
+    <ClInclude Include="Libraries\yaml\src\indentation.h" />
+    <ClInclude Include="Libraries\yaml\src\nodebuilder.h" />
+    <ClInclude Include="Libraries\yaml\src\nodeevents.h" />
+    <ClInclude Include="Libraries\yaml\src\ptr_vector.h" />
+    <ClInclude Include="Libraries\yaml\src\regex_yaml.h" />
+    <ClInclude Include="Libraries\yaml\src\regeximpl.h" />
+    <ClInclude Include="Libraries\yaml\src\scanner.h" />
+    <ClInclude Include="Libraries\yaml\src\scanscalar.h" />
+    <ClInclude Include="Libraries\yaml\src\scantag.h" />
+    <ClInclude Include="Libraries\yaml\src\setting.h" />
+    <ClInclude Include="Libraries\yaml\src\singledocparser.h" />
+    <ClInclude Include="Libraries\yaml\src\stream.h" />
+    <ClInclude Include="Libraries\yaml\src\streamcharsource.h" />
+    <ClInclude Include="Libraries\yaml\src\stringsource.h" />
+    <ClInclude Include="Libraries\yaml\src\tag.h" />
+    <ClInclude Include="Libraries\yaml\src\token.h" />
     <ClInclude Include="MainApp\Application.h" />
     <ClInclude Include="MainApp\Buffer.h" />
     <ClInclude Include="MainApp\Camera.h" />
@@ -135,6 +157,7 @@
     <ClInclude Include="MainApp\RenderSystems\WireframeSystem.h" />
     <ClInclude Include="MainApp\RenderSystems\WorldGridSystem.h" />
     <ClInclude Include="MainApp\Renderer.h" />
+    <ClInclude Include="MainApp\SceneSerializer.h" />
     <ClInclude Include="MainApp\SwapChain.h" />
     <ClInclude Include="MainApp\Texture.h" />
     <ClInclude Include="MainApp\TextureSampler.h" />
@@ -156,6 +179,37 @@
     <ClCompile Include="Libraries\ImGui\imgui_impl_vulkan.cpp" />
     <ClCompile Include="Libraries\ImGui\imgui_tables.cpp" />
     <ClCompile Include="Libraries\ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="Libraries\yaml\src\binary.cpp" />
+    <ClCompile Include="Libraries\yaml\src\contrib\graphbuilder.cpp" />
+    <ClCompile Include="Libraries\yaml\src\contrib\graphbuilderadapter.cpp" />
+    <ClCompile Include="Libraries\yaml\src\convert.cpp" />
+    <ClCompile Include="Libraries\yaml\src\depthguard.cpp" />
+    <ClCompile Include="Libraries\yaml\src\directives.cpp" />
+    <ClCompile Include="Libraries\yaml\src\emit.cpp" />
+    <ClCompile Include="Libraries\yaml\src\emitfromevents.cpp" />
+    <ClCompile Include="Libraries\yaml\src\emitter.cpp" />
+    <ClCompile Include="Libraries\yaml\src\emitterstate.cpp" />
+    <ClCompile Include="Libraries\yaml\src\emitterutils.cpp" />
+    <ClCompile Include="Libraries\yaml\src\exceptions.cpp" />
+    <ClCompile Include="Libraries\yaml\src\exp.cpp" />
+    <ClCompile Include="Libraries\yaml\src\memory.cpp" />
+    <ClCompile Include="Libraries\yaml\src\node.cpp" />
+    <ClCompile Include="Libraries\yaml\src\node_data.cpp" />
+    <ClCompile Include="Libraries\yaml\src\nodebuilder.cpp" />
+    <ClCompile Include="Libraries\yaml\src\nodeevents.cpp" />
+    <ClCompile Include="Libraries\yaml\src\null.cpp" />
+    <ClCompile Include="Libraries\yaml\src\ostream_wrapper.cpp" />
+    <ClCompile Include="Libraries\yaml\src\parse.cpp" />
+    <ClCompile Include="Libraries\yaml\src\parser.cpp" />
+    <ClCompile Include="Libraries\yaml\src\regex_yaml.cpp" />
+    <ClCompile Include="Libraries\yaml\src\scanner.cpp" />
+    <ClCompile Include="Libraries\yaml\src\scanscalar.cpp" />
+    <ClCompile Include="Libraries\yaml\src\scantag.cpp" />
+    <ClCompile Include="Libraries\yaml\src\scantoken.cpp" />
+    <ClCompile Include="Libraries\yaml\src\simplekey.cpp" />
+    <ClCompile Include="Libraries\yaml\src\singledocparser.cpp" />
+    <ClCompile Include="Libraries\yaml\src\stream.cpp" />
+    <ClCompile Include="Libraries\yaml\src\tag.cpp" />
     <ClCompile Include="MainApp\Application.cpp" />
     <ClCompile Include="MainApp\Buffer.cpp" />
     <ClCompile Include="MainApp\Camera.cpp" />
@@ -182,6 +236,7 @@
     <ClCompile Include="MainApp\RenderSystems\WireframeSystem.cpp" />
     <ClCompile Include="MainApp\RenderSystems\WorldGridSystem.cpp" />
     <ClCompile Include="MainApp\Renderer.cpp" />
+    <ClCompile Include="MainApp\SceneSerializer.cpp" />
     <ClCompile Include="MainApp\SwapChain.cpp" />
     <ClCompile Include="MainApp\Texture.cpp" />
     <ClCompile Include="MainApp\TextureSampler.cpp" />

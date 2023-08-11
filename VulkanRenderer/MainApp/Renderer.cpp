@@ -1,6 +1,7 @@
 #include "Renderer.h"
 #include "Log.h"
-#include "GameObject.h"
+//#include "GameObject.h"
+#include "SceneSerializer.h"
 
 #include <set>
 #include <algorithm>
@@ -365,6 +366,9 @@ void Renderer::loadGameObjects()
 	spotLight.transform.translation = { 8.1f, 2.1f, 1.0f };
 	spotLight.setObjectName("SpotLight2");
 	gameObjects.emplace(spotLight.getID(), std::move(spotLight));
+
+	SceneSerializer serializer;
+	serializer.serialize("MainApp/resources/scenes/untitled.scene", gameObjects);
 }
 
 void Renderer::loadMaterials(DescriptorSetLayout& layout)
