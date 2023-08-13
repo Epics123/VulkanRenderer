@@ -25,6 +25,9 @@
     <Filter Include="MainApp\RenderSystems">
       <UniqueIdentifier>{F2D589C3-5E42-45BE-2736-DD1B93616726}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MainApp\Scene">
+      <UniqueIdentifier>{C81BF159-34DC-6C90-FD16-B60D6996B16C}</UniqueIdentifier>
+    </Filter>
     <Filter Include="MainApp\resources">
       <UniqueIdentifier>{B551250E-2168-23A4-6ADF-AEC5D634F42B}</UniqueIdentifier>
     </Filter>
@@ -227,6 +230,9 @@
     </ClInclude>
     <ClInclude Include="MainApp\Renderer.h">
       <Filter>MainApp</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\Scene\Scene.h">
+      <Filter>MainApp\Scene</Filter>
     </ClInclude>
     <ClInclude Include="MainApp\SceneSerializer.h">
       <Filter>MainApp</Filter>
@@ -460,6 +466,9 @@
     </ClCompile>
     <ClCompile Include="MainApp\Renderer.cpp">
       <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\Scene\Scene.cpp">
+      <Filter>MainApp\Scene</Filter>
     </ClCompile>
     <ClCompile Include="MainApp\SceneSerializer.cpp">
       <Filter>MainApp</Filter>

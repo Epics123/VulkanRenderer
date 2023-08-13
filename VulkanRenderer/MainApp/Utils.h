@@ -18,5 +18,12 @@ namespace Utils
 	bool loadImageFromFile(Device& device, const char* filepath, Texture& outTexture, VkFormat format = VK_FORMAT_R8G8B8A8_SRGB);
 
 	std::string getCPUName();
+
+	class FileDialogs
+	{
+	public:
+		static std::string openFile(const char* filter);
+		static std::string saveFile(const char* filter);
+	};
 }
 

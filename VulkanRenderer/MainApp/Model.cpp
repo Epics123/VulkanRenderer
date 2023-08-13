@@ -13,6 +13,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 
+const std::string Model::modelDir = "MainApp/resources/vulkan/models/";
+
 namespace std
 {
 	template<>
@@ -38,15 +40,16 @@ Model::~Model()
 
 }
 
-std::unique_ptr<Model> Model::createModelFromFile(Device& device, const std::string& filepath)
+std::unique_ptr<Model> Model::createModelFromFile(Device& device, const std::string& filename)
 {
 	Builder builder{};
-	builder.loadModel(filepath);
+	const std::string& path = modelDir + filename;
+	builder.loadModel(path);
 
 	CORE_INFO("Vertex Count: {0}", builder.vertices.size())
 
 	std::unique_ptr<Model>modelPtr = std::make_unique<Model>(device, builder);
-	modelPtr->setModelPath(filepath);
+	modelPtr->setModelPath(filename);
 
 	return modelPtr;
 }

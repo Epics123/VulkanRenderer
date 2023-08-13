@@ -32,7 +32,7 @@ void SpotLightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo)
 		obj.transform.updateTransform();
 		// copy light info to ubo
 		ubo.spotLights[lightIndex].position = glm::vec4(obj.transform.translation, obj.spotLight->lightType);
-		ubo.spotLights[lightIndex].color = glm::vec4(obj.color, obj.spotLight->intensity);
+		ubo.spotLights[lightIndex].color = glm::vec4(obj.spotLight->color, obj.spotLight->intensity);
 
 		glm::vec3 direction = glm::vec3(0.0f, 0.0f, -1.0f) * obj.transform.orientation;
 		ubo.spotLights[lightIndex].direction = glm::vec4(direction, glm::cos(glm::radians(obj.spotLight->cutoffAngle)));

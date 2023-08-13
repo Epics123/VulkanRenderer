@@ -117,23 +117,23 @@ void Renderer::init()
 
 	materialDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 
-	totalObjects = 6; // TODO: replace
+	CORE_WARN("Loading Game Objects...")
+	SceneSerializer serializer;
+	serializer.deserialize("MainApp/resources/scenes/untitled.scene", mDevice, sceneData);
+	CORE_WARN("Game Object Load Complete!")
 
 	materialUboBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 	minUboAlignment = mDevice.properties.limits.minUniformBufferOffsetAlignment;
 	for (size_t i = 0; i < materialUboBuffers.size(); i++)
 	{
-		materialUboBuffers[i] = std::make_unique<Buffer>(mDevice, sizeof(MaterialUbo), totalObjects, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, minUboAlignment);
+		materialUboBuffers[i] = std::make_unique<Buffer>(mDevice, sizeof(MaterialUbo), sceneData.materialCount, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, minUboAlignment);
 		materialUboBuffers[i]->map(materialUboBuffers[i]->getBufferSize());
-	}
+	}	
 
 	CORE_WARN("Loading Materials...")
 	loadMaterials(*materialSetLayout);
 	CORE_WARN("Material Load Finished!")
-
-	CORE_WARN("Loading Game Objects...")
-	loadGameObjects();
-	CORE_WARN("Game Object Load Complete!")
+	
 
 	renderSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout(), materialSetLayout->getDescriptorSetLayout());
 	pointLightSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
@@ -272,121 +272,8 @@ void Renderer::recreateSwapChain()
 	}
 }
 
-void Renderer::loadGameObjects()
-{
-	std::shared_ptr<Model> model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/teapot/downScaledPot.obj");
-	GameObject teapot = GameObject::createGameObject();
-	teapot.model = model;
-	teapot.setMaterial(materials[2]);
-	teapot.transform.translation = {-0.5f, 0.0f, 0.0f};
-	teapot.transform.rotation = {0.0f, 0.0f, 90.0f};
-	teapot.transform.scale = {1.0f, 1.0f, 1.0f};
-	teapot.setObjectName("Teapot");
-	gameObjects.emplace(teapot.getID(), std::move(teapot));
-
-	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/smoothVase/smooth_vase.obj");
-	GameObject smoothVase = GameObject::createGameObject();
-	smoothVase.model = model;
-	//smoothVase.setMaterial(ShaderParameters{ 1, 0, glm::vec4(0.0f, 0.1f, 1.0f, 1.0f), 0.2f, 0.5f });
-	smoothVase.setMaterial(materials[0]);
-	smoothVase.transform.translation = { 0.5f, 0.0f, 0.0f };
-	smoothVase.transform.rotation = { 0.0f, 0.0f, 0.0f };
-	smoothVase.transform.scale = { 3.0f, 3.0f, 3.0f };
-	smoothVase.setObjectName("SmoothVase");
-	gameObjects.emplace(smoothVase.getID(), std::move(smoothVase));
-
-	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/sphere/sphere.obj");
-	GameObject sphere = GameObject::createGameObject();
-	sphere.model = model;
-	sphere.setMaterial(ShaderParameters{ 1, 0, glm::vec4(1.0f, 0.8f, 0.0f, 1.0f), 0.6f, 0.0f, 1.0f });
-	sphere.transform.translation = { 0.5f, 1.4f, 0.0f };
-	sphere.transform.rotation = { 0.0f, 0.0f, 0.0f };
-	sphere.transform.scale = { 1.0f, 1.0f, 1.0f };
-	sphere.setObjectName("Sphere");
-	gameObjects.emplace(sphere.getID(), std::move(sphere));
-	
-	GameObject sphere2 = GameObject::createGameObject();
-	sphere2.model = model;
-	//sphere2.setMaterial(ShaderParameters{ 1, 1 });
-	sphere2.setMaterial(materials[0]);
-	sphere2.transform.translation = { 2.5f, 0.0f, 0.0f };
-	sphere2.transform.rotation = { 0.0f, 0.0f, 0.0f };
-	sphere2.transform.scale = { 1.0f, 1.0f, 1.0f };
-	sphere2.setObjectName("Sphere2");
-	gameObjects.emplace(sphere2.getID(), std::move(sphere2));
-
-	model = Model::createModelFromFile(mDevice, "MainApp/resources/vulkan/models/quad/quad.obj");
-	GameObject floor = GameObject::createGameObject();
-	floor.model = model;
-	//floor.setMaterial(ShaderParameters{1, 1});
-	floor.setMaterial(materials[1]);
-	floor.transform.translation = { 0.0f, 0.0f, -0.3f };
-	floor.transform.rotation = { 0.0f, 0.0f, 0.0f };
-	floor.transform.scale = { 3.0f, 3.0f, 1.0f };
-	floor.setObjectName("Floor");
-	gameObjects.emplace(floor.getID(), std::move(floor));
-
-	GameObject floor2 = GameObject::createGameObject();
-	floor2.model = model;
-	floor2.setMaterial(materials[3]);
-	floor2.transform.translation = { 1.5f, 0.0f, -0.3f };
-	floor2.transform.rotation = { 0.0f, 0.0f, 0.0f };
-	floor2.transform.scale = { 3.0f, 3.0f, 1.0f };
-	floor2.setObjectName("Floor2");
-	gameObjects.emplace(floor2.getID(), std::move(floor2));
-
-	totalObjects = static_cast<uint32_t>(gameObjects.size());
-
-	std::vector<glm::vec3> lightColors{
-	 {1.f, .1f, .1f},
-	 {.1f, .1f, 1.f},
-	 {.1f, 1.f, .1f},
-	 {1.f, 1.f, .1f},
-	 {.1f, 1.f, 1.f},
-	 {1.f, 1.f, 1.f}
-	};
-
-	for (int i = 0; i < lightColors.size(); i++)
-	{
-		GameObject pointLight = GameObject::makePointLight();
-		pointLight.color = lightColors[i];
-		pointLight.pointLight->intensity = 5.0f;
-		glm::mat4 lightRot = glm::rotate(glm::mat4(1.0f), (i * glm::two_pi<float>()) / lightColors.size(), {0.0f, 0.0f, 1.0f});
-		pointLight.transform.translation = glm::vec3(lightRot * glm::vec4(0.0f, 1.5f, 1.5f, 1.0f));
-		pointLight.setObjectName("PointLight" + std::to_string(i));
-		gameObjects.emplace(pointLight.getID(), std::move(pointLight));
-	}
-
-	GameObject spotLight = GameObject::makeSpotLight(20.0f, 45.0f, glm::vec3(1.0f, 1.0f, 1.0f));
-	spotLight.transform.translation = {5.7f, 0.0f, 1.5f};
-	spotLight.setObjectName("SpotLight");
-	gameObjects.emplace(spotLight.getID(), std::move(spotLight));
-
-	spotLight = GameObject::makeSpotLight(10.0f, 25.0f, glm::vec3(1.0f, 1.0f, 0.0f));
-	spotLight.transform.translation = { 8.1f, 2.1f, 1.0f };
-	spotLight.setObjectName("SpotLight2");
-	gameObjects.emplace(spotLight.getID(), std::move(spotLight));
-
-	SceneSerializer serializer;
-	serializer.serialize("MainApp/resources/scenes/untitled.scene", gameObjects);
-}
-
 void Renderer::loadMaterials(DescriptorSetLayout& layout)
 {
-	MaterialBuilder builder;
-
-	Material mat = builder.buildMaterial("MainApp/resources/vulkan/materials/PBR_Untextured.mat", mDevice);
-	materials.push_back(mat);
-
-	mat = builder.buildMaterial("MainApp/resources/vulkan/materials/BlackBrick.mat", mDevice);
-	materials.push_back(mat);
-
-	mat = builder.buildMaterial("MainApp/resources/vulkan/materials/PBR_Textured.mat", mDevice);
-	materials.push_back(mat);
-
-	mat = builder.buildMaterial("MainApp/resources/vulkan/materials/StoneFloor.mat", mDevice);
-	materials.push_back(mat);
-
 	for (uint32_t i = 0; i < (uint32_t)materialDescriptorSets.size(); i++)
 	{
 		VkDescriptorBufferInfo bufferInfo = materialUboBuffers[i]->descriptorInfo(materialUboBuffers[i]->getAlignmentSize());
@@ -394,9 +281,9 @@ void Renderer::loadMaterials(DescriptorSetLayout& layout)
 	}
 
 	uint32_t textureIndex = 0;
-	for (uint32_t i = 0; i < (uint32_t)materials.size(); i++)
+	for (std::pair<std::string, std::shared_ptr<Material>> material : sceneData.materials)
 	{
-		ShaderParameters& params = materials[i].getShaderParameters();
+		ShaderParameters& params = material.second->getShaderParameters();
 		if (params.toggleTexture)
 		{
 			for (std::pair<uint32_t, Texture> texture : params.materialTextures)
@@ -415,6 +302,7 @@ void Renderer::loadMaterials(DescriptorSetLayout& layout)
 				}
 			}
 			params.textureIndex = textureIndex;
+			sceneData.materials[material.first]->setShaderParameters(params);
 			textureIndex++;
 		}
 	}
@@ -422,9 +310,9 @@ void Renderer::loadMaterials(DescriptorSetLayout& layout)
 
 void Renderer::cleanupTextures()
 {
-	for(Material& mat : materials)
+	for(auto& mat : sceneData.materials)
 	{
-		mat.cleanup(mDevice);
+		mat.second->cleanup(mDevice);
 	}
 }
 
@@ -478,7 +366,7 @@ void Renderer::drawFrame(float dt)
 		{ 
 			frameIndex, currentFrametime, currentFramerate, dt, 
 			showGrid, renderMode, commandBuffer, mainCamera, 
-			globalDescriptorSets[frameIndex], materialDescriptorSets[frameIndex], gameObjects,
+			globalDescriptorSets[frameIndex], materialDescriptorSets[frameIndex], sceneData.objects,
 			0, 0
 		};
 

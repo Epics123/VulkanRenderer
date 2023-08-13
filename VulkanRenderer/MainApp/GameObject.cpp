@@ -35,11 +35,11 @@ void TransformComponent::updateTransform()
 GameObject GameObject::makePointLight(float intensity, float radius, glm::vec3 color)
 {
 	GameObject obj = createGameObject();
-	obj.color = color;
 	obj.transform.scale.x = radius;
 	obj.pointLight = std::make_unique<PointLightComponent>();
 	obj.pointLight->intensity = intensity;
 	obj.pointLight->lightType = LightType::Point;
+	obj.pointLight->color = color;
 
 	return obj;
 }
@@ -47,11 +47,11 @@ GameObject GameObject::makePointLight(float intensity, float radius, glm::vec3 c
 GameObject GameObject::makeSpotLight(float intensity, float cutoffAngle, glm::vec3 color)
 {
 	GameObject obj = createGameObject();
-	obj.color = color;
 	obj.spotLight = std::make_unique<SpotLightComponent>();
 	obj.spotLight->intensity = intensity;
 	obj.spotLight->cutoffAngle = cutoffAngle;
 	obj.spotLight->lightType = LightType::Spot;
+	obj.spotLight->color = color;
 
 	return obj;
 }
@@ -59,33 +59,52 @@ GameObject GameObject::makeSpotLight(float intensity, float cutoffAngle, glm::ve
 void GameObject::setPointLightColor(glm::vec3& color)
 {
 	if(pointLight)
-		color = color;
+		pointLight->color = color;
 }
 
 void GameObject::setSpotLightColor(glm::vec3& color)
 {
 	if(spotLight)
-		color = color;
+		spotLight->color = color;
 }
 
 void GameObject::setMaterial(ShaderParameters params)
 {
 	if(materialComp)
-		materialComp->material.setShaderParameters(params);
+		materialComp->material->setShaderParameters(params);
 	else
 	{
 		materialComp = std::make_unique<MaterialComponent>();
-		materialComp->material.setShaderParameters(params);
+		materialComp->material->setShaderParameters(params);
 	}
 }
 
 void GameObject::setMaterial(Material& mat)
 {
 	if(materialComp)
+	{
+		materialComp->material = std::make_shared<Material>(mat);
+		materialComp->materialFileName = mat.getMaterialFileName();
+	}
+	else
+	{
+		materialComp = std::make_unique<MaterialComponent>();
+		materialComp->material = std::make_shared<Material>(mat);
+		materialComp->materialFileName = mat.getMaterialFileName();
+	}
+}
+
+void GameObject::setMaterial(std::shared_ptr<Material> mat)
+{
+	if (materialComp)
+	{
 		materialComp->material = mat;
+		materialComp->materialFileName = mat->getMaterialFileName();
+	}
 	else
 	{
 		materialComp = std::make_unique<MaterialComponent>();
 		materialComp->material = mat;
+		materialComp->materialFileName = mat->getMaterialFileName();
 	}
 }

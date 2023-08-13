@@ -12,6 +12,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+Application* Application::applicationInstance = nullptr;
 
 Application::Application()
 {
@@ -57,12 +58,34 @@ Application::Application(const char* appName, uint32_t appWidth, uint32_t appHei
 	window = new Window(name, width, height, true);
 }
 
+Application* Application::initInstance(const char* appName, uint32_t appWidth, uint32_t appHeight)
+{
+	if(!Application::applicationInstance)
+	{
+		Application::applicationInstance = new Application(appName, appWidth, appHeight);
+		return Application::applicationInstance;
+	}
+	else
+	{
+		return Application::applicationInstance;
+	}
+}
+
+void Application::cleanupInstance()
+{
+	if(Application::applicationInstance)
+	{
+		Application::applicationInstance->cleanup();
+		delete Application::applicationInstance;
+		Application::applicationInstance = nullptr;
+	}
+}
+
 void Application::run()
 {
 	window->initWindow(keyCallback, cursorPosCallback, mouseButtonCallback, scrollCallback, framebufferResizeCallback, this);
 	vulkanRenderer = Renderer::initInstance(window);
 	update();
-	cleanup();
 }
 
 void Application::framebufferResizeCallback(GLFWwindow* window, int width, int height)

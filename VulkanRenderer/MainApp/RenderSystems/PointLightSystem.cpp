@@ -35,7 +35,7 @@ void PointLightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo)
 
 		// copy light info to ubo
 		ubo.pointLights[lightIndex].position = glm::vec4(obj.transform.translation, obj.pointLight->lightType);
-		ubo.pointLights[lightIndex].color = glm::vec4(obj.color, obj.pointLight->intensity);
+		ubo.pointLights[lightIndex].color = glm::vec4(obj.pointLight->color, obj.pointLight->intensity);
 		ubo.pointLights[lightIndex].radius = obj.transform.scale.x;
 		lightIndex++;
 	}

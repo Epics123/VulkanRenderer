@@ -157,6 +157,7 @@
     <ClInclude Include="MainApp\RenderSystems\WireframeSystem.h" />
     <ClInclude Include="MainApp\RenderSystems\WorldGridSystem.h" />
     <ClInclude Include="MainApp\Renderer.h" />
+    <ClInclude Include="MainApp\Scene\Scene.h" />
     <ClInclude Include="MainApp\SceneSerializer.h" />
     <ClInclude Include="MainApp\SwapChain.h" />
     <ClInclude Include="MainApp\Texture.h" />
@@ -236,6 +237,7 @@
     <ClCompile Include="MainApp\RenderSystems\WireframeSystem.cpp" />
     <ClCompile Include="MainApp\RenderSystems\WorldGridSystem.cpp" />
     <ClCompile Include="MainApp\Renderer.cpp" />
+    <ClCompile Include="MainApp\Scene\Scene.cpp" />
     <ClCompile Include="MainApp\SceneSerializer.cpp" />
     <ClCompile Include="MainApp\SwapChain.cpp" />
     <ClCompile Include="MainApp\Texture.cpp" />

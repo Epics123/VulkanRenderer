@@ -11,6 +11,7 @@
 #include "../Camera.h"
 #include "../Utils.h"
 #include "../Material.h"
+#include "../SceneSerializer.h"
 
 #include <iostream>
 
@@ -35,12 +36,26 @@ void ImGuiSystem::drawImGui(FrameInfo& frameInfo)
 	ImGui::NewFrame();
 
 	//drawViewport();
-	ImGui::ShowDemoWindow();
+	//ImGui::ShowDemoWindow();
 
 	ImGuiIO& io = ImGui::GetIO();
 	frameInfo.camera.canScroll = !io.WantCaptureMouse;
 
 	drawDebugWindow();
+	if (ImGui::BeginMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			if (ImGui::MenuItem("Serialize"))
+			{
+				SceneSerializer serializer;
+				serializer.serialize("MainApp/resources/scenes/untitled.scene", frameInfo.gameObjects);
+			}
+
+			ImGui::EndMenu();
+		}
+		ImGui::EndMenuBar();
+	}
 	drawFrameInfo(frameInfo.framerate, frameInfo.frameTime);
 
 	ImGui::NewLine();
@@ -138,14 +153,14 @@ void ImGuiSystem::drawSceneInfo(FrameInfo& frameInfo)
 				if (obj.pointLight)
 				{
 					DrawFloatControl("Intensity", obj.pointLight->intensity, 1.0f, 120.0f, 0.0f, 20.0f, true);
-					DrawColor3Control("Color", obj.color, 0.0f, 120.0f);
+					DrawColor3Control("Color", obj.pointLight->color, 0.0f, 120.0f);
 				}
 
 				if(obj.spotLight)
 				{
 					DrawFloatControl("Intensity", obj.spotLight->intensity, 1.0f, 120.0f, 0.0f, 20.0f, true);
 					DrawFloatControl("Cutoff Angle", obj.spotLight->cutoffAngle, 0.0f, 120.0f, 0.0f, 90.0f, true);
-					DrawColor3Control("Color", obj.color, 0.0f, 120.0f);
+					DrawColor3Control("Color", obj.spotLight->color, 0.0f, 120.0f);
 					ImGui::NewLine();
 				}
 
@@ -206,7 +221,10 @@ void ImGuiSystem::drawMaterialEditor(GameObject& obj)
 			{
 				if (ImGui::BeginMenu("File"))
 				{
-					if (ImGui::MenuItem("Some menu item"))
+					if (ImGui::MenuItem("Select Material"))
+					{
+					}
+					if (ImGui::MenuItem("Create Material"))
 					{
 					}
 					ImGui::EndMenu();
@@ -217,7 +235,7 @@ void ImGuiSystem::drawMaterialEditor(GameObject& obj)
 
 			if(obj.materialComp)
 			{
-				ShaderParameters shaderParams = obj.materialComp->material.getShaderParameters();
+				ShaderParameters shaderParams = obj.materialComp->material->getShaderParameters();
 
 				if(shaderParams.toggleTexture == 0)
 				{
@@ -246,7 +264,7 @@ void ImGuiSystem::drawMaterialEditor(GameObject& obj)
 					
 					uint32_t start = shaderParams.textureIndex * imageCount;
 					uint32_t n = 0;
-					ShaderParameters& params = obj.materialComp->material.getShaderParameters();
+					ShaderParameters& params = obj.materialComp->material->getShaderParameters();
 
 					for(std::pair<uint32_t, Texture> texture : params.materialTextures)
 					{
@@ -262,7 +280,7 @@ void ImGuiSystem::drawMaterialEditor(GameObject& obj)
 					}
 				}
 
-				obj.materialComp->material.setShaderParameters(shaderParams);
+				obj.materialComp->material->setShaderParameters(shaderParams);
 			}
 			
 

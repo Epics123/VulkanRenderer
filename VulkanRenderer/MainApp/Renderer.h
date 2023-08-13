@@ -25,6 +25,8 @@
 #include "Enums.h"
 #include "Utils.h"
 
+#include "Scene/Scene.h"
+
 // Render Systems
 #include "RenderSystems/RenderSystem.h"
 #include "RenderSystems/PointLightSystem.h"
@@ -60,8 +62,6 @@ public:
 
 	void recreateSwapChain();
 	RenderPass getSwapChainRenderPass() const { return mSwapChain->getRenderPass(); }
-
-	void loadGameObjects();
 
 	void loadMaterials(DescriptorSetLayout& layout);
 	void cleanupTextures();
@@ -169,6 +169,8 @@ private:
 	VkImage depthImage;
 	VkDeviceMemory depthImageMemory;
 	VkImageView depthImageView;
+
+	SceneData sceneData;
 
 	std::vector<Material> materials;
 	size_t minUboAlignment;

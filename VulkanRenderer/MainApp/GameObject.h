@@ -40,6 +40,7 @@ struct TransformComponent
 struct LightComponent
 {
 	LightType lightType;
+	glm::vec3 color;
 };
 
 struct PointLightComponent : LightComponent
@@ -55,7 +56,7 @@ struct SpotLightComponent : PointLightComponent
 
 struct MaterialComponent
 {
-	Material material;
+	std::shared_ptr<Material> material;
 	std::string materialFileName = "";
 };
 
@@ -89,12 +90,12 @@ public:
 
 	void setMaterial(ShaderParameters params); // TODO: replace with actual material
 	void setMaterial(Material& mat);
+	void setMaterial(std::shared_ptr<Material> mat);
 
 	glm::vec3 getForwardVector() { return transform.forward; }
 	glm::vec3 getUpVector() { return transform.up; }
 	glm::vec3 getRightVector() { return transform.right; }
 
-	glm::vec3 color{};
 	TransformComponent transform{};
 
 	// optional components

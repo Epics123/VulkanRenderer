@@ -8,8 +8,16 @@
 class Application
 {
 public:
+	static Application* applicationInstance;
+
 	Application();
 	Application(const char* appName, uint32_t appWidth, uint32_t appHeight);
+
+	static Application* getInstance() { return applicationInstance; }
+	static Application* initInstance(const char* appName, uint32_t appWidth, uint32_t appHeight);
+	static void cleanupInstance();
+
+	Window* getApplicationWindow() { return window; }
 
 	void run();
 

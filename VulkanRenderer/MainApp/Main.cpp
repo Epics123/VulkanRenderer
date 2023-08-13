@@ -7,18 +7,26 @@
 
 int main()
 {
-	Application app = Application("Vulkan Renderer", 1280, 720);
+	Application* app = Application::initInstance("Vulkan Renderer", 1280, 720);
 
 	try
 	{
-		app.run();
+		app->run();
 	}
 	catch (const std::exception& e)
 	{
 		std::cerr << e.what() << std::endl;
+
+		app->cleanupInstance();
+		app = nullptr;
+
 		system("pause");
+
 		return EXIT_FAILURE;
 	}
+
+	app->cleanupInstance();
+	app = nullptr;
 
 	system("pause");
 

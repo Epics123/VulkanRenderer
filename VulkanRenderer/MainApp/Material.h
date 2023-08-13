@@ -36,10 +36,14 @@ public:
 	ShaderParameters& getShaderParameters() { return shaderParams; }
 	void setShaderParameters(ShaderParameters params);
 
+	void setMaterialFileName(const std::string& file) { fileName = file; }
+	const std::string& getMaterialFileName() { return fileName; }
+
 	void cleanup(class Device& device);
 
 private:
 	ShaderParameters shaderParams;
+	std::string fileName;
 };
 
 class MaterialBuilder

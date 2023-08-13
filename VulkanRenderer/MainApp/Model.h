@@ -46,13 +46,16 @@ public:
 	Model(const Model&) = delete;
 	void operator=(const Model&) = delete;
 
-	static std::unique_ptr<Model> createModelFromFile(Device& device, const std::string& filepath);
+	static std::unique_ptr<Model> createModelFromFile(Device& device, const std::string& filename);
 
 	void bind(VkCommandBuffer commandBuffer);
 	void draw(VkCommandBuffer commandBuffer);
 
 	void setModelPath(const std::string& path) { modelPath = path; }
 	const std::string& getModelPath() { return modelPath; }
+
+public:
+	static const std::string modelDir;
 
 private:
 	void createVertexBuffers(const std::vector<Vertex>& vertices);

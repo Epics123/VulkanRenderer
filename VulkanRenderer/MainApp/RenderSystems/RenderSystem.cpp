@@ -33,7 +33,7 @@ void RenderSystem::update(FrameInfo& frameInfo, Buffer* buffer)
 		if (!obj.model)
 			continue;
 
-		ShaderParameters shaderParams = obj.materialComp->material.getShaderParameters();
+		ShaderParameters shaderParams = obj.materialComp->material->getShaderParameters();
 
 		MaterialUbo ubo{};
 		ubo.albedo = shaderParams.albedo;
@@ -62,7 +62,7 @@ void RenderSystem::render(FrameInfo& frameInfo)
 		if (!obj.model)
 			continue;
 
-		ShaderParameters shaderParams = obj.materialComp->material.getShaderParameters();
+		ShaderParameters shaderParams = obj.materialComp->material->getShaderParameters();
 
 		SimplePushConstantData push{};
 		push.modelMatrix = obj.transform.getTransform();
