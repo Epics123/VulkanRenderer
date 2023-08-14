@@ -2,61 +2,12 @@
 
 #include "Log.h"
 #include "Device.h"
+#include "Utils.h"
+#include "Utils/YamlHelpers.h"
 
 #include <fstream>
 #include <sstream>
-#include <yaml-cpp/yaml.h>
-
-namespace YAML
-{
-	template<>
-	struct convert<glm::vec3>
-	{
-		static Node encode(const glm::vec3& rhs)
-		{
-			Node node;
-			node.push_back(rhs.x);
-			node.push_back(rhs.y);
-			node.push_back(rhs.z);
-			return node;
-		}
-
-		static bool decode(const Node& node, glm::vec3& rhs)
-		{
-			if(!node.IsSequence() || node.size() != 3)
-				return false;
-
-				rhs.x = node[0].as<float>();
-				rhs.y = node[1].as<float>();
-				rhs.z = node[2].as<float>();
-		}
-	};
-
-	template<>
-	struct convert<glm::vec4>
-	{
-		static Node encode(const glm::vec4& rhs)
-		{
-			Node node;
-			node.push_back(rhs.x);
-			node.push_back(rhs.y);
-			node.push_back(rhs.z);
-			node.push_back(rhs.w);
-			return node;
-		}
-
-		static bool decode(const Node& node, glm::vec4& rhs)
-		{
-			if (!node.IsSequence() || node.size() != 4)
-				return false;
-
-			rhs.x = node[0].as<float>();
-			rhs.y = node[1].as<float>();
-			rhs.z = node[2].as<float>();
-			rhs.z = node[3].as<float>();
-		}
-	};
-}
+#include <filesystem>
 
 YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& v)
 {
@@ -250,7 +201,6 @@ bool SceneSerializer::deserialize(const std::string& filepath, Device& device, S
 			if(materialComponent)
 			{
 				std::string materialFile = materialComponent["MaterialFile"].as<std::string>();
-				//std::unordered_map<std::string, Material>::const_iterator it = outSceneData.materials.find(materialFile);
 
 				// check if we have already loaded this material
 				if(outSceneData.materials.find(materialFile) != outSceneData.materials.end())
@@ -269,9 +219,7 @@ bool SceneSerializer::deserialize(const std::string& filepath, Device& device, S
 					}
 					else
 					{
-						MaterialBuilder builder;
-
-						mat = builder.buildMaterial(builder.getMaterialFilePath() + materialFile, device);
+						mat = MaterialSerializer::deserialize(MaterialBuilder::getMaterialFilePath() + materialFile, device);
 						mat.setMaterialFileName(materialFile);
 						std::shared_ptr<Material> matPtr = std::make_shared<Material>(mat);
 						outSceneData.materials.emplace(materialFile, matPtr);
@@ -323,4 +271,166 @@ bool SceneSerializer::deserialize(const std::string& filepath, Device& device, S
 	}
 
 	return true;
+}
+
+void MaterialSerializer::serialize(const std::string& filepath, std::shared_ptr<Material> material)
+{
+	YAML::Emitter out;
+	out << YAML::BeginMap;
+	out << YAML::Key << "Material" << YAML::Value << material->getNameInternal();
+	out << YAML::Key << "Params" << YAML::Value << YAML::BeginSeq;
+
+	out << YAML::BeginMap;
+	out << YAML::Key << "ToggleTextures" << YAML::Value << material->getShaderParameters().toggleTexture;
+	out << YAML::EndMap;
+
+	bool usingTexture = material->getShaderParameters().toggleTexture == 1 ? true : false;
+
+	if (usingTexture)
+	{
+		out << YAML::BeginMap;
+		out << YAML::Key << "TextureDir" << YAML::Value << material->getShaderParameters().textureDir;
+		out << YAML::EndMap;
+	}
+	else
+	{
+		glm::vec4& albedo = material->getShaderParameters().albedo;
+		out << YAML::BeginMap;
+		out << YAML::Key << "Albedo" << YAML::Value << albedo;
+		out << YAML::EndMap;
+
+		out << YAML::BeginMap;
+		out << YAML::Key << "Roughness" << YAML::Value << material->getShaderParameters().roughness;
+		out << YAML::EndMap;
+
+		out << YAML::BeginMap;
+		out << YAML::Key << "AmbientOcclusion" << YAML::Value << material->getShaderParameters().ambientOcclusion;
+		out << YAML::EndMap;
+
+		out << YAML::BeginMap;
+		out << YAML::Key << "Metallic" << YAML::Value << material->getShaderParameters().metallic;
+		out << YAML::EndMap;
+	}
+
+	out << YAML::EndSeq;
+	out << YAML::EndMap;
+
+	std::ofstream fout(filepath);
+	fout << out.c_str();
+}
+
+Material MaterialSerializer::deserialize(const std::string& filepath, class Device& device)
+{
+	std::ifstream inFile(filepath);
+	std::stringstream ss;
+	ss << inFile.rdbuf();
+
+	YAML::Node data = YAML::Load(ss.str());
+	if (!data["Material"])
+	{
+		CORE_ERROR("Material Deserialization Failed: Material file was not in the correct format!")
+		return Material();
+	}
+
+	Material mat;
+	ShaderParameters params;
+
+	std::string materialName = data["Material"].as<std::string>();
+	mat.setNameInternal(materialName);
+
+	auto materialParams = data["Params"];
+	for (auto param : materialParams)
+	{
+		if (param)
+		{
+			auto toggleTex = param["ToggleTextures"];
+			if(toggleTex)
+			{
+				uint32_t toggleTexture = param["ToggleTextures"].as<uint32_t>();
+				params.toggleTexture = toggleTexture;
+			}
+
+			if(params.toggleTexture == 0)
+			{
+				auto albedoParam = param["Albedo"];
+				if (albedoParam)
+				{
+					glm::vec4 albedo = param["Albedo"].as<glm::vec4>();
+					params.albedo = albedo;
+				}
+
+				auto roughnessParams = param["Roughness"];
+				if (roughnessParams)
+				{
+					float roughness = param["Roughness"].as<float>();
+					params.roughness = roughness;
+				}
+
+				auto aoParams = param["AmbientOcclusion"];
+				if (aoParams)
+				{
+					float ao = param["AmbientOcclusion"].as<float>();
+					params.ambientOcclusion = ao;
+				}
+
+				auto metallicParams = param["Metallic"];
+				if (metallicParams)
+				{
+					float metallic = param["Metallic"].as<float>();
+					params.metallic = metallic;
+				}
+			}
+			else
+			{
+				auto textureParams = param["TextureDir"];
+				if(textureParams)
+				{
+					std::string textureDir = param["TextureDir"].as<std::string>();
+					params.textureDir = textureDir;
+
+					MaterialBuilder builder;
+
+					for (const auto& entry : std::filesystem::directory_iterator(textureDir))
+					{
+						std::filesystem::path path = entry.path();
+						std::string fileName = path.string();
+
+						//TODO: Handle case where multiple materials reference the same textures
+
+						Texture texture;
+
+						//Check if the texture we are loading is a normal map
+						if (path.stem().string().find(builder.normalExtension) != std::string::npos)
+						{
+							//Set texture format for normal maps
+							texture.setTextureFormat(VK_FORMAT_R8G8B8A8_UNORM);
+							Utils::loadImageFromFile(device, fileName.c_str(), texture, VK_FORMAT_R8G8B8A8_UNORM);
+						}
+						// load texture with default format
+						else
+						{
+							Utils::loadImageFromFile(device, fileName.c_str(), texture);
+						}
+						texture.createTextureImageView(device);
+						texture.createTextureSampler(device);
+						texture.setNameInternal(path.stem().string());
+
+						int binding = builder.getBindingFromFileName(path.stem().string());
+						if (binding < 0)
+						{
+							CORE_ERROR("Invalid file name to find binding: {0}", fileName)
+						}
+						else
+						{
+							params.materialTextures[(uint32_t)binding] = texture;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	mat.setShaderParameters(params);
+
+	return mat;
 }

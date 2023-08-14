@@ -6,3 +6,10 @@ enum RenderMode
 	WIREFRAME,
 	UNLIT
 };
+
+enum LightType
+{
+	Point,
+	Spot,
+	Directional
+};

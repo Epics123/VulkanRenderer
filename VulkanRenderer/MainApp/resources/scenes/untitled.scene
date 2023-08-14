@@ -34,7 +34,7 @@ Objects:
     Model:
       ModelPath: sphere/sphere.obj
     Material:
-      MaterialFile: ""
+      MaterialFile: "RedMetallic.mat"
   - Object: 3
     Tag:
       Name: Sphere2
@@ -72,7 +72,7 @@ Objects:
     Tag:
       Name: PointLight0
     Transform:
-      Translation: [-0.0771576613, 1.49798989, 1.5]
+      Translation: [1.1487124, 0.964564979, 1.5]
       Rotation: [0, 0, 0]
       Scale: [0.100000001, 1, 1]
     PointLightComponent:
@@ -83,7 +83,7 @@ Objects:
     Tag:
       Name: PointLight1
     Transform:
-      Translation: [-1.33587968, 0.682174325, 1.5]
+      Translation: [-0.260982275, 1.47709882, 1.5]
       Rotation: [0, 0, 0]
       Scale: [0.100000001, 1, 1]
     PointLightComponent:
@@ -94,7 +94,7 @@ Objects:
     Tag:
       Name: PointLight2
     Transform:
-      Translation: [-1.25872362, -0.815826595, 1.49999988]
+      Translation: [-1.40970612, 0.512529552, 1.49999988]
       Rotation: [0, 0, 0]
       Scale: [0.100000001, 1, 1]
     PointLightComponent:
@@ -105,7 +105,7 @@ Objects:
     Tag:
       Name: PointLight3
     Transform:
-      Translation: [0.0771576613, -1.49798989, 1.5]
+      Translation: [-1.1487124, -0.964564979, 1.5]
       Rotation: [0, 0, 0]
       Scale: [0.100000001, 1, 1]
     PointLightComponent:
@@ -116,7 +116,7 @@ Objects:
     Tag:
       Name: PointLight4
     Transform:
-      Translation: [1.33586645, -0.682162106, 1.5]
+      Translation: [0.260985166, -1.47708237, 1.5]
       Rotation: [0, 0, 0]
       Scale: [0.100000001, 1, 1]
     PointLightComponent:
@@ -127,7 +127,7 @@ Objects:
     Tag:
       Name: PointLight5
     Transform:
-      Translation: [1.25872123, 0.815828025, 1.5]
+      Translation: [1.40970659, -0.512526929, 1.5]
       Rotation: [0, 0, 0]
       Scale: [0.100000001, 1, 1]
     PointLightComponent:

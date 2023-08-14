@@ -2,6 +2,7 @@
 
 #include "Model.h"
 #include "Material.h"
+#include "Enums.h"
 
 #include "glm/gtc/matrix_transform.hpp"
 #include <glm/gtc/quaternion.hpp>
@@ -9,13 +10,6 @@
 #include <memory>
 #include <unordered_map>
 #include <string.h>
-
-enum LightType
-{
-	Point,
-	Spot,
-	Directional
-};
 
 struct TransformComponent
 {

@@ -221,11 +221,17 @@ void ImGuiSystem::drawMaterialEditor(GameObject& obj)
 			{
 				if (ImGui::BeginMenu("File"))
 				{
-					if (ImGui::MenuItem("Select Material"))
+					if(ImGui::MenuItem("Select Material"))
 					{
 					}
-					if (ImGui::MenuItem("Create Material"))
+					if(ImGui::MenuItem("Create Material"))
 					{
+					}
+					if(ImGui::MenuItem("Serialize"))
+					{
+						MaterialSerializer serializer;
+						const std::string path = MaterialBuilder::getMaterialFilePath() + obj.materialComp->materialFileName;
+						serializer.serialize(path, obj.materialComp->material);
 					}
 					ImGui::EndMenu();
 				}

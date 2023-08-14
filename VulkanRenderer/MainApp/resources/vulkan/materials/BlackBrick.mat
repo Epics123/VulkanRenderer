@@ -1,9 +1,4 @@
-#name
-pbr_textured
-
-#toggleTexture
-1
-
-#params
-#textureDir
-MainApp/resources/vulkan/textures/bricks/
+Material: "black_brick"
+Params:
+  - ToggleTextures: 1
+  - TextureDir: MainApp/resources/vulkan/textures/bricks/

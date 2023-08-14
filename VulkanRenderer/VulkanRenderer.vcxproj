@@ -163,6 +163,7 @@
     <ClInclude Include="MainApp\Texture.h" />
     <ClInclude Include="MainApp\TextureSampler.h" />
     <ClInclude Include="MainApp\Utils.h" />
+    <ClInclude Include="MainApp\Utils\YamlHelpers.h" />
     <ClInclude Include="MainApp\VertexAttributes.h" />
     <ClInclude Include="MainApp\VertexBuffer.h" />
     <ClInclude Include="MainApp\Window.h" />
@@ -243,6 +244,7 @@
     <ClCompile Include="MainApp\Texture.cpp" />
     <ClCompile Include="MainApp\TextureSampler.cpp" />
     <ClCompile Include="MainApp\Utils.cpp" />
+    <ClCompile Include="MainApp\Utils\YamlHelper.cpp" />
     <ClCompile Include="MainApp\VertexAttributes.cpp" />
     <ClCompile Include="MainApp\VertexBuffer.cpp" />
     <ClCompile Include="MainApp\Window.cpp" />

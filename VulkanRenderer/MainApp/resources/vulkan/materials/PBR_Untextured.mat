@@ -1,11 +1,7 @@
-#name
-pbr_untextured
-
-#toggleTexture
-0
-
-#params
-0.1 0.2 0.8 1.0
-0.5
-0.5
-0.0
+Material: "pbr_untextured"
+Params:
+  - ToggleTextures: 0
+  - Albedo: [0, 0.5, 1, 1]
+  - Roughness: 0.5
+  - AmbientOcclusion: 0.5
+  - Metallic: 0

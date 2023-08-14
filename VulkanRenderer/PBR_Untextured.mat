@@ -1,0 +1,9 @@
+Material: ""
+Params:
+  - ToggleTextures
+  - 0
+  - UntexturedParams
+  - Albedo: [0.100000001, 0.200000003, 0.800000012, 1]
+    Roughness: 0.5
+    AmbientOcclusion: 0.5
+    Metallic: 0

@@ -28,6 +28,9 @@
     <Filter Include="MainApp\Scene">
       <UniqueIdentifier>{C81BF159-34DC-6C90-FD16-B60D6996B16C}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MainApp\Utils">
+      <UniqueIdentifier>{0BB01E5A-7770-9A90-40AB-E30DAC2ADF6C}</UniqueIdentifier>
+    </Filter>
     <Filter Include="MainApp\resources">
       <UniqueIdentifier>{B551250E-2168-23A4-6ADF-AEC5D634F42B}</UniqueIdentifier>
     </Filter>
@@ -248,6 +251,9 @@
     </ClInclude>
     <ClInclude Include="MainApp\Utils.h">
       <Filter>MainApp</Filter>
+    </ClInclude>
+    <ClInclude Include="MainApp\Utils\YamlHelpers.h">
+      <Filter>MainApp\Utils</Filter>
     </ClInclude>
     <ClInclude Include="MainApp\VertexAttributes.h">
       <Filter>MainApp</Filter>
@@ -493,6 +499,9 @@
     </ClCompile>
     <ClCompile Include="MainApp\Window.cpp">
       <Filter>MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="MainApp\Utils\YamlHelper.cpp">
+      <Filter>MainApp\Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
