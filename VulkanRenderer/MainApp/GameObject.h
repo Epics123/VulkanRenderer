@@ -37,6 +37,11 @@ struct LightComponent
 	glm::vec3 color;
 };
 
+struct DirectionalLightComponent : LightComponent
+{
+	glm::vec3 direction;
+};
+
 struct PointLightComponent : LightComponent
 {
 	float intensity = 1.0f;

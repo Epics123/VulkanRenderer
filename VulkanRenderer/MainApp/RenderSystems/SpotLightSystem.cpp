@@ -36,9 +36,8 @@ void SpotLightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo)
 
 		glm::vec3 direction = glm::vec3(0.0f, 0.0f, -1.0f) * obj.transform.orientation;
 		ubo.spotLights[lightIndex].direction = glm::vec4(direction, glm::cos(glm::radians(obj.spotLight->cutoffAngle)));
+		ubo.spotLights[lightIndex].outerCutoff = glm::cos(glm::radians(obj.spotLight->outerCutoffAngle));
 
-		float outerCutoff = glm::cos(glm::radians((obj.spotLight->cutoffAngle + 2.0f)));
-		ubo.spotLights[lightIndex].outerCutoff = outerCutoff;
 		lightIndex++;
 	}
 	ubo.numSpotLights = lightIndex;

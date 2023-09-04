@@ -1,0 +1,7 @@
+Material: red_metallic
+Params:
+  - ToggleTextures: 0
+  - Albedo: [1, 0, 0, 1]
+  - Roughness: 0.5
+  - AmbientOcclusion: 0.200000003
+  - Metallic: 1

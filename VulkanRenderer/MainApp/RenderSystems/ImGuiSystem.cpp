@@ -159,7 +159,8 @@ void ImGuiSystem::drawSceneInfo(FrameInfo& frameInfo)
 				if(obj.spotLight)
 				{
 					DrawFloatControl("Intensity", obj.spotLight->intensity, 1.0f, 120.0f, 0.0f, 20.0f, true);
-					DrawFloatControl("Cutoff Angle", obj.spotLight->cutoffAngle, 0.0f, 120.0f, 0.0f, 90.0f, true);
+					DrawFloatControl("Cutoff Angle", obj.spotLight->outerCutoffAngle, 0.0f, 120.0f, 0.0f, obj.spotLight->cutoffAngle, true);
+					DrawFloatControl("Outer Cutoff Angle", obj.spotLight->cutoffAngle, 0.0f, 120.0f, 0.0f, 90.0f, true);
 					DrawColor3Control("Color", obj.spotLight->color, 0.0f, 120.0f);
 					ImGui::NewLine();
 				}

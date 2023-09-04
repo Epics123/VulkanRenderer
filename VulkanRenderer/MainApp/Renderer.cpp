@@ -119,7 +119,10 @@ void Renderer::init()
 
 	CORE_WARN("Loading Game Objects...")
 	SceneSerializer serializer;
-	serializer.deserialize("MainApp/resources/scenes/untitled.scene", mDevice, sceneData);
+	if(!serializer.deserialize("MainApp/resources/scenes/untitled.scene", mDevice, sceneData))
+	{
+		CORE_ERROR("Failed to load scene!")
+	}
 	CORE_WARN("Game Object Load Complete!")
 
 	materialUboBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);

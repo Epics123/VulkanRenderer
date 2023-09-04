@@ -209,8 +209,6 @@ vec2 calculateParalaxTexCoords(vec2 uv, vec3 viewDir)
 
 void main()
 {
-	//TODO: Toggle texture map usage w/ uniform int (i.e 0 = no texture, 1 = texture)
-
 	vec2 uv = texCoord;
 
 	vec3 cameraPosWorld = inverse(ubo.view)[3].xyz;
@@ -251,7 +249,7 @@ void main()
 		H = normalize(V + L);
 		Lo += calculateLighting(V, N, L, H, albedo, pointLight.color);
 	}
-	vec3 ambient = vec3(0.03) * albedo * ao;
+	vec3 ambient = vec3(0.01) * albedo * ao;
 	// spot lights
 	for(int j = 0; j < ubo.numSpotLights; j++)
 	{
@@ -262,9 +260,9 @@ void main()
 		if(theta > spotLight.direction.w)
 		{
 			float epsilon = spotLight.direction.w - spotLight.outerCutoff;
-			float spotFadeIntensity = clamp((theta - spotLight.outerCutoff) / epsilon, 0.0, 1.0);
+			float spotFadeIntensity = smoothstep(0.0, 1.0, (theta - spotLight.outerCutoff) / -epsilon); // having a negative epislon value works for some reason, need to swap outer and inner cutoff values on the CPU side
 			
-			attenuation = 1.0 / dot(L, L);
+			attenuation = spotFadeIntensity;
 			L = normalize(L);
 			H = normalize(V + L);
 

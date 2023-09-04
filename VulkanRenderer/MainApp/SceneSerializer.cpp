@@ -104,8 +104,8 @@ static void serializeObject(YAML::Emitter& out, GameObject& obj)
 		out << YAML::Key << "Intensity" << YAML::Value << obj.spotLight->intensity;
 		glm::vec3 color = obj.spotLight->color;
 		out << YAML::Key << "Color" << YAML::Value << color;
-		out << YAML::Key << "CutoffAngle" << YAML::Value << obj.spotLight->cutoffAngle;
-		out << YAML::Key << "OuterCutoffAngle" << YAML::Value << obj.spotLight->outerCutoffAngle;
+		out << YAML::Key << "CutoffAngle" << YAML::Value << obj.spotLight->outerCutoffAngle;
+		out << YAML::Key << "OuterCutoffAngle" << YAML::Value << obj.spotLight->cutoffAngle;
 		out << YAML::EndMap;
 	}
 
@@ -262,8 +262,8 @@ bool SceneSerializer::deserialize(const std::string& filepath, Device& device, S
 				deserializedObj.spotLight->intensity = intensity;
 				deserializedObj.spotLight->lightType = LightType::Point;
 				deserializedObj.spotLight->color = color;
-				deserializedObj.spotLight->cutoffAngle = cutoffAngle;
-				deserializedObj.spotLight->outerCutoffAngle = outerCuttoffAngle;
+				deserializedObj.spotLight->cutoffAngle = outerCuttoffAngle;
+				deserializedObj.spotLight->outerCutoffAngle = cutoffAngle;
 			}
 
 			outSceneData.objects.emplace(deserializedObj.getID(), std::move(deserializedObj));
@@ -328,7 +328,7 @@ Material MaterialSerializer::deserialize(const std::string& filepath, class Devi
 	YAML::Node data = YAML::Load(ss.str());
 	if (!data["Material"])
 	{
-		CORE_ERROR("Material Deserialization Failed: Material file was not in the correct format!")
+		CORE_ERROR("Material deserialization failed for [{0}]: Material file was not in the correct format!", filepath)
 		return Material();
 	}
 
