@@ -33,12 +33,16 @@ layout (set = 0, binding = 0) uniform GlobalUbo
 	mat4 projection;
 	mat4 view;
 	mat4 invView;
+} ubo;
+
+layout (set = 0, binding = 1) uniform LightUbo
+{
 	vec4 ambientColor;
 	PointLight pointLights[10];
 	SpotLight spotLights[10];
 	int numLights;
 	int numSpotLights;
-} ubo;
+} lightUbo;
 
 void main()
 {
@@ -48,7 +52,7 @@ void main()
 	vec3 cameraRightWorld = {ubo.view[0][0], ubo.view[1][0], ubo.view[2][0]};
 	vec3 cameraUpWorld = {ubo.view[0][1], ubo.view[1][1], ubo.view[2][1]};
 
-	PointLight light = ubo.pointLights[lightIndex];
+	PointLight light = lightUbo.pointLights[lightIndex];
 
 	vec3 positionWorld = light.position.xyz + light.radius * fragOffset.x * cameraRightWorld + light.radius * fragOffset.y * cameraUpWorld;
 

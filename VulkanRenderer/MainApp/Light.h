@@ -12,6 +12,11 @@ struct Light
 	glm::vec4 color{}; // w is light intensity
 };
 
+struct DirectionalLight : Light
+{
+	glm::vec4 direction{};
+};
+
 struct PointLight : Light
 {
 	alignas(16) float radius;

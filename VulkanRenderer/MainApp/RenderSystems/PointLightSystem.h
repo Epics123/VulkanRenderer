@@ -18,8 +18,8 @@ public:
 
 	void init(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
 
-	void update(FrameInfo& frameInfo, GlobalUbo& ubo);
-	void render(FrameInfo& frameInfo, GlobalUbo& ubo);
+	void update(FrameInfo& frameInfo, LightUbo& ubo);
+	void render(FrameInfo& frameInfo, LightUbo& ubo);
 
 private:
 	void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);

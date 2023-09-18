@@ -15,31 +15,11 @@ layout (location = 3) out vec2 texCoord;
 layout (location = 4) out vec3 fragTangent;
 layout (location = 5) out vec3 fragBitangent;
 
-struct PointLight
-{
-	vec4 position;
-	vec4 color; // w is intensity
-	float radius;
-};
-
-struct SpotLight
-{
-	vec4 position;
-	vec4 color; // w is intensity
-	vec4 direction;
-	float outerCutoff;
-};
-
 layout (set = 0, binding = 0) uniform GlobalUbo
 {
 	mat4 projection;
 	mat4 view;
 	mat4 invView;
-	vec4 ambientColor;
-	PointLight pointLights[10];
-	SpotLight spotLights[10];
-	int numLights;
-	int numSpotLights;
 } ubo;
 
 layout (set = 1, binding = 5) uniform MaterialUbo

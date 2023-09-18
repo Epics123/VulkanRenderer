@@ -19,7 +19,7 @@ void PointLightSystem::init(VkRenderPass renderPass, VkDescriptorSetLayout globa
 	createPipeline(renderPass);
 }
 
-void PointLightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo)
+void PointLightSystem::update(FrameInfo& frameInfo, LightUbo& ubo)
 {
 	int lightIndex = 0;
 	glm::mat4 lightRot = glm::rotate(glm::mat4(1.0f), frameInfo.deltaTime, { 0.0f, 0.0f, 1.0f });
@@ -42,7 +42,7 @@ void PointLightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo)
 	ubo.numLights = lightIndex;
 }
 
-void PointLightSystem::render(FrameInfo& frameInfo, GlobalUbo& ubo)
+void PointLightSystem::render(FrameInfo& frameInfo, LightUbo& ubo)
 {
 	// Sort Lights
 	std::map<float, GameObject::id_t> sortedLights;

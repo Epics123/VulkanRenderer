@@ -133,6 +133,7 @@ private:
 	std::vector<VkDescriptorSet> globalDescriptorSets;
 	std::vector<VkDescriptorSet> materialDescriptorSets;
 	std::vector<std::unique_ptr<Buffer>> uboBuffers;
+	std::vector<std::unique_ptr<Buffer>> lightUboBuffers;
 	std::vector<std::unique_ptr<Buffer>> materialUboBuffers;
 	class GameObject::Map gameObjects;
 

@@ -20,6 +20,13 @@ struct PointLight
 	float radius;
 };
 
+struct DirectionalLight
+{
+	vec4 position;
+	vec4 color;
+	vec4 direction;
+};
+
 struct SpotLight
 {
 	vec4 position;
@@ -33,12 +40,17 @@ layout (set = 0, binding = 0) uniform GlobalUbo
 	mat4 projection;
 	mat4 view;
 	mat4 invView;
+} ubo;
+
+layout (set = 0, binding = 1) uniform LightUbo
+{
 	vec4 ambientColor;
 	PointLight pointLights[10];
 	SpotLight spotLights[10];
+	DirectionalLight directionalLight;
 	int numLights;
 	int numSpotLights;
-} ubo;
+} lightUbo;
 
 //TODO: Add metalic map
 layout(set = 1, binding = 0) uniform sampler2D diffuseMap[];
@@ -238,22 +250,29 @@ void main()
 	}
 
 	vec3 Lo = vec3(0.0);
+	vec3 ambient = vec3(0.01) * albedo * ao;
+
+	// directional light
+	L = normalize(-lightUbo.directionalLight.direction.xyz);
+	H = normalize(V + L);
+	attenuation = 1.0;
+	Lo += calculateLighting(V, N, L, H, albedo, lightUbo.directionalLight.color);
 
 	// point lights
-	for(int i = 0; i < ubo.numLights; i++)
+	for(int i = 0; i < lightUbo.numLights; i++)
 	{
-		PointLight pointLight = ubo.pointLights[i];
+		PointLight pointLight = lightUbo.pointLights[i];
 		L = pointLight.position.xyz - fragPosWorld;
 		attenuation = 1.0 / dot(L, L); // dist sq
 		L = normalize(L);
 		H = normalize(V + L);
 		Lo += calculateLighting(V, N, L, H, albedo, pointLight.color);
 	}
-	vec3 ambient = vec3(0.01) * albedo * ao;
+
 	// spot lights
-	for(int j = 0; j < ubo.numSpotLights; j++)
+	for(int j = 0; j < lightUbo.numSpotLights; j++)
 	{
-		SpotLight spotLight = ubo.spotLights[j];
+		SpotLight spotLight = lightUbo.spotLights[j];
 		L = spotLight.position.xyz - fragPosWorld;
 		float theta = dot(normalize(L), normalize(-spotLight.direction.xyz));
 
@@ -271,7 +290,6 @@ void main()
 		else
 			Lo += ambient;
 	}
-
 	
 	vec3 color = ambient + Lo;
 

@@ -69,6 +69,7 @@ void Renderer::init()
 		DescriptorPool::Builder(mDevice)
 		.setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT * 2)
 		.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
+		.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
 		.addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 6)
 		.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, SwapChain::MAX_FRAMES_IN_FLIGHT)
 		.build();
@@ -91,9 +92,17 @@ void Renderer::init()
 		uboBuffers[i]->map();
 	}
 
+	lightUboBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+	for (int i = 0; i < lightUboBuffers.size(); i++)
+	{
+		lightUboBuffers[i] = std::make_unique<Buffer>(mDevice, sizeof(LightUbo), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+		lightUboBuffers[i]->map();
+	}
+
 	// highest set common to all shaders
 	std::unique_ptr<DescriptorSetLayout> globalSetLayout = DescriptorSetLayout::Builder(mDevice)
 		.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
+		.addBinding(1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
 		.build();
 
 	std::unique_ptr<DescriptorSetLayout> materialSetLayout = DescriptorSetLayout::Builder(mDevice)
@@ -110,8 +119,10 @@ void Renderer::init()
 	for (int i = 0; i < globalDescriptorSets.size(); i++)
 	{
 		VkDescriptorBufferInfo bufferInfo = uboBuffers[i]->descriptorInfo();
+		VkDescriptorBufferInfo lightBufferInfo = lightUboBuffers[i]->descriptorInfo();
 		DescriptorWriter(*globalSetLayout, *globalDescriptorPool)
 			.writeBuffer(0, &bufferInfo)
+			.writeBuffer(1, &lightBufferInfo)
 			.build(globalDescriptorSets[i]);
 	}
 
@@ -123,6 +134,12 @@ void Renderer::init()
 	{
 		CORE_ERROR("Failed to load scene!")
 	}
+	GameObject dirLight = GameObject::createGameObject();
+	dirLight.directionalLight = std::make_unique<DirectionalLightComponent>();
+	dirLight.directionalLight->direction = glm::vec3(0.0f, 0.0f, -1.0f);
+	dirLight.directionalLight->color = glm::vec3(1.0f, 1.0f, 1.0f);
+	dirLight.setObjectName("Directional Light");
+	sceneData.objects.emplace(dirLight.getID(), std::move(dirLight));
 	CORE_WARN("Game Object Load Complete!")
 
 	materialUboBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -381,10 +398,14 @@ void Renderer::drawFrame(float dt)
 		ubo.projection = mainCamera.proj;
 		ubo.view = mainCamera.view;
 		ubo.inverseView = mainCamera.invView;
-		pointLightSystem.update(frameInfo, ubo);
-		spotLightSystem.update(frameInfo, ubo);
 		uboBuffers[frameIndex]->writeToBuffer(&ubo);
 		uboBuffers[frameIndex]->flush();
+
+		LightUbo lightUbo{};
+		pointLightSystem.update(frameInfo, lightUbo);
+		spotLightSystem.update(frameInfo, lightUbo);
+		lightUboBuffers[frameIndex]->writeToBuffer(&lightUbo);
+		lightUboBuffers[frameIndex]->flush();
 
 		// render
 		beginSwapChainRenderPass(commandBuffer);
@@ -396,8 +417,8 @@ void Renderer::drawFrame(float dt)
 			// order matters for transparency
 			renderSystem.update(frameInfo, materialUboBuffers[frameIndex].get());
 			renderSystem.render(frameInfo);
-			pointLightSystem.render(frameInfo, ubo);
-			spotLightSystem.render(frameInfo, ubo);
+			pointLightSystem.render(frameInfo, lightUbo);
+			spotLightSystem.render(frameInfo, lightUbo);
 			break;
 		case WIREFRAME:
 			wireframeSystem.render(frameInfo);

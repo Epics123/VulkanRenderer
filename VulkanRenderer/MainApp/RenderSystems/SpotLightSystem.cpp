@@ -18,13 +18,22 @@ void SpotLightSystem::init(VkRenderPass renderPass, VkDescriptorSetLayout global
 	createPipeline(renderPass);
 }
 
-void SpotLightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo)
+void SpotLightSystem::update(FrameInfo& frameInfo, LightUbo& ubo)
 {
 	int lightIndex = 0;
 
 	for (auto& keyValue : frameInfo.gameObjects)
 	{
 		GameObject& obj = keyValue.second;
+
+		if(obj.directionalLight)
+		{
+			ubo.directionalLight.position = glm::vec4(obj.transform.translation, obj.directionalLight->lightType);
+			ubo.directionalLight.color = glm::vec4(obj.directionalLight->color, obj.directionalLight->intensity);
+
+			glm::vec3 direction = obj.directionalLight->direction;
+			ubo.directionalLight.direction = glm::vec4(direction, 0.0f);
+		}
 
 		if (!obj.spotLight)
 			continue;
@@ -43,7 +52,7 @@ void SpotLightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo)
 	ubo.numSpotLights = lightIndex;
 }
 
-void SpotLightSystem::render(FrameInfo& frameInfo, GlobalUbo& ubo)
+void SpotLightSystem::render(FrameInfo& frameInfo, LightUbo& ubo)
 {
 	pipeline->bind(frameInfo.commandBuffer);
 

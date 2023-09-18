@@ -25,12 +25,16 @@ layout (set = 0, binding = 0) uniform GlobalUbo
 	mat4 projection;
 	mat4 view;
 	mat4 invView;
+} ubo;
+
+layout (set = 0, binding = 1) uniform LightUbo
+{
 	vec4 ambientColor;
 	PointLight pointLights[10];
 	SpotLight spotLights[10];
 	int numLights;
 	int numSpotLights;
-} ubo;
+} lightUbo;
 
 const float PI = 3.14159265;
 
@@ -40,5 +44,5 @@ void main()
 	if(dist >= 1.0)
 		discard;
 	
-	outColor = vec4(ubo.spotLights[lightIndex].color.xyz, 1.0);//0.5 * (cos(dist * PI) + 1.0));
+	outColor = vec4(lightUbo.spotLights[lightIndex].color.xyz, 1.0);//0.5 * (cos(dist * PI) + 1.0));
 }

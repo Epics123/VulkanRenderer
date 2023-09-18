@@ -13,9 +13,9 @@
 
 struct TransformComponent
 {
-	glm::vec3 translation{};
+	glm::vec3 translation{0.0f, 0.0f, 0.0f};
 	glm::vec3 scale{1.0f, 1.0f, 1.0f};
-	glm::vec3 rotation{};
+	glm::vec3 rotation{0.0f, 0.0f, 0.0f};
 
 	glm::vec3 forward;
 	glm::vec3 up;
@@ -39,7 +39,8 @@ struct LightComponent
 
 struct DirectionalLightComponent : LightComponent
 {
-	glm::vec3 direction;
+	glm::vec3 direction; 
+	float intensity = 1.0f;
 };
 
 struct PointLightComponent : LightComponent
@@ -100,6 +101,7 @@ public:
 	// optional components
 	std::shared_ptr<Model> model{};
 	std::unique_ptr<MaterialComponent> materialComp{};
+	std::unique_ptr<DirectionalLightComponent> directionalLight = nullptr;
 	std::unique_ptr<PointLightComponent> pointLight = nullptr;
 	std::unique_ptr<SpotLightComponent> spotLight = nullptr;
 

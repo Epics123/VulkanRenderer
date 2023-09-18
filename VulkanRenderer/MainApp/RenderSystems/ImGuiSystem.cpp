@@ -165,6 +165,15 @@ void ImGuiSystem::drawSceneInfo(FrameInfo& frameInfo)
 					ImGui::NewLine();
 				}
 
+				if(obj.directionalLight)
+				{
+					glm::vec3 direction = obj.directionalLight->direction;
+					DrawVec3ControlClamped("Direction", direction, 0.0f, 120.0f, -1.0f, 1.0f);
+					obj.directionalLight->direction = direction;
+					DrawColor3Control("Color", obj.directionalLight->color, 0.0f, 120.0f);
+					DrawFloatControl("Intensity", obj.directionalLight->intensity, 1.0f, 120.0f, 0.0f, 20.0f, true);
+				}
+
 				ImGui::TreePop();
 			}
 		}
@@ -444,6 +453,66 @@ void ImGuiSystem::DrawVec3Control(const char* label, glm::vec4& values, float re
 	ImGui::PopStyleColor(3);
 
 	ImGui::SameLine();
+	ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::PopItemWidth();
+
+	ImGui::PopStyleVar();
+
+	ImGui::Columns(1);
+	ImGui::PopID();
+}
+
+void ImGuiSystem::DrawVec3ControlClamped(const char* label, glm::vec3& values, float resetValue /*= 0.0f*/, float columnWidth /*= 100.0f*/, float min /*= 0.0f*/, float max /*= 1.0f*/)
+{
+	ImGui::PushID(label);
+
+	ImGui::Columns(2);
+
+	ImGui::SetColumnWidth(0, columnWidth);
+	ImGui::Text(label);
+	ImGui::NextColumn();
+
+	ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+
+	float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+	ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+	if (ImGui::Button("X", buttonSize))
+		values.x = resetValue;
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine();
+	values.x = glm::clamp(values.x, min, max);
+	ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::PopItemWidth();
+	ImGui::SameLine();
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.3f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.3f, 1.0f });
+	if (ImGui::Button("Y", buttonSize))
+		values.y = resetValue;
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine();
+	values.y = glm::clamp(values.y, min, max);
+	ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::PopItemWidth();
+	ImGui::SameLine();
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+	if (ImGui::Button("Z", buttonSize))
+		values.z = resetValue;
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine();
+	values.z = glm::clamp(values.z, min, max);
 	ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
 	ImGui::PopItemWidth();
 
