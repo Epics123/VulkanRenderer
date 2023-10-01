@@ -134,12 +134,6 @@ void Renderer::init()
 	{
 		CORE_ERROR("Failed to load scene!")
 	}
-	GameObject dirLight = GameObject::createGameObject();
-	dirLight.directionalLight = std::make_unique<DirectionalLightComponent>();
-	dirLight.directionalLight->direction = glm::vec3(0.0f, 0.0f, -1.0f);
-	dirLight.directionalLight->color = glm::vec3(1.0f, 1.0f, 1.0f);
-	dirLight.setObjectName("Directional Light");
-	sceneData.objects.emplace(dirLight.getID(), std::move(dirLight));
 	CORE_WARN("Game Object Load Complete!")
 
 	materialUboBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -153,7 +147,6 @@ void Renderer::init()
 	CORE_WARN("Loading Materials...")
 	loadMaterials(*materialSetLayout);
 	CORE_WARN("Material Load Finished!")
-	
 
 	renderSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout(), materialSetLayout->getDescriptorSetLayout());
 	pointLightSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());

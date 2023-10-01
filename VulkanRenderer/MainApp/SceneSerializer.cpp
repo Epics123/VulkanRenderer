@@ -109,6 +109,19 @@ static void serializeObject(YAML::Emitter& out, GameObject& obj)
 		out << YAML::EndMap;
 	}
 
+	if(obj.directionalLight)
+	{
+		out << YAML::Key << "DirectionalLightComponent";
+		out << YAML::BeginMap;
+		out << YAML::Key << "LightType" << YAML::Value << obj.directionalLight->lightType;
+		out << YAML::Key << "Intensity" << YAML::Value << obj.directionalLight->intensity;
+		glm::vec3 color = obj.directionalLight->color;
+		out << YAML::Key << "Color" << YAML::Value << color;
+		glm::vec3& direction = obj.directionalLight->direction;
+		out << YAML::Key << "Direction" << YAML::Value << direction;
+		out << YAML::EndMap;
+	}
+
 	out << YAML::EndMap; // Object
 }
 
@@ -236,12 +249,11 @@ bool SceneSerializer::deserialize(const std::string& filepath, Device& device, S
 				LightType type = getLightType(lightTypeStr);
 
 				float intensity = pointLightComponent["Intensity"].as<float>();
-
 				glm::vec3 color = pointLightComponent["Color"].as<glm::vec3>();
 
 				deserializedObj.pointLight = std::make_unique<PointLightComponent>();
 				deserializedObj.pointLight->intensity = intensity;
-				deserializedObj.pointLight->lightType = LightType::Point;
+				deserializedObj.pointLight->lightType = type;
 				deserializedObj.pointLight->color = color;
 			}
 
@@ -252,7 +264,6 @@ bool SceneSerializer::deserialize(const std::string& filepath, Device& device, S
 				LightType type = getLightType(lightTypeStr);
 
 				float intensity = spotLightComponent["Intensity"].as<float>();
-
 				glm::vec3 color = spotLightComponent["Color"].as<glm::vec3>();
 
 				float cutoffAngle = spotLightComponent["CutoffAngle"].as<float>();
@@ -260,10 +271,27 @@ bool SceneSerializer::deserialize(const std::string& filepath, Device& device, S
 
 				deserializedObj.spotLight = std::make_unique<SpotLightComponent>();
 				deserializedObj.spotLight->intensity = intensity;
-				deserializedObj.spotLight->lightType = LightType::Point;
+				deserializedObj.spotLight->lightType = type;
 				deserializedObj.spotLight->color = color;
 				deserializedObj.spotLight->cutoffAngle = outerCuttoffAngle;
 				deserializedObj.spotLight->outerCutoffAngle = cutoffAngle;
+			}
+
+			auto directionalLightComponent = object["DirectionalLightComponent"];
+			if(directionalLightComponent)
+			{
+				std::string lightTypeStr = directionalLightComponent["LightType"].as<std::string>();
+				LightType type = getLightType(lightTypeStr);
+
+				float intensity = directionalLightComponent["Intensity"].as<float>();
+				glm::vec3 color = directionalLightComponent["Color"].as<glm::vec3>();
+				glm::vec3 direction = directionalLightComponent["Direction"].as<glm::vec3>();
+
+				deserializedObj.directionalLight = std::make_unique<DirectionalLightComponent>();
+				deserializedObj.directionalLight->direction = direction;
+				deserializedObj.directionalLight->color = color;
+				deserializedObj.directionalLight->intensity = intensity;
+				deserializedObj.directionalLight->lightType = type;
 			}
 
 			outSceneData.objects.emplace(deserializedObj.getID(), std::move(deserializedObj));

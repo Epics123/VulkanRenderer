@@ -147,6 +147,7 @@ void ImGuiSystem::drawSceneInfo(FrameInfo& frameInfo)
 				DrawVec3Control("Position", obj.transform.translation, 0.0f, 120.0f);
 				DrawVec3Control("Rotation", obj.transform.rotation, 0.0f, 120.0f, true);
 				DrawVec3Control("Scale", obj.transform.scale, 1.0f, 120.0f);
+				ImGui::NewLine();
 
 				drawMaterialEditor(obj);
 
@@ -170,7 +171,7 @@ void ImGuiSystem::drawSceneInfo(FrameInfo& frameInfo)
 					glm::vec3 direction = obj.directionalLight->direction;
 					DrawVec3ControlClamped("Direction", direction, 0.0f, 120.0f, -1.0f, 1.0f);
 					obj.directionalLight->direction = direction;
-					DrawColor3Control("Color", obj.directionalLight->color, 0.0f, 120.0f);
+					DrawVec3Control("Color", obj.directionalLight->color, 0.0f, 120.0f);
 					DrawFloatControl("Intensity", obj.directionalLight->intensity, 1.0f, 120.0f, 0.0f, 20.0f, true);
 				}
 

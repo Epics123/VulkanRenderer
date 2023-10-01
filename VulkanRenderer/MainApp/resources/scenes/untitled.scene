@@ -1,5 +1,5 @@
 Scene: Untitled
-TotalObjectCount: 14
+TotalObjectCount: 15
 TotalMaterialCount: 6
 Objects:
   - Object: 0
@@ -72,7 +72,7 @@ Objects:
     Tag:
       Name: PointLight0
     Transform:
-      Translation: [0.443797559, 1.43282676, 1.5]
+      Translation: [-1.35737765, 0.638345599, 1.5]
       Rotation: [0, 0, 0]
       Scale: [0.100000001, 1, 1]
     PointLightComponent:
@@ -83,7 +83,7 @@ Objects:
     Tag:
       Name: PointLight1
     Transform:
-      Translation: [-1.01895428, 1.1007477, 1.5]
+      Translation: [-1.23149431, -0.856337309, 1.5]
       Rotation: [0, 0, 0]
       Scale: [0.100000001, 1, 1]
     PointLightComponent:
@@ -94,7 +94,7 @@ Objects:
     Tag:
       Name: PointLight2
     Transform:
-      Translation: [-1.46277487, -0.332079351, 1.49999988]
+      Translation: [0.125867113, -1.49470484, 1.49999988]
       Rotation: [0, 0, 0]
       Scale: [0.100000001, 1, 1]
     PointLightComponent:
@@ -105,7 +105,7 @@ Objects:
     Tag:
       Name: PointLight3
     Transform:
-      Translation: [-0.443797559, -1.43282676, 1.5]
+      Translation: [1.35737765, -0.638345599, 1.5]
       Rotation: [0, 0, 0]
       Scale: [0.100000001, 1, 1]
     PointLightComponent:
@@ -116,7 +116,7 @@ Objects:
     Tag:
       Name: PointLight4
     Transform:
-      Translation: [1.01895797, -1.100734, 1.5]
+      Translation: [1.23148561, 0.856348813, 1.5]
       Rotation: [0, 0, 0]
       Scale: [0.100000001, 1, 1]
     PointLightComponent:
@@ -127,7 +127,7 @@ Objects:
     Tag:
       Name: PointLight5
     Transform:
-      Translation: [1.46277392, 0.332078993, 1.5]
+      Translation: [-0.12586844, 1.49470365, 1.5]
       Rotation: [0, 0, 0]
       Scale: [0.100000001, 1, 1]
     PointLightComponent:
@@ -142,7 +142,7 @@ Objects:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     SpotLightComponent:
-      LightType: Point
+      LightType: Spot
       Intensity: 11.6000004
       Color: [1, 1, 1]
       CutoffAngle: 47.2999992
@@ -155,8 +155,20 @@ Objects:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     SpotLightComponent:
-      LightType: Point
+      LightType: Spot
       Intensity: 8
       Color: [0.852941155, 1, 0]
       CutoffAngle: 30.3999996
       OuterCutoffAngle: 37.5
+  - Object: 14
+    Tag:
+      Name: Directional Light
+    Transform:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    DirectionalLightComponent:
+      LightType: Directional
+      Intensity: 1
+      Color: [1, 1, 1]
+      Direction: [0, 0, -1]
