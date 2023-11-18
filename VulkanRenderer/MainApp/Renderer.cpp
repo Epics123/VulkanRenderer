@@ -240,6 +240,14 @@ void Renderer::createCommandBuffers()
 
 	if (vkAllocateCommandBuffers(mDevice.getDevice(), &allocInfo, commandBuffers.data()) != VK_SUCCESS)
 	{
+		CORE_ERROR("Failed to allocate command buffers!")
+		throw std::runtime_error("Failed to allocate command buffers!");
+	}
+
+	shadowCommandBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+	if (vkAllocateCommandBuffers(mDevice.getDevice(), &allocInfo, shadowCommandBuffers.data()) != VK_SUCCESS)
+	{
+		CORE_ERROR("Failed to allocate shadow pass command buffers!")
 		throw std::runtime_error("Failed to allocate command buffers!");
 	}
 }
@@ -369,37 +377,36 @@ VkCommandBuffer Renderer::beginFrame()
 
 void Renderer::drawFrame(float dt)
 {
-	if (VkCommandBuffer commandBuffer = beginFrame())
+	VkCommandBuffer commandBuffer = beginFrame();
+	int frameIndex = getFrameIndex();
+
+	FrameInfo frameInfo
 	{
-		int frameIndex = getFrameIndex();
+		frameIndex, currentFrametime, currentFramerate, dt,
+		showGrid, renderMode, commandBuffer, mainCamera,
+		globalDescriptorSets[frameIndex], materialDescriptorSets[frameIndex], sceneData.objects,
+		0, 0
+	};
 
-		imguiSystem.setViewportInfo(window->getWidth() * 0.5f, window->getHeight() * 0.5f, window->getWidth(), window->getHeight());
+	frameInfo.numObjs = totalObjects;
+	frameInfo.dynamicOffset = materialUboBuffers[frameIndex]->getAlignmentSize();
 
-		FrameInfo frameInfo 
-		{ 
-			frameIndex, currentFrametime, currentFramerate, dt, 
-			showGrid, renderMode, commandBuffer, mainCamera, 
-			globalDescriptorSets[frameIndex], materialDescriptorSets[frameIndex], sceneData.objects,
-			0, 0
-		};
+	// update ubos
+	GlobalUbo ubo{};
+	ubo.projection = mainCamera.proj;
+	ubo.view = mainCamera.view;
+	ubo.inverseView = mainCamera.invView;
+	uboBuffers[frameIndex]->writeToBuffer(&ubo);
+	uboBuffers[frameIndex]->flush();
 
-		frameInfo.numObjs = totalObjects;
-		frameInfo.dynamicOffset = materialUboBuffers[frameIndex]->getAlignmentSize();
-		
-		// update ubos
-		GlobalUbo ubo{};
-		ubo.projection = mainCamera.proj;
-		ubo.view = mainCamera.view;
-		ubo.inverseView = mainCamera.invView;
-		uboBuffers[frameIndex]->writeToBuffer(&ubo);
-		uboBuffers[frameIndex]->flush();
+	LightUbo lightUbo{};
+	pointLightSystem.update(frameInfo, lightUbo);
+	spotLightSystem.update(frameInfo, lightUbo);
+	lightUboBuffers[frameIndex]->writeToBuffer(&lightUbo);
+	lightUboBuffers[frameIndex]->flush();
 
-		LightUbo lightUbo{};
-		pointLightSystem.update(frameInfo, lightUbo);
-		spotLightSystem.update(frameInfo, lightUbo);
-		lightUboBuffers[frameIndex]->writeToBuffer(&lightUbo);
-		lightUboBuffers[frameIndex]->flush();
-
+	if (commandBuffer)
+	{
 		// render
 		beginSwapChainRenderPass(commandBuffer);
 		mainCamera.updateModel(dt);

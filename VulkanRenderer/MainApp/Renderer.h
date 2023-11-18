@@ -124,6 +124,7 @@ private:
 	std::string texturePath;
 	
 	std::vector<VkCommandBuffer> commandBuffers;
+	std::vector<VkCommandBuffer> shadowCommandBuffers;
 	
 	Device mDevice{*window};
 	std::unique_ptr <SwapChain> mSwapChain;
