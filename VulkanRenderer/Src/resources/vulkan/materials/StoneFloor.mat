@@ -1,0 +1,4 @@
+Material: "stone_floor"
+Params:
+  - ToggleTextures: 1
+  - TextureDir: Src/resources/vulkan/textures/stone_ground/

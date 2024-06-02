@@ -1,4 +1,0 @@
-Material: "stone_floor"
-Params:
-  - ToggleTextures: 1
-  - TextureDir: MainApp/resources/vulkan/textures/stone_ground/

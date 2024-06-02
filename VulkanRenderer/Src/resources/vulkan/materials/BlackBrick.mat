@@ -1,0 +1,4 @@
+Material: "black_brick"
+Params:
+  - ToggleTextures: 1
+  - TextureDir: Src/resources/vulkan/textures/bricks/

@@ -1,0 +1,4 @@
+Material: pbr_textured
+Params:
+  - ToggleTextures: 1
+  - TextureDir: Src/resources/vulkan/textures/dull_brass/

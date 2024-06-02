@@ -19,26 +19,50 @@
     <Filter Include="Libraries\yaml\src\contrib">
       <UniqueIdentifier>{FB71A380-E781-4F51-503B-B46F3C6A3EEA}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MainApp">
-      <UniqueIdentifier>{6BCAF114-D7A9-70B0-E0C1-FB864C20D711}</UniqueIdentifier>
+    <Filter Include="Src">
+      <UniqueIdentifier>{0D23880B-792C-887C-02A8-9E7C6EB0937C}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MainApp\RenderSystems">
-      <UniqueIdentifier>{F2D589C3-5E42-45BE-2736-DD1B93616726}</UniqueIdentifier>
+    <Filter Include="Src\Common">
+      <UniqueIdentifier>{A59F4B88-9157-8DD5-FA5E-6631E63528C6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MainApp\Scene">
-      <UniqueIdentifier>{C81BF159-34DC-6C90-FD16-B60D6996B16C}</UniqueIdentifier>
+    <Filter Include="Src\Core">
+      <UniqueIdentifier>{8537E246-7104-3D52-9A1D-2BFA864972E0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MainApp\Utils">
-      <UniqueIdentifier>{0BB01E5A-7770-9A90-40AB-E30DAC2ADF6C}</UniqueIdentifier>
+    <Filter Include="Src\Engine">
+      <UniqueIdentifier>{F27CE08C-DE34-22DA-473C-FB353313BDCA}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MainApp\resources">
-      <UniqueIdentifier>{B551250E-2168-23A4-6ADF-AEC5D634F42B}</UniqueIdentifier>
+    <Filter Include="Src\Engine\Logging">
+      <UniqueIdentifier>{882F0E16-7413-CF6B-DD73-C9BEC976B9ED}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MainApp\resources\vulkan">
-      <UniqueIdentifier>{B5D51F2F-A1FA-6EAF-CA45-543FB6C96DCD}</UniqueIdentifier>
+    <Filter Include="Src\Engine\Renderer">
+      <UniqueIdentifier>{D870B46F-44D2-917D-CD3F-D82F39A0C83C}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MainApp\resources\vulkan\shaders">
-      <UniqueIdentifier>{AE774CB2-9AC8-37F4-C32C-26B6AFDCCA5D}</UniqueIdentifier>
+    <Filter Include="Src\Engine\Renderer\RenderPasses">
+      <UniqueIdentifier>{F6C6DCC5-E217-C807-0B7C-B6C9F72B5B71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Engine\Runtime">
+      <UniqueIdentifier>{255C70F2-1140-3148-7AA0-2B9B66A31BCA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Engine\Scene">
+      <UniqueIdentifier>{8F579322-7B50-B274-A482-97F990DA9180}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Engine\Serialization">
+      <UniqueIdentifier>{FF940D05-EBB9-5C85-1405-421500895BA3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Engine\Utils">
+      <UniqueIdentifier>{D2EBC022-BEE4-DF74-E716-C5F9D36EBF80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\RenderSystems">
+      <UniqueIdentifier>{14A28D69-80B8-8BFF-C92F-172135855C87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\resources">
+      <UniqueIdentifier>{D75C34FB-431D-B031-0C58-F9AE78D7F40D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\resources\vulkan">
+      <UniqueIdentifier>{97C6322A-8355-BCF3-2C74-D0EE18E2CC99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\resources\vulkan\shaders">
+      <UniqueIdentifier>{902A2B1F-7CE5-1ACB-259D-93151137655B}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -153,116 +177,110 @@
     <ClInclude Include="Libraries\yaml\src\token.h">
       <Filter>Libraries\yaml\src</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\Application.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\Application.h">
+      <Filter>Src</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\Buffer.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\Common\Defines.h">
+      <Filter>Src\Common</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\Camera.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\Common\Enums.h">
+      <Filter>Src\Common</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\CommandBuffer.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\Core\Buffer.h">
+      <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\Descriptors.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\Core\CommandBuffer.h">
+      <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\Device.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\Core\Context.h">
+      <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\Enums.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\Core\Pipeline.h">
+      <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\FrameInfo.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\Core\SwapChain.h">
+      <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\GameObject.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\Core\Texture.h">
+      <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\Image.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\Core\VertexBuffer.h">
+      <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\Light.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\Engine\Logging\Log.h">
+      <Filter>Src\Engine\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\Log.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\Engine\Renderer\Descriptors.h">
+      <Filter>Src\Engine\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\Material.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\Engine\Renderer\Light.h">
+      <Filter>Src\Engine\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\Mesh.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\Engine\Renderer\Material.h">
+      <Filter>Src\Engine\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\Model.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\Engine\Renderer\Mesh.h">
+      <Filter>Src\Engine\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\Pipeline.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\Engine\Renderer\Model.h">
+      <Filter>Src\Engine\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\RenderPass.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\Engine\Renderer\RenderPasses\RenderPass.h">
+      <Filter>Src\Engine\Renderer\RenderPasses</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\RenderSystems\ImGuiSystem.h">
-      <Filter>MainApp\RenderSystems</Filter>
+    <ClInclude Include="Src\Engine\Renderer\Renderer.h">
+      <Filter>Src\Engine\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\RenderSystems\PointLightSystem.h">
-      <Filter>MainApp\RenderSystems</Filter>
+    <ClInclude Include="Src\Engine\Renderer\Window.h">
+      <Filter>Src\Engine\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\RenderSystems\RenderSystem.h">
-      <Filter>MainApp\RenderSystems</Filter>
+    <ClInclude Include="Src\Engine\Runtime\Camera.h">
+      <Filter>Src\Engine\Runtime</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\RenderSystems\RenderSystemBase.h">
-      <Filter>MainApp\RenderSystems</Filter>
+    <ClInclude Include="Src\Engine\Runtime\FrameInfo.h">
+      <Filter>Src\Engine\Runtime</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\RenderSystems\ShadowSystem.h">
-      <Filter>MainApp\RenderSystems</Filter>
+    <ClInclude Include="Src\Engine\Runtime\GameObject.h">
+      <Filter>Src\Engine\Runtime</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\RenderSystems\SpotLightSystem.h">
-      <Filter>MainApp\RenderSystems</Filter>
+    <ClInclude Include="Src\Engine\Scene\Scene.h">
+      <Filter>Src\Engine\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\RenderSystems\UnlitSystem.h">
-      <Filter>MainApp\RenderSystems</Filter>
+    <ClInclude Include="Src\Engine\Serialization\SceneSerializer.h">
+      <Filter>Src\Engine\Serialization</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\RenderSystems\WireframeSystem.h">
-      <Filter>MainApp\RenderSystems</Filter>
+    <ClInclude Include="Src\Engine\Utils\Utils.h">
+      <Filter>Src\Engine\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\RenderSystems\WorldGridSystem.h">
-      <Filter>MainApp\RenderSystems</Filter>
+    <ClInclude Include="Src\Engine\Utils\YamlHelpers.h">
+      <Filter>Src\Engine\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\Renderer.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\RenderSystems\ImGuiSystem.h">
+      <Filter>Src\RenderSystems</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\Scene\Scene.h">
-      <Filter>MainApp\Scene</Filter>
+    <ClInclude Include="Src\RenderSystems\PointLightSystem.h">
+      <Filter>Src\RenderSystems</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\SceneSerializer.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\RenderSystems\RenderSystem.h">
+      <Filter>Src\RenderSystems</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\SwapChain.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\RenderSystems\RenderSystemBase.h">
+      <Filter>Src\RenderSystems</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\Texture.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\RenderSystems\ShadowSystem.h">
+      <Filter>Src\RenderSystems</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\TextureSampler.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\RenderSystems\SpotLightSystem.h">
+      <Filter>Src\RenderSystems</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\Utils.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\RenderSystems\UnlitSystem.h">
+      <Filter>Src\RenderSystems</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\Utils\YamlHelpers.h">
-      <Filter>MainApp\Utils</Filter>
+    <ClInclude Include="Src\RenderSystems\WireframeSystem.h">
+      <Filter>Src\RenderSystems</Filter>
     </ClInclude>
-    <ClInclude Include="MainApp\VertexAttributes.h">
-      <Filter>MainApp</Filter>
-    </ClInclude>
-    <ClInclude Include="MainApp\VertexBuffer.h">
-      <Filter>MainApp</Filter>
-    </ClInclude>
-    <ClInclude Include="MainApp\Window.h">
-      <Filter>MainApp</Filter>
+    <ClInclude Include="Src\RenderSystems\WorldGridSystem.h">
+      <Filter>Src\RenderSystems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -395,163 +413,154 @@
     <ClCompile Include="Libraries\yaml\src\tag.cpp">
       <Filter>Libraries\yaml\src</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\Application.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="Src\Application.cpp">
+      <Filter>Src</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\Buffer.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="Src\Core\Buffer.cpp">
+      <Filter>Src\Core</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\Camera.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="Src\Core\CommandBuffer.cpp">
+      <Filter>Src\Core</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\CommandBuffer.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="Src\Core\Context.cpp">
+      <Filter>Src\Core</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\Descriptors.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="Src\Core\Pipeline.cpp">
+      <Filter>Src\Core</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\Device.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="Src\Core\SwapChain.cpp">
+      <Filter>Src\Core</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\GameObject.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="Src\Core\Texture.cpp">
+      <Filter>Src\Core</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\Image.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="Src\Core\VertexBuffer.cpp">
+      <Filter>Src\Core</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\Light.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="Src\Engine\Logging\Log.cpp">
+      <Filter>Src\Engine\Logging</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\Log.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="Src\Engine\Renderer\Descriptors.cpp">
+      <Filter>Src\Engine\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\Main.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="Src\Engine\Renderer\Light.cpp">
+      <Filter>Src\Engine\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\Material.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="Src\Engine\Renderer\Material.cpp">
+      <Filter>Src\Engine\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\Mesh.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="Src\Engine\Renderer\Mesh.cpp">
+      <Filter>Src\Engine\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\Model.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="Src\Engine\Renderer\Model.cpp">
+      <Filter>Src\Engine\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\Pipeline.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="Src\Engine\Renderer\RenderPasses\RenderPass.cpp">
+      <Filter>Src\Engine\Renderer\RenderPasses</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\RenderPass.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="Src\Engine\Renderer\Renderer.cpp">
+      <Filter>Src\Engine\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\RenderSystems\ImGuiSystem.cpp">
-      <Filter>MainApp\RenderSystems</Filter>
+    <ClCompile Include="Src\Engine\Renderer\Window.cpp">
+      <Filter>Src\Engine\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\RenderSystems\PointLightSystem.cpp">
-      <Filter>MainApp\RenderSystems</Filter>
+    <ClCompile Include="Src\Engine\Runtime\Camera.cpp">
+      <Filter>Src\Engine\Runtime</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\RenderSystems\RenderSystem.cpp">
-      <Filter>MainApp\RenderSystems</Filter>
+    <ClCompile Include="Src\Engine\Runtime\GameObject.cpp">
+      <Filter>Src\Engine\Runtime</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\RenderSystems\RenderSystemBase.cpp">
-      <Filter>MainApp\RenderSystems</Filter>
+    <ClCompile Include="Src\Engine\Scene\Scene.cpp">
+      <Filter>Src\Engine\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\RenderSystems\ShadowSystem.cpp">
-      <Filter>MainApp\RenderSystems</Filter>
+    <ClCompile Include="Src\Engine\Serialization\SceneSerializer.cpp">
+      <Filter>Src\Engine\Serialization</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\RenderSystems\SpotLightSystem.cpp">
-      <Filter>MainApp\RenderSystems</Filter>
+    <ClCompile Include="Src\Engine\Utils\Utils.cpp">
+      <Filter>Src\Engine\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\RenderSystems\UnlitSystem.cpp">
-      <Filter>MainApp\RenderSystems</Filter>
+    <ClCompile Include="Src\Engine\Utils\YamlHelper.cpp">
+      <Filter>Src\Engine\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\RenderSystems\WireframeSystem.cpp">
-      <Filter>MainApp\RenderSystems</Filter>
+    <ClCompile Include="Src\Main.cpp">
+      <Filter>Src</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\RenderSystems\WorldGridSystem.cpp">
-      <Filter>MainApp\RenderSystems</Filter>
+    <ClCompile Include="Src\RenderSystems\ImGuiSystem.cpp">
+      <Filter>Src\RenderSystems</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\Renderer.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="Src\RenderSystems\PointLightSystem.cpp">
+      <Filter>Src\RenderSystems</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\Scene\Scene.cpp">
-      <Filter>MainApp\Scene</Filter>
+    <ClCompile Include="Src\RenderSystems\RenderSystem.cpp">
+      <Filter>Src\RenderSystems</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\SceneSerializer.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="Src\RenderSystems\RenderSystemBase.cpp">
+      <Filter>Src\RenderSystems</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\SwapChain.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="Src\RenderSystems\ShadowSystem.cpp">
+      <Filter>Src\RenderSystems</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\Texture.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="Src\RenderSystems\SpotLightSystem.cpp">
+      <Filter>Src\RenderSystems</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\TextureSampler.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="Src\RenderSystems\UnlitSystem.cpp">
+      <Filter>Src\RenderSystems</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\Utils.cpp">
-      <Filter>MainApp</Filter>
+    <ClCompile Include="Src\RenderSystems\WireframeSystem.cpp">
+      <Filter>Src\RenderSystems</Filter>
     </ClCompile>
-    <ClCompile Include="MainApp\VertexAttributes.cpp">
-      <Filter>MainApp</Filter>
-    </ClCompile>
-    <ClCompile Include="MainApp\VertexBuffer.cpp">
-      <Filter>MainApp</Filter>
-    </ClCompile>
-    <ClCompile Include="MainApp\Window.cpp">
-      <Filter>MainApp</Filter>
-    </ClCompile>
-    <ClCompile Include="MainApp\Utils\YamlHelper.cpp">
-      <Filter>MainApp\Utils</Filter>
+    <ClCompile Include="Src\RenderSystems\WorldGridSystem.cpp">
+      <Filter>Src\RenderSystems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="MainApp\resources\vulkan\shaders\BasicUnlit.frag">
-      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    <None Include="Src\resources\vulkan\shaders\BasicUnlit.frag">
+      <Filter>Src\resources\vulkan\shaders</Filter>
     </None>
-    <None Include="MainApp\resources\vulkan\shaders\BasicUnlit.vert">
-      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    <None Include="Src\resources\vulkan\shaders\BasicUnlit.vert">
+      <Filter>Src\resources\vulkan\shaders</Filter>
     </None>
-    <None Include="MainApp\resources\vulkan\shaders\PBR.frag">
-      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    <None Include="Src\resources\vulkan\shaders\PBR.frag">
+      <Filter>Src\resources\vulkan\shaders</Filter>
     </None>
-    <None Include="MainApp\resources\vulkan\shaders\PBR.vert">
-      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    <None Include="Src\resources\vulkan\shaders\PBR.vert">
+      <Filter>Src\resources\vulkan\shaders</Filter>
     </None>
-    <None Include="MainApp\resources\vulkan\shaders\PointLight.frag">
-      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    <None Include="Src\resources\vulkan\shaders\PointLight.frag">
+      <Filter>Src\resources\vulkan\shaders</Filter>
     </None>
-    <None Include="MainApp\resources\vulkan\shaders\PointLight.vert">
-      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    <None Include="Src\resources\vulkan\shaders\PointLight.vert">
+      <Filter>Src\resources\vulkan\shaders</Filter>
     </None>
-    <None Include="MainApp\resources\vulkan\shaders\Shadows.frag">
-      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    <None Include="Src\resources\vulkan\shaders\Shadows.frag">
+      <Filter>Src\resources\vulkan\shaders</Filter>
     </None>
-    <None Include="MainApp\resources\vulkan\shaders\Shadows.vert">
-      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    <None Include="Src\resources\vulkan\shaders\Shadows.vert">
+      <Filter>Src\resources\vulkan\shaders</Filter>
     </None>
-    <None Include="MainApp\resources\vulkan\shaders\SpotLight.frag">
-      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    <None Include="Src\resources\vulkan\shaders\SpotLight.frag">
+      <Filter>Src\resources\vulkan\shaders</Filter>
     </None>
-    <None Include="MainApp\resources\vulkan\shaders\SpotLight.vert">
-      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    <None Include="Src\resources\vulkan\shaders\SpotLight.vert">
+      <Filter>Src\resources\vulkan\shaders</Filter>
     </None>
-    <None Include="MainApp\resources\vulkan\shaders\Test.frag">
-      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    <None Include="Src\resources\vulkan\shaders\Test.frag">
+      <Filter>Src\resources\vulkan\shaders</Filter>
     </None>
-    <None Include="MainApp\resources\vulkan\shaders\Test.vert">
-      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    <None Include="Src\resources\vulkan\shaders\Test.vert">
+      <Filter>Src\resources\vulkan\shaders</Filter>
     </None>
-    <None Include="MainApp\resources\vulkan\shaders\Wireframe.frag">
-      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    <None Include="Src\resources\vulkan\shaders\Wireframe.frag">
+      <Filter>Src\resources\vulkan\shaders</Filter>
     </None>
-    <None Include="MainApp\resources\vulkan\shaders\Wireframe.vert">
-      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    <None Include="Src\resources\vulkan\shaders\Wireframe.vert">
+      <Filter>Src\resources\vulkan\shaders</Filter>
     </None>
-    <None Include="MainApp\resources\vulkan\shaders\WorldGrid.frag">
-      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    <None Include="Src\resources\vulkan\shaders\WorldGrid.frag">
+      <Filter>Src\resources\vulkan\shaders</Filter>
     </None>
-    <None Include="MainApp\resources\vulkan\shaders\WorldGrid.vert">
-      <Filter>MainApp\resources\vulkan\shaders</Filter>
+    <None Include="Src\resources\vulkan\shaders\WorldGrid.vert">
+      <Filter>Src\resources\vulkan\shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

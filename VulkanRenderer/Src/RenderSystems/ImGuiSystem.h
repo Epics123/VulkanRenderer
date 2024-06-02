@@ -1,0 +1,60 @@
+#pragma once
+
+#include "../Core/Context.h"
+#include "Runtime/FrameInfo.h"
+#include "Runtime/GameObject.h"
+#include "../Common/Enums.h"
+
+#include <vector>
+#include <memory>
+#include <string.h>
+
+class ImGuiSystem
+{
+public:
+	ImGuiSystem(Context& device);
+	~ImGuiSystem();
+
+	ImGuiSystem(const ImGuiSystem&) = delete;
+	ImGuiSystem& operator=(const ImGuiSystem&) = delete;
+
+	struct ViewportInfo
+	{
+		float x = 0.0f;
+		float y = 0.0f;
+		float width = 0.0f;
+		float height = 0.0f;
+	};
+
+	void drawViewport();
+
+	void drawImGui(FrameInfo& frameInfo);
+	void drawDebugWindow();
+	void drawRenderModeText(RenderMode mode);
+	void drawFrameInfo(float framerate, float frameTime);
+	void drawDeviceSpecs();
+	void drawSceneInfo(FrameInfo& frameInfo);
+	void drawShowGridText(FrameInfo& frameInfo);
+	void drawGizmos(FrameInfo& frameInfo);
+
+	void drawMaterialEditor(GameObject& obj);
+
+	GameObject& getSelectedObject(FrameInfo& frameInfo);
+
+	void setViewportInfo(float x, float y, float width, float height);
+
+	static void DrawVec3Control(const char* label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f, bool isRotation = false);
+	static void DrawVec3Control(const char* label, glm::vec4& values, float resetValue = 0.0f, float columnWidth = 100.0f);
+	static void DrawVec3ControlClamped(const char* label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f, float min = 0.0f, float max = 1.0f);
+	static void DrawFloatControl(const char* label, float& value, float resetValue = 1.0f, float columnWidth = 100.0f, float min = 0.0f, float max = 0.0f, bool shouldClamp = false);
+	static void DrawColor3Control(const char* label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f);
+
+private:
+	Context& device;
+
+	uint32_t selectionContext = 0;
+
+	std::string cpuInfo;
+
+	ViewportInfo viewportInfo{};
+};

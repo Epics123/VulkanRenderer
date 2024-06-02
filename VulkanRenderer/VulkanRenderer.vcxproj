@@ -58,7 +58,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.189.2\Include;Libraries\glfw\include;Libraries\glm;Libraries\ImGui;Libraries\ObjLoader;Libraries\ImgLoader;Libraries\spdlog\include;Libraries\yaml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.189.2\Include;Libraries\glfw\include;Libraries\glm;Libraries\ImGui;Libraries\ObjLoader;Libraries\ImgLoader;Libraries\spdlog\include;Libraries\yaml\include;Src\Core;Src\Engine;Src\Engine\Runtime;Src\Engine\Renderer;Src\Engine\Renderer\RenderPasses;Src\Engine\Logging;Src\Engine\Serialization;Src\Engine\Utils;Src\RenderSystems;Src\Engine\Scene;Src\Engine\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -75,7 +75,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.189.2\Include;Libraries\glfw\include;Libraries\glm;Libraries\ImGui;Libraries\ObjLoader;Libraries\ImgLoader;Libraries\spdlog\include;Libraries\yaml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.189.2\Include;Libraries\glfw\include;Libraries\glm;Libraries\ImGui;Libraries\ObjLoader;Libraries\ImgLoader;Libraries\spdlog\include;Libraries\yaml\include;Src\Core;Src\Engine;Src\Engine\Runtime;Src\Engine\Renderer;Src\Engine\Renderer\RenderPasses;Src\Engine\Logging;Src\Engine\Serialization;Src\Engine\Utils;Src\RenderSystems;Src\Engine\Scene;Src\Engine\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -130,43 +130,41 @@
     <ClInclude Include="Libraries\yaml\src\stringsource.h" />
     <ClInclude Include="Libraries\yaml\src\tag.h" />
     <ClInclude Include="Libraries\yaml\src\token.h" />
-    <ClInclude Include="MainApp\Application.h" />
-    <ClInclude Include="MainApp\Buffer.h" />
-    <ClInclude Include="MainApp\Camera.h" />
-    <ClInclude Include="MainApp\CommandBuffer.h" />
-    <ClInclude Include="MainApp\Descriptors.h" />
-    <ClInclude Include="MainApp\Device.h" />
-    <ClInclude Include="MainApp\Enums.h" />
-    <ClInclude Include="MainApp\FrameInfo.h" />
-    <ClInclude Include="MainApp\GameObject.h" />
-    <ClInclude Include="MainApp\Image.h" />
-    <ClInclude Include="MainApp\Light.h" />
-    <ClInclude Include="MainApp\Log.h" />
-    <ClInclude Include="MainApp\Material.h" />
-    <ClInclude Include="MainApp\Mesh.h" />
-    <ClInclude Include="MainApp\Model.h" />
-    <ClInclude Include="MainApp\Pipeline.h" />
-    <ClInclude Include="MainApp\RenderPass.h" />
-    <ClInclude Include="MainApp\RenderSystems\ImGuiSystem.h" />
-    <ClInclude Include="MainApp\RenderSystems\PointLightSystem.h" />
-    <ClInclude Include="MainApp\RenderSystems\RenderSystem.h" />
-    <ClInclude Include="MainApp\RenderSystems\RenderSystemBase.h" />
-    <ClInclude Include="MainApp\RenderSystems\ShadowSystem.h" />
-    <ClInclude Include="MainApp\RenderSystems\SpotLightSystem.h" />
-    <ClInclude Include="MainApp\RenderSystems\UnlitSystem.h" />
-    <ClInclude Include="MainApp\RenderSystems\WireframeSystem.h" />
-    <ClInclude Include="MainApp\RenderSystems\WorldGridSystem.h" />
-    <ClInclude Include="MainApp\Renderer.h" />
-    <ClInclude Include="MainApp\Scene\Scene.h" />
-    <ClInclude Include="MainApp\SceneSerializer.h" />
-    <ClInclude Include="MainApp\SwapChain.h" />
-    <ClInclude Include="MainApp\Texture.h" />
-    <ClInclude Include="MainApp\TextureSampler.h" />
-    <ClInclude Include="MainApp\Utils.h" />
-    <ClInclude Include="MainApp\Utils\YamlHelpers.h" />
-    <ClInclude Include="MainApp\VertexAttributes.h" />
-    <ClInclude Include="MainApp\VertexBuffer.h" />
-    <ClInclude Include="MainApp\Window.h" />
+    <ClInclude Include="Src\Application.h" />
+    <ClInclude Include="Src\Common\Defines.h" />
+    <ClInclude Include="Src\Common\Enums.h" />
+    <ClInclude Include="Src\Core\Buffer.h" />
+    <ClInclude Include="Src\Core\CommandBuffer.h" />
+    <ClInclude Include="Src\Core\Context.h" />
+    <ClInclude Include="Src\Core\Pipeline.h" />
+    <ClInclude Include="Src\Core\SwapChain.h" />
+    <ClInclude Include="Src\Core\Texture.h" />
+    <ClInclude Include="Src\Core\VertexBuffer.h" />
+    <ClInclude Include="Src\Engine\Logging\Log.h" />
+    <ClInclude Include="Src\Engine\Renderer\Descriptors.h" />
+    <ClInclude Include="Src\Engine\Renderer\Light.h" />
+    <ClInclude Include="Src\Engine\Renderer\Material.h" />
+    <ClInclude Include="Src\Engine\Renderer\Mesh.h" />
+    <ClInclude Include="Src\Engine\Renderer\Model.h" />
+    <ClInclude Include="Src\Engine\Renderer\RenderPasses\RenderPass.h" />
+    <ClInclude Include="Src\Engine\Renderer\Renderer.h" />
+    <ClInclude Include="Src\Engine\Renderer\Window.h" />
+    <ClInclude Include="Src\Engine\Runtime\Camera.h" />
+    <ClInclude Include="Src\Engine\Runtime\FrameInfo.h" />
+    <ClInclude Include="Src\Engine\Runtime\GameObject.h" />
+    <ClInclude Include="Src\Engine\Scene\Scene.h" />
+    <ClInclude Include="Src\Engine\Serialization\SceneSerializer.h" />
+    <ClInclude Include="Src\Engine\Utils\Utils.h" />
+    <ClInclude Include="Src\Engine\Utils\YamlHelpers.h" />
+    <ClInclude Include="Src\RenderSystems\ImGuiSystem.h" />
+    <ClInclude Include="Src\RenderSystems\PointLightSystem.h" />
+    <ClInclude Include="Src\RenderSystems\RenderSystem.h" />
+    <ClInclude Include="Src\RenderSystems\RenderSystemBase.h" />
+    <ClInclude Include="Src\RenderSystems\ShadowSystem.h" />
+    <ClInclude Include="Src\RenderSystems\SpotLightSystem.h" />
+    <ClInclude Include="Src\RenderSystems\UnlitSystem.h" />
+    <ClInclude Include="Src\RenderSystems\WireframeSystem.h" />
+    <ClInclude Include="Src\RenderSystems\WorldGridSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Libraries\ImGui\ImGuizmo\GraphEditor.cpp" />
@@ -212,60 +210,57 @@
     <ClCompile Include="Libraries\yaml\src\singledocparser.cpp" />
     <ClCompile Include="Libraries\yaml\src\stream.cpp" />
     <ClCompile Include="Libraries\yaml\src\tag.cpp" />
-    <ClCompile Include="MainApp\Application.cpp" />
-    <ClCompile Include="MainApp\Buffer.cpp" />
-    <ClCompile Include="MainApp\Camera.cpp" />
-    <ClCompile Include="MainApp\CommandBuffer.cpp" />
-    <ClCompile Include="MainApp\Descriptors.cpp" />
-    <ClCompile Include="MainApp\Device.cpp" />
-    <ClCompile Include="MainApp\GameObject.cpp" />
-    <ClCompile Include="MainApp\Image.cpp" />
-    <ClCompile Include="MainApp\Light.cpp" />
-    <ClCompile Include="MainApp\Log.cpp" />
-    <ClCompile Include="MainApp\Main.cpp" />
-    <ClCompile Include="MainApp\Material.cpp" />
-    <ClCompile Include="MainApp\Mesh.cpp" />
-    <ClCompile Include="MainApp\Model.cpp" />
-    <ClCompile Include="MainApp\Pipeline.cpp" />
-    <ClCompile Include="MainApp\RenderPass.cpp" />
-    <ClCompile Include="MainApp\RenderSystems\ImGuiSystem.cpp" />
-    <ClCompile Include="MainApp\RenderSystems\PointLightSystem.cpp" />
-    <ClCompile Include="MainApp\RenderSystems\RenderSystem.cpp" />
-    <ClCompile Include="MainApp\RenderSystems\RenderSystemBase.cpp" />
-    <ClCompile Include="MainApp\RenderSystems\ShadowSystem.cpp" />
-    <ClCompile Include="MainApp\RenderSystems\SpotLightSystem.cpp" />
-    <ClCompile Include="MainApp\RenderSystems\UnlitSystem.cpp" />
-    <ClCompile Include="MainApp\RenderSystems\WireframeSystem.cpp" />
-    <ClCompile Include="MainApp\RenderSystems\WorldGridSystem.cpp" />
-    <ClCompile Include="MainApp\Renderer.cpp" />
-    <ClCompile Include="MainApp\Scene\Scene.cpp" />
-    <ClCompile Include="MainApp\SceneSerializer.cpp" />
-    <ClCompile Include="MainApp\SwapChain.cpp" />
-    <ClCompile Include="MainApp\Texture.cpp" />
-    <ClCompile Include="MainApp\TextureSampler.cpp" />
-    <ClCompile Include="MainApp\Utils.cpp" />
-    <ClCompile Include="MainApp\Utils\YamlHelper.cpp" />
-    <ClCompile Include="MainApp\VertexAttributes.cpp" />
-    <ClCompile Include="MainApp\VertexBuffer.cpp" />
-    <ClCompile Include="MainApp\Window.cpp" />
+    <ClCompile Include="Src\Application.cpp" />
+    <ClCompile Include="Src\Core\Buffer.cpp" />
+    <ClCompile Include="Src\Core\CommandBuffer.cpp" />
+    <ClCompile Include="Src\Core\Context.cpp" />
+    <ClCompile Include="Src\Core\Pipeline.cpp" />
+    <ClCompile Include="Src\Core\SwapChain.cpp" />
+    <ClCompile Include="Src\Core\Texture.cpp" />
+    <ClCompile Include="Src\Core\VertexBuffer.cpp" />
+    <ClCompile Include="Src\Engine\Logging\Log.cpp" />
+    <ClCompile Include="Src\Engine\Renderer\Descriptors.cpp" />
+    <ClCompile Include="Src\Engine\Renderer\Light.cpp" />
+    <ClCompile Include="Src\Engine\Renderer\Material.cpp" />
+    <ClCompile Include="Src\Engine\Renderer\Mesh.cpp" />
+    <ClCompile Include="Src\Engine\Renderer\Model.cpp" />
+    <ClCompile Include="Src\Engine\Renderer\RenderPasses\RenderPass.cpp" />
+    <ClCompile Include="Src\Engine\Renderer\Renderer.cpp" />
+    <ClCompile Include="Src\Engine\Renderer\Window.cpp" />
+    <ClCompile Include="Src\Engine\Runtime\Camera.cpp" />
+    <ClCompile Include="Src\Engine\Runtime\GameObject.cpp" />
+    <ClCompile Include="Src\Engine\Scene\Scene.cpp" />
+    <ClCompile Include="Src\Engine\Serialization\SceneSerializer.cpp" />
+    <ClCompile Include="Src\Engine\Utils\Utils.cpp" />
+    <ClCompile Include="Src\Engine\Utils\YamlHelper.cpp" />
+    <ClCompile Include="Src\Main.cpp" />
+    <ClCompile Include="Src\RenderSystems\ImGuiSystem.cpp" />
+    <ClCompile Include="Src\RenderSystems\PointLightSystem.cpp" />
+    <ClCompile Include="Src\RenderSystems\RenderSystem.cpp" />
+    <ClCompile Include="Src\RenderSystems\RenderSystemBase.cpp" />
+    <ClCompile Include="Src\RenderSystems\ShadowSystem.cpp" />
+    <ClCompile Include="Src\RenderSystems\SpotLightSystem.cpp" />
+    <ClCompile Include="Src\RenderSystems\UnlitSystem.cpp" />
+    <ClCompile Include="Src\RenderSystems\WireframeSystem.cpp" />
+    <ClCompile Include="Src\RenderSystems\WorldGridSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="MainApp\resources\vulkan\shaders\BasicUnlit.frag" />
-    <None Include="MainApp\resources\vulkan\shaders\BasicUnlit.vert" />
-    <None Include="MainApp\resources\vulkan\shaders\PBR.frag" />
-    <None Include="MainApp\resources\vulkan\shaders\PBR.vert" />
-    <None Include="MainApp\resources\vulkan\shaders\PointLight.frag" />
-    <None Include="MainApp\resources\vulkan\shaders\PointLight.vert" />
-    <None Include="MainApp\resources\vulkan\shaders\Shadows.frag" />
-    <None Include="MainApp\resources\vulkan\shaders\Shadows.vert" />
-    <None Include="MainApp\resources\vulkan\shaders\SpotLight.frag" />
-    <None Include="MainApp\resources\vulkan\shaders\SpotLight.vert" />
-    <None Include="MainApp\resources\vulkan\shaders\Test.frag" />
-    <None Include="MainApp\resources\vulkan\shaders\Test.vert" />
-    <None Include="MainApp\resources\vulkan\shaders\Wireframe.frag" />
-    <None Include="MainApp\resources\vulkan\shaders\Wireframe.vert" />
-    <None Include="MainApp\resources\vulkan\shaders\WorldGrid.frag" />
-    <None Include="MainApp\resources\vulkan\shaders\WorldGrid.vert" />
+    <None Include="Src\resources\vulkan\shaders\BasicUnlit.frag" />
+    <None Include="Src\resources\vulkan\shaders\BasicUnlit.vert" />
+    <None Include="Src\resources\vulkan\shaders\PBR.frag" />
+    <None Include="Src\resources\vulkan\shaders\PBR.vert" />
+    <None Include="Src\resources\vulkan\shaders\PointLight.frag" />
+    <None Include="Src\resources\vulkan\shaders\PointLight.vert" />
+    <None Include="Src\resources\vulkan\shaders\Shadows.frag" />
+    <None Include="Src\resources\vulkan\shaders\Shadows.vert" />
+    <None Include="Src\resources\vulkan\shaders\SpotLight.frag" />
+    <None Include="Src\resources\vulkan\shaders\SpotLight.vert" />
+    <None Include="Src\resources\vulkan\shaders\Test.frag" />
+    <None Include="Src\resources\vulkan\shaders\Test.vert" />
+    <None Include="Src\resources\vulkan\shaders\Wireframe.frag" />
+    <None Include="Src\resources\vulkan\shaders\Wireframe.vert" />
+    <None Include="Src\resources\vulkan\shaders\WorldGrid.frag" />
+    <None Include="Src\resources\vulkan\shaders\WorldGrid.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

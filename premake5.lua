@@ -21,16 +21,16 @@ project "VulkanRenderer"
 
 	files
 	{
-		"%{prj.name}/MainApp/**.h",
-		"%{prj.name}/MainApp/**.cpp",
+		"%{prj.name}/Src/**.h",
+		"%{prj.name}/Src/**.cpp",
 		"%{prj.name}/Libraries/ImGui/**.h",
 		"%{prj.name}/Libraries/ImGui/**.cpp",
 		"%{prj.name}/Libraries/ImGui/ImGuizmo/**.h",
 		"%{prj.name}/Libraries/ImGui/ImGuizmo/**.cpp",
 		"%{prj.name}/Libraries/yaml/src/**.h",
 		"%{prj.name}/Libraries/yaml/src/**.cpp",
-		"%{prj.name}/MainApp/resources/**.vert",
-		"%{prj.name}/MainApp/resources/**.frag",
+		"%{prj.name}/Src/resources/**.vert",
+		"%{prj.name}/Src/resources/**.frag",
 	}
 
 	includedirs
@@ -42,7 +42,18 @@ project "VulkanRenderer"
 		"%{IncludeDir.ObjLoader}",
 		"%{IncludeDir.ImgLoader}",
 		"%{IncludeDir.spdlog}",
-		"%{IncludeDir.yaml}"
+		"%{IncludeDir.yaml}",
+		"%{IncludeDir.Core}",
+		"%{IncludeDir.Engine}",
+		"%{IncludeDir.Runtime}",
+		"%{IncludeDir.Renderer}",
+		"%{IncludeDir.RendererPass}",
+		"%{IncludeDir.Logging}",
+		"%{IncludeDir.Serialization}",
+		"%{IncludeDir.Utils}",
+		"%{IncludeDir.RenderSystems}",
+		"%{IncludeDir.Scene}",
+		"%{IncludeDir.Common}"
 	}
 
 	libdirs
