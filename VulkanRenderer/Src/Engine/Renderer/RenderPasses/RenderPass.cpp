@@ -3,6 +3,7 @@
 
 #include <array>
 #include <cassert>
+#include <optional>
 
 RenderPass::RenderPass()
 {
@@ -429,3 +430,127 @@ void DepthPass::createRenderPassSampler(Context& device)
 		throw std::runtime_error("Failed to create depth pass sampler");
 	}
 }
+
+// DEFERRED_RENDERING_REWORK
+
+FRenderPass::FRenderPass(const Context& context, const std::vector<RenderPassInitInfo>& initInfos, const std::vector<std::shared_ptr<Texture>> resolveAttachments)
+	:device{context.getDevice()}
+{
+	std::vector<VkAttachmentDescription> attachmentDescriptors;
+	std::vector<VkAttachmentReference> colorAttachmentReferences;
+	std::vector<VkAttachmentReference> resolveAttachmentReferences;
+	std::optional<VkAttachmentReference> depthStencilAttachmentReference;
+	
+	for(size_t i = 0; i < initInfos.size(); i++)
+	{
+		const bool bIsStencil = initInfos[i].attachmentTexture->isStencil();
+		const bool bIsDepth = initInfos[i].attachmentTexture->isDepth();
+
+		VkAttachmentDescription attachmentDesc{};
+		attachmentDesc.format = initInfos[i].attachmentTexture->getTextureFormat();
+		attachmentDesc.samples = initInfos[i].attachmentTexture->getSampleCount();
+		attachmentDesc.loadOp = initInfos[i].loadOp;
+		attachmentDesc.storeOp = initInfos[i].storeOp;
+		attachmentDesc.stencilLoadOp = bIsStencil ? initInfos[i].loadOp : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		attachmentDesc.stencilStoreOp = bIsStencil ? initInfos[i].storeOp : VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		attachmentDesc.initialLayout = initInfos[i].attachmentTexture->getLayout();
+		attachmentDesc.finalLayout = initInfos[i].layout;
+
+		attachmentDescriptors.emplace_back(attachmentDesc);
+
+		if(bIsStencil || bIsDepth)
+		{
+			depthStencilAttachmentReference = VkAttachmentReference{};
+			depthStencilAttachmentReference->attachment = (uint32_t)i;
+			depthStencilAttachmentReference->layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		}
+		else
+		{
+			VkAttachmentReference colorAttachment{};
+			colorAttachment.attachment = (uint32_t)i;
+			colorAttachment.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+			colorAttachmentReferences.emplace_back(colorAttachment);
+		}
+	}
+
+	const size_t numAttachments = attachmentDescriptors.size();
+	for(size_t j = 0; j < resolveAttachments.size(); j++)
+	{
+		VkAttachmentDescription resolvedAttachmentDesc{};
+		resolvedAttachmentDesc.format = resolveAttachments[j]->getTextureFormat();
+		resolvedAttachmentDesc.samples = VK_SAMPLE_COUNT_1_BIT;
+		resolvedAttachmentDesc.loadOp = initInfos[j + numAttachments].loadOp;
+		resolvedAttachmentDesc.storeOp = initInfos[j + numAttachments].storeOp;
+		resolvedAttachmentDesc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		resolvedAttachmentDesc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		resolvedAttachmentDesc.initialLayout = resolveAttachments[j]->getLayout();
+		resolvedAttachmentDesc.finalLayout = initInfos[j + numAttachments].layout;
+		attachmentDescriptors.push_back(resolvedAttachmentDesc);
+
+		VkAttachmentReference resolvedAttachmentRef{};
+		resolvedAttachmentRef.attachment = static_cast<uint32_t>(attachmentDescriptors.size() - 1);
+		resolvedAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		resolveAttachmentReferences.emplace_back(resolvedAttachmentRef);
+	}
+
+	VkSubpassDescription subpassDesc {};
+	subpassDesc.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+	subpassDesc.colorAttachmentCount = static_cast<uint32_t>(colorAttachmentReferences.size());
+	subpassDesc.pColorAttachments = colorAttachmentReferences.data();
+	subpassDesc.pResolveAttachments = resolveAttachmentReferences.data();
+	subpassDesc.pDepthStencilAttachment = depthStencilAttachmentReference.has_value() ? &depthStencilAttachmentReference.value() : nullptr;
+
+	std::array<VkSubpassDependency, 2> dependencies;
+	dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
+	dependencies[0].dstSubpass = 0;
+	dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+	dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT |
+								   VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT |
+								   VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT |
+								   VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+	dependencies[0].srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+	dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | 
+									VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
+									VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT |
+									VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT | 
+									VK_ACCESS_SHADER_READ_BIT;
+	
+	dependencies[1].srcSubpass = 0;
+	dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
+	dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT |
+								   VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT |
+								   VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+	dependencies[1].dstStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
+	dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT |
+									VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
+									VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT |
+									VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+	dependencies[1].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | 
+									VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
+									VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT |
+									VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT | 
+									VK_ACCESS_SHADER_READ_BIT;
+
+
+	VkRenderPassCreateInfo renderPassInfo{};
+	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+	renderPassInfo.attachmentCount = static_cast<uint32_t>(attachmentDescriptors.size());
+	renderPassInfo.pAttachments = attachmentDescriptors.data();
+	renderPassInfo.subpassCount = 1;
+	renderPassInfo.pSubpasses = &subpassDesc;
+	renderPassInfo.dependencyCount = 2;
+	renderPassInfo.pDependencies = dependencies.data(); // TODO: This is very liberal, dependencies should be provided depending on each pass
+
+	if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to create render pass!");
+	}
+}
+
+FRenderPass::~FRenderPass()
+{
+	vkDestroyRenderPass(device, renderPass, nullptr);
+}
+
+// END_DEFERRED_RENDERING_REWORK

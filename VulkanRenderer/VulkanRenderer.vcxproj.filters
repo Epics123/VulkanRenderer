@@ -282,6 +282,8 @@
     <ClInclude Include="Src\RenderSystems\WorldGridSystem.h">
       <Filter>Src\RenderSystems</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Engine\Renderer\RenderPasses\GBufferPass.h" />
+    <ClInclude Include="Src\Core\Framebuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Libraries\ImGui\ImGuizmo\GraphEditor.cpp">
@@ -512,6 +514,7 @@
     <ClCompile Include="Src\RenderSystems\WorldGridSystem.cpp">
       <Filter>Src\RenderSystems</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Core\Framebuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Src\resources\vulkan\shaders\BasicUnlit.frag">

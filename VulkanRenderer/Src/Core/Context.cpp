@@ -1,6 +1,8 @@
 #include "Context.h"
 #include "Log.h"
 
+#include "RenderPass.h"
+
 #include <cstring>
 #include <iostream>
 #include <set>
@@ -671,3 +673,12 @@ void Context::transitionImageLayout(VkImage& image, VkFormat format, VkImageLayo
 
     endSingleTimeCommands(cmdBuffer);
 }
+
+// DEFERRED_RENDERING_REWORK
+
+std::shared_ptr<class FRenderPass> Context::createRenderPass(const std::vector<RenderPassInitInfo>& initInfos, const std::vector<std::shared_ptr<class Texture>>& resolveAttachments)
+{
+    return std::make_shared<FRenderPass>(*this, initInfos, resolveAttachments);
+}
+
+// END_DEFERRED_RENDERING_REWORK

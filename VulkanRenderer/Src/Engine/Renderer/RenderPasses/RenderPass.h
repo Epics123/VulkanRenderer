@@ -1,7 +1,12 @@
 #pragma once
 
+#include "../Common/Defines.h"
+#include "Texture.h"
+
 #include <vulkan/vulkan.h>
 #include <vector>
+
+#include <memory>
 
 struct FrameBufferAttachment
 {
@@ -9,6 +14,35 @@ struct FrameBufferAttachment
 	VkDeviceMemory memory;
 	VkImageView view;
 };
+
+// DEFERRED_RENDERING_REWORK
+
+struct RenderPassInitInfo
+{
+	std::shared_ptr<Texture> attachmentTexture;
+	VkAttachmentLoadOp loadOp;
+	VkAttachmentStoreOp storeOp;
+	VkImageLayout layout;
+	VkPipelineBindPoint bindPoint;
+	std::string name = "";
+};
+
+class FRenderPass
+{
+public:
+	MOVABLE_ONLY(FRenderPass);
+
+	FRenderPass(const Context& context, const std::vector<RenderPassInitInfo>& initInfos, const std::vector<std::shared_ptr<Texture>> resolveAttachments);
+	~FRenderPass();
+
+	VkRenderPass getRenderPass() const { return renderPass; };
+
+private:
+	VkDevice device = VK_NULL_HANDLE;
+	VkRenderPass renderPass = VK_NULL_HANDLE;
+};
+
+// END_DEFERRED_RENDERING_REWORK	
 
 class RenderPass
 {

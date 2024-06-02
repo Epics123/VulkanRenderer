@@ -136,6 +136,7 @@
     <ClInclude Include="Src\Core\Buffer.h" />
     <ClInclude Include="Src\Core\CommandBuffer.h" />
     <ClInclude Include="Src\Core\Context.h" />
+    <ClInclude Include="Src\Core\Framebuffer.h" />
     <ClInclude Include="Src\Core\Pipeline.h" />
     <ClInclude Include="Src\Core\SwapChain.h" />
     <ClInclude Include="Src\Core\Texture.h" />
@@ -146,6 +147,7 @@
     <ClInclude Include="Src\Engine\Renderer\Material.h" />
     <ClInclude Include="Src\Engine\Renderer\Mesh.h" />
     <ClInclude Include="Src\Engine\Renderer\Model.h" />
+    <ClInclude Include="Src\Engine\Renderer\RenderPasses\GBufferPass.h" />
     <ClInclude Include="Src\Engine\Renderer\RenderPasses\RenderPass.h" />
     <ClInclude Include="Src\Engine\Renderer\Renderer.h" />
     <ClInclude Include="Src\Engine\Renderer\Window.h" />
@@ -214,6 +216,7 @@
     <ClCompile Include="Src\Core\Buffer.cpp" />
     <ClCompile Include="Src\Core\CommandBuffer.cpp" />
     <ClCompile Include="Src\Core\Context.cpp" />
+    <ClCompile Include="Src\Core\Framebuffer.cpp" />
     <ClCompile Include="Src\Core\Pipeline.cpp" />
     <ClCompile Include="Src\Core\SwapChain.cpp" />
     <ClCompile Include="Src\Core\Texture.cpp" />

@@ -5,6 +5,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <vulkan/vulkan.h>
 
@@ -40,7 +41,7 @@ public:
 	MOVABLE_ONLY(Context)
 
     VkCommandPool getCommandPool() { return commandPool; }
-    VkDevice getDevice() { return device_; }
+    VkDevice getDevice() const { return device_; }
     VkPhysicalDevice getPhysicalDevice() { return physicalDevice; }
     VkSurfaceKHR surface() { return surface_; }
     VkQueue graphicsQueue() { return graphicsQueue_; }
@@ -61,6 +62,12 @@ public:
 
     void createImageWithInfo(const VkImageCreateInfo& imageInfo, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
     void transitionImageLayout(VkImage& image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+
+    // DEFERRED_RENDERING_REWORK
+
+    std::shared_ptr<class FRenderPass> createRenderPass(const std::vector<struct RenderPassInitInfo>& initInfos, const std::vector<std::shared_ptr<class Texture>>& resolveAttachments = {});
+
+    // END_DEFERRED_RENDERING_REWORK
 
     VkPhysicalDeviceProperties properties;
 

@@ -17,9 +17,17 @@ public:
 	void createTextureImageView(Context& device);
 	void createTextureSampler(Context& device);
 
+	VkFormat getTextureFormat() const { return textureFormat; }
 	void setTextureFormat(VkFormat format) { textureFormat = format; }
 
+	VkSampleCountFlagBits getSampleCount() const { return msaaSamples; }
+
+	VkImageLayout getLayout() const { return layout; }
+
 	VkDescriptorSet getDescriptorSet() { return descriptorSet; }
+
+	bool isStencil() const;
+	bool isDepth() const;
 
 	void cleanup(Context& device);
 
@@ -32,6 +40,9 @@ private:
 	VkImageView textureImageView;
 	VkSampler textureSampler;
 	VkFormat textureFormat = VK_FORMAT_R8G8B8A8_SRGB;
+	VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_1_BIT;
+	VkImageTiling imageTiling = VK_IMAGE_TILING_OPTIMAL;
+	VkImageLayout layout = VK_IMAGE_LAYOUT_UNDEFINED;
 
 	VkDescriptorSet descriptorSet;
 
