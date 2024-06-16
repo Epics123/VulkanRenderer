@@ -284,6 +284,7 @@
     </ClInclude>
     <ClInclude Include="Src\Engine\Renderer\RenderPasses\GBufferPass.h" />
     <ClInclude Include="Src\Core\Framebuffer.h" />
+    <ClInclude Include="Src\Core\PhysicalDevice.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Libraries\ImGui\ImGuizmo\GraphEditor.cpp">
@@ -515,6 +516,7 @@
       <Filter>Src\RenderSystems</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Framebuffer.cpp" />
+    <ClCompile Include="Src\Core\PhysicalDevice.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Src\resources\vulkan\shaders\BasicUnlit.frag">

@@ -22,13 +22,13 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -130,6 +130,7 @@
     <ClInclude Include="Libraries\yaml\src\stringsource.h" />
     <ClInclude Include="Libraries\yaml\src\tag.h" />
     <ClInclude Include="Libraries\yaml\src\token.h" />
+    <ClInclude Include="Src\Core\PhysicalDevice.h" />
     <ClInclude Include="Src\Application.h" />
     <ClInclude Include="Src\Common\Defines.h" />
     <ClInclude Include="Src\Common\Enums.h" />
@@ -212,6 +213,7 @@
     <ClCompile Include="Libraries\yaml\src\singledocparser.cpp" />
     <ClCompile Include="Libraries\yaml\src\stream.cpp" />
     <ClCompile Include="Libraries\yaml\src\tag.cpp" />
+    <ClCompile Include="Src\Core\PhysicalDevice.cpp" />
     <ClCompile Include="Src\Application.cpp" />
     <ClCompile Include="Src\Core\Buffer.cpp" />
     <ClCompile Include="Src\Core\CommandBuffer.cpp" />
