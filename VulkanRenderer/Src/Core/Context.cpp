@@ -7,6 +7,7 @@
 #include <iostream>
 #include <set>
 #include <unordered_set>
+#include <algorithm>
 
 // local callback functions
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
@@ -141,85 +142,180 @@ void Context::pickPhysicalDevice()
         if (isDeviceSuitable(device))
         {
             physicalDevice = device;
+			// DEFERRED_RENDERING_REWORK
+
+            physicalDevice_ = PhysicalDevice(device, surface_);
+
+	        // END_DEFERRED_RENDERING_REWORK
             break;
         }
     }
 
-    if (physicalDevice == VK_NULL_HANDLE)
+    // DEFERRED_RENDERING_REWORK
+
+    if(!physicalDevice_.isDeviceValid())
+    {
+        throw std::runtime_error("Failed to find a suitable GPU!");
+    }
+
+    CORE_INFO("Physical Device: {0}", physicalDevice_.getDeviceProperties().deviceName);
+
+    // Always request a graphics queue
+    physicalDevice_.reserveQueues(defaultRequestedQueues | VK_QUEUE_GRAPHICS_BIT, surface_);
+
+    // END_DEFERRED_RENDERING_REWORK
+
+    /*if (physicalDevice == VK_NULL_HANDLE)
     {
         throw std::runtime_error("failed to find a suitable GPU!");
     }
 
     vkGetPhysicalDeviceProperties(physicalDevice, &properties);
-    CORE_INFO("Physical Device: {0}", properties.deviceName)
+    CORE_INFO("Physical Device: {0}", properties.deviceName)*/
 }
 
 void Context::createLogicalDevice()
 {
-    QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+    // DEFERRED_RENDERING_REWORK
+
+    // TODO: logical device creation
+    const auto familyIndices = physicalDevice_.findQueueFamilies();
 
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-    std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily, indices.presentFamily };
+    std::vector<std::vector<float>> prioritiesForAllFamilies(familyIndices.size());
 
-    float queuePriority = 1.0f;
-    for (uint32_t queueFamily : uniqueQueueFamilies)
+    size_t index = 0;
+    for(QueueFamilyPair queueFamily : familyIndices)
     {
+        const uint32_t queueFamilyIndex = queueFamily.first;
+        const uint32_t queueCount = queueFamily.second;
+
+        prioritiesForAllFamilies[index] = std::vector<float>(queueCount, 1.0f);
+
         VkDeviceQueueCreateInfo queueCreateInfo = {};
-        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-        queueCreateInfo.queueFamilyIndex = queueFamily;
-        queueCreateInfo.queueCount = 1;
-        queueCreateInfo.pQueuePriorities = &queuePriority;
-        queueCreateInfos.push_back(queueCreateInfo);
+		queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+		queueCreateInfo.queueFamilyIndex = queueFamilyIndex;
+		queueCreateInfo.queueCount = queueCount;
+		queueCreateInfo.pQueuePriorities = prioritiesForAllFamilies[index].data();
+		queueCreateInfos.emplace_back(queueCreateInfo);
+
+        ++index;
     }
 
-	VkPhysicalDeviceDescriptorIndexingFeatures physicalDeviceDescriptorIndexingFeatures{};
-	physicalDeviceDescriptorIndexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
-	physicalDeviceDescriptorIndexingFeatures.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
-	physicalDeviceDescriptorIndexingFeatures.runtimeDescriptorArray = VK_TRUE;
-	physicalDeviceDescriptorIndexingFeatures.descriptorBindingVariableDescriptorCount = VK_TRUE;
-    physicalDeviceDescriptorIndexingFeatures.descriptorBindingPartiallyBound = VK_TRUE;
-    physicalDeviceDescriptorIndexingFeatures.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
+    VkPhysicalDeviceFeatures2 deviceFeatures{};
+    deviceFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+    deviceFeatures.features = physicalDeviceFeatures.physicalDeviceFeatures;
 
-    VkPhysicalDeviceFeatures deviceFeatures = {};
-    deviceFeatures.samplerAnisotropy = VK_TRUE;
-    deviceFeatures.fillModeNonSolid = VK_TRUE;
-    deviceFeatures.shaderSampledImageArrayDynamicIndexing = VK_TRUE;
+    VulkanFeatureChain<> featureChain;
+    featureChain.pushBack(deviceFeatures);
+    featureChain.pushBack(physicalDeviceFeatures.vulkan11Features);
+    featureChain.pushBack(physicalDeviceFeatures.vulkan12Features);
 
-    VkPhysicalDeviceFeatures2 deviceFeatures2{};
-    deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-    deviceFeatures2.features = deviceFeatures;
-    deviceFeatures2.pNext = &physicalDeviceDescriptorIndexingFeatures;
+	if (physicalDevice_.isRayTracingSupported() && shouldSupportRayTracing)
+	{
+		featureChain.pushBack(physicalDeviceFeatures.accelStructFeatures);
+		featureChain.pushBack(physicalDeviceFeatures.rayTracingPipelineFeatures);
+		featureChain.pushBack(physicalDeviceFeatures.rayQueryFeatures);
+	}
 
-    VkDeviceCreateInfo createInfo = {};
-    createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+	if (physicalDevice_.isMultiviewSupported())
+	{
+		physicalDeviceFeatures.vulkan11Features.multiview = VK_TRUE;
+	}
 
-    createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
-    createInfo.pQueueCreateInfos = queueCreateInfos.data();
+	if (physicalDevice_.isFragmentDensityMapSupported())
+	{
+		featureChain.pushBack(physicalDeviceFeatures.fragmentDensityMapFeatures);
+	}
 
-    //createInfo.pEnabledFeatures = &deviceFeatures;
-    createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
-    createInfo.ppEnabledExtensionNames = deviceExtensions.data();
-    createInfo.pNext = &deviceFeatures2;
+    VkDeviceCreateInfo deviceCreateInfo{};
+    deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    deviceCreateInfo.pNext = featureChain.firstNextPtr();
+    deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+    deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
+    deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+    deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
-    // might not really be necessary anymore because device specific validation layers
-    // have been deprecated
-    if (enableValidationLayers)
-    {
-        createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-        createInfo.ppEnabledLayerNames = validationLayers.data();
-    }
-    else
-    {
-        createInfo.enabledLayerCount = 0;
-    }
+	if (enableValidationLayers)
+	{
+        deviceCreateInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+        deviceCreateInfo.ppEnabledLayerNames = validationLayers.data();
+	}
 
-    if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device_) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to create logical device!");
-    }
+    VkResult result = vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device_);
+	if (result != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to create logical device!");
+	}
 
-    vkGetDeviceQueue(device_, indices.graphicsFamily, 0, &graphicsQueue_);
-    vkGetDeviceQueue(device_, indices.presentFamily, 0, &presentQueue_);
+    resizeQueues();
+
+    // END_DEFERRED_RENDERING_REWORK
+
+ //   QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+
+ //   std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+ //   std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily, indices.presentFamily };
+
+ //   float queuePriority = 1.0f;
+ //   for (uint32_t queueFamily : uniqueQueueFamilies)
+ //   {
+ //       VkDeviceQueueCreateInfo queueCreateInfo = {};
+ //       queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+ //       queueCreateInfo.queueFamilyIndex = queueFamily;
+ //       queueCreateInfo.queueCount = 1;
+ //       queueCreateInfo.pQueuePriorities = &queuePriority;
+ //       queueCreateInfos.push_back(queueCreateInfo);
+ //   }
+
+	//VkPhysicalDeviceDescriptorIndexingFeatures physicalDeviceDescriptorIndexingFeatures{};
+	//physicalDeviceDescriptorIndexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
+	//physicalDeviceDescriptorIndexingFeatures.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+	//physicalDeviceDescriptorIndexingFeatures.runtimeDescriptorArray = VK_TRUE;
+	//physicalDeviceDescriptorIndexingFeatures.descriptorBindingVariableDescriptorCount = VK_TRUE;
+ //   physicalDeviceDescriptorIndexingFeatures.descriptorBindingPartiallyBound = VK_TRUE;
+ //   physicalDeviceDescriptorIndexingFeatures.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
+
+ //   VkPhysicalDeviceFeatures deviceFeatures = {};
+ //   deviceFeatures.samplerAnisotropy = VK_TRUE;
+ //   deviceFeatures.fillModeNonSolid = VK_TRUE;
+ //   deviceFeatures.shaderSampledImageArrayDynamicIndexing = VK_TRUE;
+
+ //   VkPhysicalDeviceFeatures2 deviceFeatures2{};
+ //   deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+ //   deviceFeatures2.features = deviceFeatures;
+ //   deviceFeatures2.pNext = &physicalDeviceDescriptorIndexingFeatures;
+
+ //   VkDeviceCreateInfo createInfo = {};
+ //   createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+
+ //   createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+ //   createInfo.pQueueCreateInfos = queueCreateInfos.data();
+
+ //   //createInfo.pEnabledFeatures = &deviceFeatures;
+ //   createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+ //   createInfo.ppEnabledExtensionNames = deviceExtensions.data();
+ //   createInfo.pNext = &deviceFeatures2;
+
+ //   // might not really be necessary anymore because device specific validation layers
+ //   // have been deprecated
+ //   if (enableValidationLayers)
+ //   {
+ //       createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+ //       createInfo.ppEnabledLayerNames = validationLayers.data();
+ //   }
+ //   else
+ //   {
+ //       createInfo.enabledLayerCount = 0;
+ //   }
+
+ //   if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device_) != VK_SUCCESS)
+ //   {
+ //       throw std::runtime_error("failed to create logical device!");
+ //   }
+
+ //   vkGetDeviceQueue(device_, indices.graphicsFamily, 0, &graphicsQueue_);
+ //   vkGetDeviceQueue(device_, indices.presentFamily, 0, &presentQueue_);
 }
 
 void Context::createCommandPool()
@@ -443,6 +539,38 @@ SwapChainSupportDetails Context::querySwapChainSupport(VkPhysicalDevice device)
             details.presentModes.data());
     }
     return details;
+}
+
+void Context::resizeQueues()
+{
+    if(physicalDevice_.getGraphicsFamilyIndex().has_value() && physicalDevice_.graphicsFamilyCount() > 0)
+    {
+        graphicsQueues.resize(physicalDevice_.graphicsFamilyCount(), VK_NULL_HANDLE);
+        for(size_t i = 0; i < graphicsQueues.size(); i++)
+        {
+            vkGetDeviceQueue(device_, physicalDevice_.getGraphicsFamilyIndex().value(), uint32_t(i), &graphicsQueues[i]);
+        }
+    }
+    if(physicalDevice_.getComputeFamilyIndex().has_value() && physicalDevice_.computeFamilyCount() > 0)
+    {
+        computeQueues.resize(physicalDevice_.computeFamilyCount(), VK_NULL_HANDLE);
+		for (size_t i = 0; i < computeQueues.size(); i++)
+		{
+			vkGetDeviceQueue(device_, physicalDevice_.getComputeFamilyIndex().value(), uint32_t(i), &computeQueues[i]);
+		}
+    }
+    if(physicalDevice_.getTransferFamilyIndex().has_value() && physicalDevice_.transferFamilyCount() > 0)
+    {
+        transferQueues.resize(physicalDevice_.transferFamilyCount(), VK_NULL_HANDLE);
+		for (size_t i = 0; i < transferQueues.size(); i++)
+		{
+			vkGetDeviceQueue(device_, physicalDevice_.getTransferFamilyIndex().value(), uint32_t(i), &transferQueues[i]);
+		}
+    }
+    if(physicalDevice_.getPresentationFamilyIndex().has_value())
+    {
+        vkGetDeviceQueue(device_, physicalDevice_.getPresentationFamilyIndex().value(), 0, &presentQueue_);
+    }
 }
 
 VkFormat Context::findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features)

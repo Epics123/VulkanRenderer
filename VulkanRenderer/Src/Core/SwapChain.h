@@ -6,20 +6,28 @@
 #include <vector>
 #include <memory>
 
-#include "Context.h"
+//#include "Context.h"
 #include "RenderPass.h"
+
+class Context;
+class PhysicalDevice;
 
 class SwapChain
 {
 public:
 	static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
+    explicit SwapChain() = default;
+    explicit SwapChain(const Context& inContext, const PhysicalDevice& physicalDevice, VkSurfaceKHR surface, 
+                       VkQueue inPresentQueue, VkFormat imageFormat, VkColorSpaceKHR imageColorSpace, 
+                       VkPresentModeKHR presentMode, VkExtent2D inExtent, const std::string& name = "");
+
     SwapChain(Context& deviceRef, VkExtent2D windowExtent);
     SwapChain(Context& deviceRef, VkExtent2D windowExtent, std::shared_ptr<SwapChain> previousSwapChain);
     ~SwapChain();
 
-    SwapChain(const SwapChain&) = delete;
-    SwapChain& operator=(const SwapChain&) = delete;
+    //SwapChain(const SwapChain&) = delete;
+    //SwapChain& operator=(const SwapChain&) = delete;
 
     RenderPass& getRenderPass() { return renderPass; }
     size_t imageCount() { return swapChainImages.size(); }
@@ -53,6 +61,27 @@ private:
     VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
     VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
+    // DEFERRED RENDERING REFACTOR
+    void createSwapChain(const PhysicalDevice& physicalDevice);
+
+    // END DEFERRED RENDERING REFACTOR
+
+private:
+	// DEFERRED RENDERING REFACTOR
+
+	VkDevice device = VK_NULL_HANDLE;
+	VkSwapchainKHR swapchain = VK_NULL_HANDLE;
+	VkQueue presentQueue = VK_NULL_HANDLE;
+	std::vector<std::shared_ptr<Texture>> SwapchainImages;
+	VkSemaphore imageAvailable = VK_NULL_HANDLE;
+	VkSemaphore imageRendered = VK_NULL_HANDLE;
+	uint32_t imageIndex = 0;
+	VkExtent2D extent;
+	VkFormat imageFormat;
+	VkFence acquireFence = VK_NULL_HANDLE;
+
+	// END DEFERRED RENDERING REFACTOR
+
     VkFormat swapChainImageFormat;
     VkFormat swapChainDepthFormat;
     VkExtent2D swapChainExtent;
@@ -60,7 +89,7 @@ private:
     RenderPass renderPass;
 	std::vector<VkImage> swapChainImages;
 
-    Context& device;
+    Context& context;
     VkExtent2D windowExtent;
 
     VkSwapchainKHR swapChain;

@@ -2,10 +2,12 @@
 
 #include "Renderer/Window.h"
 #include "../Common/Defines.h"
+#include "PhysicalDevice.h"
 
 #include <string>
 #include <vector>
 #include <memory>
+#include <any>
 
 #include <vulkan/vulkan.h>
 
@@ -23,6 +25,71 @@ struct QueueFamilyIndices
     bool graphicsFamilyHasValue = false;
     bool presentFamilyHasValue = false;
     bool isComplete() { return graphicsFamilyHasValue && presentFamilyHasValue; }
+};
+
+template <size_t CHAIN_SIZE = 10>
+class VulkanFeatureChain
+{
+public:
+	VulkanFeatureChain() = default;
+	MOVABLE_ONLY(VulkanFeatureChain);
+
+    template<typename T>
+	auto& pushBack(T nextVulkanChainStruct)
+	{
+		ASSERT(currentIndex_ < CHAIN_SIZE, "Chain is full");
+		data_[currentIndex_] = nextVulkanChainStruct;
+
+        // TODO: Probably don't need to be casting here anymore
+		auto& next = std::any_cast<decltype(nextVulkanChainStruct)&>(data_[currentIndex_]);
+
+		next.pNext = std::exchange(firstNext_, &next);
+		currentIndex_++;
+
+		return next;
+	}
+
+	[[nodiscard]] void* firstNextPtr() const { return firstNext_; };
+
+private:
+	std::array<std::any, CHAIN_SIZE> data_;
+	VkBaseInStructure* root_ = nullptr;
+	int currentIndex_ = 0;
+	void* firstNext_ = VK_NULL_HANDLE;
+};
+
+struct PhysicalDeviceFeatures
+{
+    PhysicalDeviceFeatures()
+    {
+        physicalDeviceFeatures = {};
+        physicalDeviceFeatures.independentBlend = VK_TRUE;
+        physicalDeviceFeatures.vertexPipelineStoresAndAtomics = VK_TRUE;
+        physicalDeviceFeatures.fragmentStoresAndAtomics = VK_TRUE;
+
+        vulkan11Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
+        vulkan12Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+
+        accelStructFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+
+        rayTracingPipelineFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR,
+
+        rayQueryFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR;
+
+        multiviewFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES;
+
+        fragmentDensityMapFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_FEATURES_EXT;
+    }
+
+	VkPhysicalDeviceFeatures physicalDeviceFeatures;
+	VkPhysicalDeviceVulkan11Features vulkan11Features{};
+	VkPhysicalDeviceVulkan12Features vulkan12Features{};
+
+	VkPhysicalDeviceAccelerationStructureFeaturesKHR accelStructFeatures{};
+	VkPhysicalDeviceRayTracingPipelineFeaturesKHR rayTracingPipelineFeatures{};
+	VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures{};
+	VkPhysicalDeviceMultiviewFeatures multiviewFeatures{};
+	VkPhysicalDeviceFragmentDensityMapFeaturesEXT fragmentDensityMapFeatures{};
 };
 
 class Context
@@ -89,6 +156,16 @@ private:
     bool checkDeviceExtensionSupport(VkPhysicalDevice device);
     SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
 
+    void resizeQueues();
+
+private:
+    // DEFERRED_RENDERING_REWORK
+    PhysicalDevice physicalDevice_;
+    PhysicalDeviceFeatures physicalDeviceFeatures;
+
+    VkQueueFlags defaultRequestedQueues = VK_QUEUE_GRAPHICS_BIT;
+    // END_DEFERRED_RENDERING_REWORK
+
     VkInstance instance;
     VkDebugUtilsMessengerEXT debugMessenger;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
@@ -98,8 +175,17 @@ private:
     VkDevice device_;
     VkSurfaceKHR surface_;
     VkQueue graphicsQueue_;
+
+    // the main queue
     VkQueue presentQueue_;
 
+    // Optional queues
+	std::vector<VkQueue> graphicsQueues;
+	std::vector<VkQueue> computeQueues;
+	std::vector<VkQueue> transferQueues;
+
+    bool shouldSupportRayTracing = false;
+
     const std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
-    const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+    const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME}; //, VK_KHR_RAY_QUERY_EXTENSION_NAME, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME };
 };

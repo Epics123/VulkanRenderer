@@ -1,4 +1,6 @@
 #include "SwapChain.h"
+#include "Context.h"
+#include "PhysicalDevice.h"
 #include "Log.h"
 
 #include <array>
@@ -10,16 +12,23 @@
 #include <stdexcept>
 
 SwapChain::SwapChain(Context& deviceRef, VkExtent2D windowExtent)
-    : device{deviceRef}, windowExtent{ windowExtent }
+    : context{deviceRef}, windowExtent{ windowExtent }
 {
     init();
 }
 
 SwapChain::SwapChain(Context& deviceRef, VkExtent2D windowExtent, std::shared_ptr<SwapChain> previousSwapChain)
-    : device{ deviceRef }, windowExtent{ windowExtent }, oldSwapChain {previousSwapChain}
+    : context{ deviceRef }, windowExtent{ windowExtent }, oldSwapChain {previousSwapChain}
 {
     init();
     oldSwapChain = nullptr;
+}
+
+SwapChain::SwapChain(const Context& inContext, const PhysicalDevice& physicalDevice, VkSurfaceKHR surface, VkQueue inPresentQueue, 
+                     VkFormat imageFormat, VkColorSpaceKHR imageColorSpace, VkPresentModeKHR presentMode, VkExtent2D inExtent, const std::string& name)
+    :context{const_cast<Context&>(inContext)}, device{ inContext.getDevice() }, presentQueue{inPresentQueue}, extent{ inExtent }
+{
+    createSwapChain();
 }
 
 void SwapChain::init()
@@ -31,34 +40,34 @@ void SwapChain::init()
 
 SwapChain::~SwapChain()
 {
-    renderPass.cleanup(device);
+    renderPass.cleanup(context);
 
     if (swapChain != nullptr)
     {
-        vkDestroySwapchainKHR(device.getDevice(), swapChain, nullptr);
+        vkDestroySwapchainKHR(context.getDevice(), swapChain, nullptr);
         swapChain = nullptr;
     }
 
     // cleanup synchronization objects
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
-        vkDestroySemaphore(device.getDevice(), renderFinishedSemaphores[i], nullptr);
-        vkDestroySemaphore(device.getDevice(), imageAvailableSemaphores[i], nullptr);
-        vkDestroyFence(device.getDevice(), inFlightFences[i], nullptr);
+        vkDestroySemaphore(context.getDevice(), renderFinishedSemaphores[i], nullptr);
+        vkDestroySemaphore(context.getDevice(), imageAvailableSemaphores[i], nullptr);
+        vkDestroyFence(context.getDevice(), inFlightFences[i], nullptr);
     }
 }
 
 VkResult SwapChain::acquireNextImage(uint32_t* imageIndex)
 {
     vkWaitForFences(
-        device.getDevice(),
+        context.getDevice(),
         1,
         &inFlightFences[currentFrame],
         VK_TRUE,
         std::numeric_limits<uint64_t>::max());
 
     VkResult result = vkAcquireNextImageKHR(
-        device.getDevice(),
+        context.getDevice(),
         swapChain,
         std::numeric_limits<uint64_t>::max(),
         imageAvailableSemaphores[currentFrame],  // must be a not signaled semaphore
@@ -73,7 +82,7 @@ VkResult SwapChain::submitCommandBuffers(
 {
     if (imagesInFlight[*imageIndex] != VK_NULL_HANDLE)
     {
-        vkWaitForFences(device.getDevice(), 1, &imagesInFlight[*imageIndex], VK_TRUE, UINT64_MAX);
+        vkWaitForFences(context.getDevice(), 1, &imagesInFlight[*imageIndex], VK_TRUE, UINT64_MAX);
     }
     imagesInFlight[*imageIndex] = inFlightFences[currentFrame];
 
@@ -93,8 +102,8 @@ VkResult SwapChain::submitCommandBuffers(
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
 
-    vkResetFences(device.getDevice(), 1, &inFlightFences[currentFrame]);
-    if (vkQueueSubmit(device.graphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]) !=
+    vkResetFences(context.getDevice(), 1, &inFlightFences[currentFrame]);
+    if (vkQueueSubmit(context.graphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]) !=
         VK_SUCCESS)
     {
         CORE_CRITICAL("Failed to submit draw command buffer!")
@@ -113,16 +122,26 @@ VkResult SwapChain::submitCommandBuffers(
 
     presentInfo.pImageIndices = imageIndex;
 
-    auto result = vkQueuePresentKHR(device.presentQueue(), &presentInfo);
+    auto result = vkQueuePresentKHR(context.presentQueue(), &presentInfo);
 
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
     return result;
 }
 
+// DEFERRED RENDERING REFACTOR
+
+void SwapChain::createSwapChain(const PhysicalDevice& physicalDevice)
+{
+	const uint32_t minImageCount = physicalDevice.getSurfaceCapabilities().minImageCount;
+	const uint32_t numImages = std::clamp(minImageCount + 1, minImageCount, physicalDevice.getSurfaceCapabilities().maxImageCount);
+}
+
+// END DEFERRED RENDERING REFACTOR
+
 void SwapChain::createSwapChain()
 {
-    SwapChainSupportDetails swapChainSupport = device.getSwapChainSupport();
+    SwapChainSupportDetails swapChainSupport = context.getSwapChainSupport();
 
     VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
     VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
@@ -137,7 +156,7 @@ void SwapChain::createSwapChain()
 
     VkSwapchainCreateInfoKHR createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    createInfo.surface = device.surface();
+    createInfo.surface = context.surface();
 
     createInfo.minImageCount = imageCount;
     createInfo.imageFormat = surfaceFormat.format;
@@ -150,7 +169,7 @@ void SwapChain::createSwapChain()
     renderPass.setDepthFormat(findDepthFormat());
     renderPass.setShouldDestroyColorImage(false);
 
-    QueueFamilyIndices indices = device.findPhysicalQueueFamilies();
+    QueueFamilyIndices indices = context.findPhysicalQueueFamilies();
     uint32_t queueFamilyIndices[] = { indices.graphicsFamily, indices.presentFamily };
 
     if (indices.graphicsFamily != indices.presentFamily)
@@ -174,7 +193,7 @@ void SwapChain::createSwapChain()
 
     createInfo.oldSwapchain = oldSwapChain == nullptr ? VK_NULL_HANDLE : oldSwapChain->swapChain;
 
-    if (vkCreateSwapchainKHR(device.getDevice(), &createInfo, nullptr, &swapChain) != VK_SUCCESS)
+    if (vkCreateSwapchainKHR(context.getDevice(), &createInfo, nullptr, &swapChain) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create swap chain!");
     }
@@ -183,10 +202,10 @@ void SwapChain::createSwapChain()
     // allowed to create a swap chain with more. That's why we'll first query the final number of
     // images with vkGetSwapchainImagesKHR, then resize the container and finally call it again to
     // retrieve the handles.
-    vkGetSwapchainImagesKHR(device.getDevice(), swapChain, &imageCount, nullptr);
+    vkGetSwapchainImagesKHR(context.getDevice(), swapChain, &imageCount, nullptr);
     swapChainImages.resize(imageCount);
     renderPass.colors.resize(imageCount);
-    vkGetSwapchainImagesKHR(device.getDevice(), swapChain, &imageCount, swapChainImages.data());
+    vkGetSwapchainImagesKHR(context.getDevice(), swapChain, &imageCount, swapChainImages.data());
 
     for(uint32_t i = 0; i < (uint32_t)swapChainImages.size(); i++)
     {
@@ -199,7 +218,7 @@ void SwapChain::createSwapChain()
 
 void SwapChain::createRenderPass()
 {
-    renderPass.createRenderPass(device, getWidth(), getHeight());
+    renderPass.createRenderPass(context, getWidth(), getHeight());
 }
 
 void SwapChain::createSyncObjects()
@@ -218,9 +237,9 @@ void SwapChain::createSyncObjects()
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
-        if (vkCreateSemaphore(device.getDevice(), &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
-            vkCreateSemaphore(device.getDevice(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
-            vkCreateFence(device.getDevice(), &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS)
+        if (vkCreateSemaphore(context.getDevice(), &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
+            vkCreateSemaphore(context.getDevice(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
+            vkCreateFence(context.getDevice(), &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to create synchronization objects for a frame!");
         }
@@ -280,7 +299,7 @@ VkExtent2D SwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilit
 
 VkFormat SwapChain::findDepthFormat()
 {
-    return device.findSupportedFormat(
+    return context.findSupportedFormat(
         { VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
         VK_IMAGE_TILING_OPTIMAL,
         VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
