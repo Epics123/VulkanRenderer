@@ -11,6 +11,41 @@
 
 class Context;
 class PhysicalDevice;
+class Texture;
+
+// DEFERRED RENDERING REFACTOR
+
+class Swapchain final
+{
+public:
+    explicit Swapchain() = default;
+    explicit Swapchain(const Context& context, const PhysicalDevice& physicalDevice, VkSurfaceKHR surface, VkQueue presentQueue, 
+                       VkSurfaceFormatKHR surfaceFormat, VkPresentModeKHR presentMode, VkExtent2D extent, const std::string& name = "");
+
+    ~Swapchain();
+
+private:
+    void createSwapchain(const Context& context, const PhysicalDevice& physicalDevice, VkSurfaceKHR surface, VkFormat imageFormat, 
+                         VkColorSpaceKHR imageColorSpace, VkPresentModeKHR presentMode, VkExtent2D extent);
+
+    void createSwaphainImages(const Context& context, VkFormat imageFormat, const VkExtent2D& extent);
+    void createSemaphores();
+    void createFence();
+
+private:
+	VkDevice device = VK_NULL_HANDLE;
+	VkSwapchainKHR swapchain = VK_NULL_HANDLE;
+	VkQueue presentQueue = VK_NULL_HANDLE;
+	std::vector<std::shared_ptr<Texture>> swapchainImages;
+	VkSemaphore imageAvailable = VK_NULL_HANDLE;
+	VkSemaphore imageRendered = VK_NULL_HANDLE;
+	uint32_t imageIndex = 0;
+	VkExtent2D extent;
+	VkFormat imageFormat;
+	VkFence acquireFence = VK_NULL_HANDLE;
+};
+
+// END DEFERRED RENDERING REFACTOR
 
 class SwapChain
 {
@@ -72,7 +107,7 @@ private:
 	VkDevice device = VK_NULL_HANDLE;
 	VkSwapchainKHR swapchain = VK_NULL_HANDLE;
 	VkQueue presentQueue = VK_NULL_HANDLE;
-	std::vector<std::shared_ptr<Texture>> SwapchainImages;
+	std::vector<std::shared_ptr<Texture_>> SwapchainImages;
 	VkSemaphore imageAvailable = VK_NULL_HANDLE;
 	VkSemaphore imageRendered = VK_NULL_HANDLE;
 	uint32_t imageIndex = 0;

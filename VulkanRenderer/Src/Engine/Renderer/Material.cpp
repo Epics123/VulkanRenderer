@@ -42,7 +42,7 @@ void Material::cleanup(class Context& device)
 {
 	if (shaderParams.materialTextures.size() > 0)
 	{
-		for (std::pair<uint32_t, Texture> tex : shaderParams.materialTextures)
+		for (std::pair<uint32_t, Texture_> tex : shaderParams.materialTextures)
 		{
 			tex.second.cleanup(device);
 		}

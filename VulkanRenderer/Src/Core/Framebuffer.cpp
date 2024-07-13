@@ -5,10 +5,10 @@
 
 #include "Logging/Log.h"
 
-Framebuffer::Framebuffer(const class Context& context, VkDevice device, VkRenderPass renderPass, const std::vector<std::shared_ptr<class Texture>>& attachments, const std::shared_ptr<class Texture> depthAttachment, const std::shared_ptr<class Texture> stencilAttachment, const std::string& name /*= ""*/)
+Framebuffer::Framebuffer(const class Context& context, VkDevice device, VkRenderPass renderPass, const std::vector<std::shared_ptr<class Texture_>>& attachments, const std::shared_ptr<class Texture_> depthAttachment, const std::shared_ptr<class Texture_> stencilAttachment, const std::string& name /*= ""*/)
 {
 	std::vector<VkImageView> imageViews;
-	for (std::shared_ptr<Texture> texture : attachments)
+	for (std::shared_ptr<Texture_> texture : attachments)
 	{
 		imageViews.push_back(texture->getTextureImageView());
 	}

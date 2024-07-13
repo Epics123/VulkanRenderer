@@ -1,6 +1,7 @@
 #include "SwapChain.h"
 #include "Context.h"
 #include "PhysicalDevice.h"
+#include "Texture.h"
 #include "Log.h"
 
 #include <array>
@@ -11,6 +12,142 @@
 #include <set>
 #include <stdexcept>
 
+// DEFERRED RENDERING REFACTOR
+
+Swapchain::Swapchain(const Context& context, const PhysicalDevice& physicalDevice, VkSurfaceKHR surface, VkQueue presentQueue, 
+                     VkSurfaceFormatKHR surfaceFormat, VkPresentModeKHR presentMode, VkExtent2D extent, const std::string& name /*= ""*/)
+    :device{context.getDevice()}, presentQueue{presentQueue}, extent{extent}
+{
+    createSwapchain(context, physicalDevice, surface, surfaceFormat.format, surfaceFormat.colorSpace, presentMode, extent);
+}
+
+
+Swapchain::~Swapchain()
+{
+   VkResult result = vkWaitForFences(device, 1, &acquireFence, VK_TRUE, UINT64_MAX);
+   if(result != VK_SUCCESS)
+   {
+	   CORE_CRITICAL("Failed to wait for fence! Error code: {0}", result);
+	   throw std::runtime_error("");
+   }
+
+   vkDestroyFence(device, acquireFence, nullptr);
+   vkDestroySemaphore(device, imageRendered, nullptr);
+   vkDestroySemaphore(device, imageAvailable, nullptr);
+   vkDestroySwapchainKHR(device, swapchain, nullptr);
+}
+
+void Swapchain::createSwapchain(const Context& context, const PhysicalDevice& physicalDevice, VkSurfaceKHR surface, VkFormat imageFormat, 
+                                VkColorSpaceKHR imageColorSpace, VkPresentModeKHR presentMode, VkExtent2D extent)
+{
+	const uint32_t minImageCount = physicalDevice.getSurfaceCapabilities().minImageCount;
+	const uint32_t numImages = std::clamp(minImageCount + 1, minImageCount, physicalDevice.getSurfaceCapabilities().maxImageCount);
+    
+   const std::optional<uint32_t> presentationFamilyIndex = physicalDevice.getPresentationFamilyIndex();
+   ASSERT(presentationFamilyIndex.has_value(), "There are no presentation queues available for the swapchain!");
+
+   const bool isPresentationQueueShared = physicalDevice.getGraphicsFamilyIndex().value() == presentationFamilyIndex.value();
+
+   std::array<uint32_t, 2> familyIndices{physicalDevice.getGraphicsFamilyIndex().value(), presentationFamilyIndex.value()};
+
+   VkSwapchainCreateInfoKHR createInfo;
+   createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+   createInfo.flags = VkSwapchainCreateFlagsKHR();
+   createInfo.surface = surface;
+   createInfo.minImageCount = numImages;
+   createInfo.imageFormat = imageFormat;
+   createInfo.imageColorSpace = imageColorSpace;
+   createInfo.imageExtent = extent;
+   createInfo.imageArrayLayers = 1;
+   createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+   createInfo.imageSharingMode = isPresentationQueueShared ? VK_SHARING_MODE_EXCLUSIVE : VK_SHARING_MODE_CONCURRENT;
+   createInfo.queueFamilyIndexCount = isPresentationQueueShared ? 0u : 2u;
+   createInfo.pQueueFamilyIndices = isPresentationQueueShared ? nullptr : familyIndices.data();
+   createInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+   createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+   createInfo.presentMode = presentMode;
+   createInfo.clipped = VK_TRUE;
+   createInfo.oldSwapchain = VK_NULL_HANDLE;
+   createInfo.pNext = VK_NULL_HANDLE;
+
+   VkResult result = vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapchain);
+   if(result != VK_SUCCESS)
+   {
+	    CORE_CRITICAL("Failed to create swapchain! Error code: {0}", result);
+        throw std::runtime_error("");
+   }
+
+   createSwaphainImages(context, imageFormat, extent);
+   createSemaphores();
+   createFence();
+}
+
+void Swapchain::createSwaphainImages(const Context& context, VkFormat imageFormat, const VkExtent2D& extent)
+{
+	// we only specified a minimum number of images in the swap chain, so the implementation is
+	// allowed to create a swap chain with more. That's why we'll first query the final number of
+	// images with vkGetSwapchainImagesKHR, then resize the container and finally call it again to
+	// retrieve the handles.
+    uint32_t imageCount = 0;
+	vkGetSwapchainImagesKHR(context.getDevice(), swapchain, &imageCount, nullptr);
+    std::vector<VkImage> images(imageCount);
+	vkGetSwapchainImagesKHR(context.getDevice(), swapchain, &imageCount, images.data());
+
+    swapchainImages.reserve(imageCount);
+    for(size_t i = 0; i < imageCount; ++i)
+    {
+       VkExtent3D extents;
+       extents.width = extent.width;
+       extents.height = extent.height;
+       extents.depth = 1;
+
+       const std::string debugName = "Swapchain image " + std::to_string(i);
+
+       std::shared_ptr<Texture> swapchainImage = std::make_shared<Texture>(context, device, images[i], imageFormat, extents, 1, false, debugName);
+
+       swapchainImages.emplace_back(swapchainImage);
+    }
+}
+
+void Swapchain::createSemaphores()
+{
+    VkSemaphoreCreateInfo createInfo;
+    createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    createInfo.pNext = VK_NULL_HANDLE;
+    createInfo.flags = 0;
+
+    VkResult result = vkCreateSemaphore(device, &createInfo, nullptr, &imageAvailable);
+    if(result != VK_SUCCESS)
+    {
+		CORE_CRITICAL("Failed to create image available semaphore! Error code: {0}", result);
+		throw std::runtime_error("");
+    }
+
+    result = vkCreateSemaphore(device, &createInfo, nullptr, &imageRendered);
+	if (result != VK_SUCCESS)
+	{
+		CORE_CRITICAL("Failed to create image rendered semaphore! Error code: {0}", result);
+		throw std::runtime_error("");
+	}
+}
+
+void Swapchain::createFence()
+{
+    VkFenceCreateInfo createInfo;
+    createInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    createInfo.flags = 0;
+    createInfo.pNext = VK_NULL_HANDLE;
+
+    VkResult result = vkCreateFence(device, &createInfo, nullptr, &acquireFence);
+    if(result != VK_SUCCESS)
+    {
+		CORE_CRITICAL("Failed to create image aquire fence! Error code: {0}", result);
+		throw std::runtime_error("");
+    }
+}
+
+// END DEFERRED RENDERING REFACTOR
+
 SwapChain::SwapChain(Context& deviceRef, VkExtent2D windowExtent)
     : context{deviceRef}, windowExtent{ windowExtent }
 {
@@ -18,10 +155,10 @@ SwapChain::SwapChain(Context& deviceRef, VkExtent2D windowExtent)
 }
 
 SwapChain::SwapChain(Context& deviceRef, VkExtent2D windowExtent, std::shared_ptr<SwapChain> previousSwapChain)
-    : context{ deviceRef }, windowExtent{ windowExtent }, oldSwapChain {previousSwapChain}
+	: context{ deviceRef }, windowExtent{ windowExtent }, oldSwapChain{ previousSwapChain }
 {
-    init();
-    oldSwapChain = nullptr;
+	init();
+	oldSwapChain = nullptr;
 }
 
 SwapChain::SwapChain(const Context& inContext, const PhysicalDevice& physicalDevice, VkSurfaceKHR surface, VkQueue inPresentQueue, 

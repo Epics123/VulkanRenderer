@@ -283,10 +283,10 @@ void ImGuiSystem::drawMaterialEditor(GameObject& obj)
 					uint32_t n = 0;
 					ShaderParameters& params = obj.materialComp->material->getShaderParameters();
 
-					for(std::pair<uint32_t, Texture> texture : params.materialTextures)
+					for(std::pair<uint32_t, Texture_> texture : params.materialTextures)
 					{
 						ImGui::PushID(n);
-						Texture tex = texture.second;
+						Texture_ tex = texture.second;
 						ImGui::Image(tex.getDescriptorSet(), imageSize);
 						float lastImageX2 = ImGui::GetItemRectMax().x;
 						float nextImageX2 = lastImageX2 + style.ItemSpacing.x + imageSize.x; // Expected position if next button was on same line

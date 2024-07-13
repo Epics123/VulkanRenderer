@@ -19,7 +19,7 @@ struct FrameBufferAttachment
 
 struct RenderPassInitInfo
 {
-	std::shared_ptr<Texture> attachmentTexture;
+	std::shared_ptr<Texture_> attachmentTexture;
 	VkAttachmentLoadOp loadOp;
 	VkAttachmentStoreOp storeOp;
 	VkImageLayout layout;
@@ -32,7 +32,7 @@ class FRenderPass
 public:
 	MOVABLE_ONLY(FRenderPass);
 
-	FRenderPass(const Context& context, const std::vector<RenderPassInitInfo>& initInfos, const std::vector<std::shared_ptr<Texture>> resolveAttachments);
+	FRenderPass(const Context& context, const std::vector<RenderPassInitInfo>& initInfos, const std::vector<std::shared_ptr<Texture_>> resolveAttachments);
 	~FRenderPass();
 
 	VkRenderPass getRenderPass() const { return renderPass; };

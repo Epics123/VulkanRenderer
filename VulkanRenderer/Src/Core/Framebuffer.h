@@ -15,9 +15,9 @@ public:
 	MOVABLE_ONLY(Framebuffer);
 
 	Framebuffer(const class Context& context, VkDevice device, VkRenderPass renderPass,
-				const std::vector<std::shared_ptr<class Texture>>& attachments,
-				const std::shared_ptr<class Texture> depthAttachment,
-				const std::shared_ptr<class Texture> stencilAttachment,
+				const std::vector<std::shared_ptr<class Texture_>>& attachments,
+				const std::shared_ptr<class Texture_> depthAttachment,
+				const std::shared_ptr<class Texture_> stencilAttachment,
 				const std::string& name = "");
 	~Framebuffer();
 

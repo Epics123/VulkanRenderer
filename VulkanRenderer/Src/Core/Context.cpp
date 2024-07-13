@@ -1,6 +1,7 @@
 #include "Context.h"
 #include "Log.h"
 
+#include "SwapChain.h"
 #include "RenderPass.h"
 
 #include <cstring>
@@ -62,6 +63,9 @@ Context::Context(Window& window) : window{ window }
 	createSurface();
 	pickPhysicalDevice();
 	createLogicalDevice();
+
+    //TODO: Initial swap chain creation
+
 	createCommandPool();
 }
 
@@ -177,8 +181,6 @@ void Context::pickPhysicalDevice()
 void Context::createLogicalDevice()
 {
     // DEFERRED_RENDERING_REWORK
-
-    // TODO: logical device creation
     const auto familyIndices = physicalDevice_.findQueueFamilies();
 
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
@@ -804,7 +806,67 @@ void Context::transitionImageLayout(VkImage& image, VkFormat format, VkImageLayo
 
 // DEFERRED_RENDERING_REWORK
 
-std::shared_ptr<class FRenderPass> Context::createRenderPass(const std::vector<RenderPassInitInfo>& initInfos, const std::vector<std::shared_ptr<class Texture>>& resolveAttachments)
+void Context::createSwapchain(VkFormat format, VkSurfaceFormatKHR surfaceFormat, VkPresentModeKHR presentMode, const VkExtent2D& extent)
+{
+    ASSERT(surface_ != VK_NULL_HANDLE, "Trying to create a swapchain without a surface! The context must be provided a valid surface to create a swapchain.")
+    swapchain = std::make_unique<Swapchain>(*this, physicalDevice_, surface_, presentQueue_, surfaceFormat, presentMode, extent);
+}
+
+
+VkSurfaceFormatKHR Context::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
+{
+	for (const auto& availableFormat : availableFormats)
+	{
+		if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+		{
+			return availableFormat;
+		}
+	}
+
+	return availableFormats[0];
+}
+
+VkPresentModeKHR Context::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes, VkPresentModeKHR desiredPresentMode)
+{
+    for (const auto& availablePresentMode : availablePresentModes)
+	{
+		if (availablePresentMode == desiredPresentMode)
+		{
+            switch (availablePresentMode)
+            {
+            case VK_PRESENT_MODE_FIFO_KHR:
+                CORE_INFO("Present Mode: V-Sync");
+                break;
+            default:
+                CORE_INFO("Present Mode: {0}", availablePresentMode);
+                break;
+            }
+
+			return availablePresentMode;
+		}
+	}
+
+    CORE_INFO("Present Mode: V-Sync");
+    return defaultPresentMode;
+}
+
+VkExtent2D Context::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, VkExtent2D windowExtent)
+{
+	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
+	{
+		return capabilities.currentExtent;
+	}
+	else
+	{
+		VkExtent2D actualExtent = windowExtent;
+		actualExtent.width = std::max(capabilities.minImageExtent.width, std::min(capabilities.maxImageExtent.width, actualExtent.width));
+		actualExtent.height = std::max(capabilities.minImageExtent.height, std::min(capabilities.maxImageExtent.height, actualExtent.height));
+
+		return actualExtent;
+	}
+}
+
+std::shared_ptr<class FRenderPass> Context::createRenderPass(const std::vector<RenderPassInitInfo>& initInfos, const std::vector<std::shared_ptr<class Texture_>>& resolveAttachments)
 {
     return std::make_shared<FRenderPass>(*this, initInfos, resolveAttachments);
 }

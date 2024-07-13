@@ -425,7 +425,7 @@ Material MaterialSerializer::deserialize(const std::string& filepath, class Cont
 
 						//TODO: Handle case where multiple materials reference the same textures
 
-						Texture texture;
+						Texture_ texture;
 
 						//Check if the texture we are loading is a normal map
 						if (path.stem().string().find(builder.normalExtension) != std::string::npos)

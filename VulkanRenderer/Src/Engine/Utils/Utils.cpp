@@ -13,7 +13,7 @@
 //#define GLFW_EXPOSE_NATIVE_WIN32
 //#include <glfw3native.h>
 
-bool Utils::loadImageFromFile(Context& device, const char* filepath, Texture& outTexture, VkFormat format)
+bool Utils::loadImageFromFile(Context& device, const char* filepath, Texture_& outTexture, VkFormat format)
 {
 	int width, height, channels;
 	stbi_uc* pixels = stbi_load(filepath, &width, &height, &channels, STBI_rgb_alpha);

@@ -66,8 +66,21 @@ Renderer::Renderer(Window* appWindow)
 
 void Renderer::init()
 {
-	recreateSwapChain();
+	// DEFERRED RENDERING REWORK
 
+	const SwapChainSupportDetails swapChainSupport = context.getSwapChainSupport();
+	const VkFormat swapChainFormat = VK_FORMAT_B8G8R8A8_UNORM;
+
+	const VkSurfaceFormatKHR swapchainSurfaceFormat = context.chooseSwapSurfaceFormat(swapChainSupport.formats);
+	const VkPresentModeKHR swapchainPresentMode = context.chooseSwapPresentMode(swapChainSupport.presentModes, VK_PRESENT_MODE_FIFO_KHR);
+	const VkExtent2D extents = context.chooseSwapExtent(swapChainSupport.capabilities, window->getExtent());
+
+	context.createSwapchain(swapChainFormat, swapchainSurfaceFormat, swapchainPresentMode, extents);
+
+	// END DEFERRED RENDERING REWORK
+
+	recreateSwapChain();
+	
 	globalDescriptorPool =
 		DescriptorPool::Builder(context)
 		.setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT * 2)
@@ -177,7 +190,7 @@ void Renderer::imguiInit()
 
 	ImGui_ImplVulkan_InitInfo init_info = {};
 	init_info.Instance = context.getInstance();
-	init_info.PhysicalDevice = context.getPhysicalDevice();
+	init_info.PhysicalDevice = context.getRawPhysicalDevice();
 	init_info.Device = context.getDevice();
 	init_info.Queue = context.graphicsQueue();
 	init_info.DescriptorPool = imguiDescriptorPool->getDescriptorPool();
@@ -310,10 +323,10 @@ void Renderer::loadMaterials(DescriptorSetLayout& layout)
 		ShaderParameters& params = material.second->getShaderParameters();
 		if (params.toggleTexture)
 		{
-			for (std::pair<uint32_t, Texture> texture : params.materialTextures)
+			for (std::pair<uint32_t, Texture_> texture : params.materialTextures)
 			{
 				uint32_t binding = texture.first;
-				Texture& tex = texture.second;
+				Texture_& tex = texture.second;
 
 				VkDescriptorImageInfo imageInfo{};
 				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;

@@ -109,7 +109,7 @@ public:
 
     VkCommandPool getCommandPool() { return commandPool; }
     VkDevice getDevice() const { return device_; }
-    VkPhysicalDevice getPhysicalDevice() { return physicalDevice; }
+    VkPhysicalDevice getRawPhysicalDevice() { return physicalDevice; }
     VkSurfaceKHR surface() { return surface_; }
     VkQueue graphicsQueue() { return graphicsQueue_; }
     VkQueue presentQueue() { return presentQueue_; }
@@ -132,7 +132,15 @@ public:
 
     // DEFERRED_RENDERING_REWORK
 
-    std::shared_ptr<class FRenderPass> createRenderPass(const std::vector<struct RenderPassInitInfo>& initInfos, const std::vector<std::shared_ptr<class Texture>>& resolveAttachments = {});
+    const PhysicalDevice& getPhysicalDevice() { return physicalDevice_; }
+
+    void createSwapchain(VkFormat format, VkSurfaceFormatKHR surfaceFormat, VkPresentModeKHR presentMode, const VkExtent2D& extent);
+
+	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes, VkPresentModeKHR desiredPresentMode);
+	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, VkExtent2D windowExtent);
+
+    std::shared_ptr<class FRenderPass> createRenderPass(const std::vector<struct RenderPassInitInfo>& initInfos, const std::vector<std::shared_ptr<class Texture_>>& resolveAttachments = {});
 
     // END_DEFERRED_RENDERING_REWORK
 
@@ -172,6 +180,8 @@ private:
     Window& window;
     VkCommandPool commandPool;
 
+    std::unique_ptr<class Swapchain> swapchain;
+
     VkDevice device_;
     VkSurfaceKHR surface_;
     VkQueue graphicsQueue_;
@@ -185,6 +195,7 @@ private:
 	std::vector<VkQueue> transferQueues;
 
     bool shouldSupportRayTracing = false;
+    VkPresentModeKHR defaultPresentMode = VK_PRESENT_MODE_FIFO_KHR;
 
     const std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
     const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME}; //, VK_KHR_RAY_QUERY_EXTENSION_NAME, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME };

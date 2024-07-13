@@ -404,7 +404,7 @@ void DepthPass::createRenderPassFramebuffers(Context& device, uint32_t framebuff
 void DepthPass::createRenderPassSampler(Context& device)
 {
 	VkPhysicalDeviceProperties properties{};
-	vkGetPhysicalDeviceProperties(device.getPhysicalDevice(), &properties);
+	vkGetPhysicalDeviceProperties(device.getRawPhysicalDevice(), &properties);
 
 	VkSamplerCreateInfo samplerInfo{};
 	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -433,7 +433,7 @@ void DepthPass::createRenderPassSampler(Context& device)
 
 // DEFERRED_RENDERING_REWORK
 
-FRenderPass::FRenderPass(const Context& context, const std::vector<RenderPassInitInfo>& initInfos, const std::vector<std::shared_ptr<Texture>> resolveAttachments)
+FRenderPass::FRenderPass(const Context& context, const std::vector<RenderPassInitInfo>& initInfos, const std::vector<std::shared_ptr<Texture_>> resolveAttachments)
 	:device{context.getDevice()}
 {
 	std::vector<VkAttachmentDescription> attachmentDescriptors;

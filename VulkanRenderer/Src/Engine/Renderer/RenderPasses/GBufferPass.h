@@ -15,12 +15,12 @@ public:
 private:
 	Context* context = nullptr;
 
-	std::shared_ptr<Texture> baseColorTexture;
-	std::shared_ptr<Texture> normalTexture;
-	std::shared_ptr<Texture> emissiveTexture;
-	std::shared_ptr<Texture> specularTexture;
-	std::shared_ptr<Texture> velocityTexture;
-	std::shared_ptr<Texture> depthTexture;
+	std::shared_ptr<Texture_> baseColorTexture;
+	std::shared_ptr<Texture_> normalTexture;
+	std::shared_ptr<Texture_> emissiveTexture;
+	std::shared_ptr<Texture_> specularTexture;
+	std::shared_ptr<Texture_> velocityTexture;
+	std::shared_ptr<Texture_> depthTexture;
 
 	std::shared_ptr<RenderPass> renderPass;
 	//std::unique_ptr<Framebuffer>

@@ -116,7 +116,7 @@ public:
 	float currentFramerate;
 	float currentFrametime;
 
-	std::vector<Texture> textures;
+	std::vector<Texture_> textures;
 
 private:
 	Renderer(Window* appWindow);

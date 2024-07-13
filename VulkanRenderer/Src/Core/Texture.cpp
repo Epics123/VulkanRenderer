@@ -1,5 +1,10 @@
 #include "Texture.h"
 
+#include "Context.h"
+#include "Buffer.h"
+
+#include "Logging/Log.h"
+
 #include "imgui_impl_vulkan.h"
 #include "imgui_internal.h"
 
@@ -7,17 +12,17 @@
 #include <iostream>
 #include <stdexcept>
 
-Texture::Texture()
+Texture_::Texture_()
 {
 
 }
 
-Texture::~Texture()
+Texture_::~Texture_()
 {
 	
 }
 
-void Texture::createTextureImageView(Context& device)
+void Texture_::createTextureImageView(Context& device)
 {
 	VkImageViewCreateInfo viewInfo{};
 	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -36,12 +41,12 @@ void Texture::createTextureImageView(Context& device)
 	}
 }
 
-void Texture::createTextureSampler(Context& device)
+void Texture_::createTextureSampler(Context& device)
 {
 	// Get physical device properties in order to calculate reasonable values for hardware
 	// TODO: break this out, query at beginning of runtime and pass relevant data in
 	VkPhysicalDeviceProperties properties{};
-	vkGetPhysicalDeviceProperties(device.getPhysicalDevice(), &properties);
+	vkGetPhysicalDeviceProperties(device.getRawPhysicalDevice(), &properties);
 
 	VkSamplerCreateInfo samplerInfo{};
 	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -79,14 +84,14 @@ void Texture::createTextureSampler(Context& device)
 	descriptorSet = ImGui_ImplVulkan_AddTexture(textureSampler, textureImageView, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-bool Texture::isStencil() const
+bool Texture_::isStencil() const
 {
 	return (textureFormat == VK_FORMAT_S8_UINT || textureFormat == VK_FORMAT_D16_UNORM_S8_UINT ||
 			textureFormat == VK_FORMAT_D24_UNORM_S8_UINT ||
 			textureFormat == VK_FORMAT_D32_SFLOAT_S8_UINT);
 }
 
-bool Texture::isDepth() const
+bool Texture_::isDepth() const
 {
 	return (textureFormat == VK_FORMAT_D16_UNORM || textureFormat == VK_FORMAT_D16_UNORM_S8_UINT ||
 		textureFormat == VK_FORMAT_D24_UNORM_S8_UINT || textureFormat == VK_FORMAT_D32_SFLOAT ||
@@ -94,10 +99,71 @@ bool Texture::isDepth() const
 		textureFormat == VK_FORMAT_X8_D24_UNORM_PACK32);
 }	
 
-void Texture::cleanup(Context& device)
+void Texture_::cleanup(Context& device)
 {
 	vkDestroySampler(device.getDevice(), textureSampler, nullptr);
 	vkDestroyImageView(device.getDevice(), textureImageView, nullptr);
 	vkDestroyImage(device.getDevice(), textureImage, nullptr);
 	vkFreeMemory(device.getDevice(), textureImageMemory, nullptr);
+}
+
+Texture::Texture(const Context& inContext, VkDevice device, VkImage inImage, VkFormat inFormat, VkExtent3D inExtents, 
+				 uint32_t numLayers, bool isMultiview, const std::string& name)
+	:context{inContext}, image{inImage}, format{inFormat}, extents{inExtents}, layerCount{numLayers}, multiview{isMultiview}, debugName{name}
+{
+	imageView = createImageView(!multiview ? VK_IMAGE_VIEW_TYPE_2D : VK_IMAGE_VIEW_TYPE_2D_ARRAY, format, 1, layerCount, name);
+}
+
+Texture::~Texture()
+{
+
+}
+
+bool Texture::isDepth() const
+{
+	return (format == VK_FORMAT_D16_UNORM || format == VK_FORMAT_D16_UNORM_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT || 
+			format == VK_FORMAT_D32_SFLOAT ||format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_X8_D24_UNORM_PACK32);
+}
+
+bool Texture::isStencil() const
+{
+	return (format == VK_FORMAT_S8_UINT || format == VK_FORMAT_D16_UNORM_S8_UINT || 
+			format == VK_FORMAT_D24_UNORM_S8_UINT || format == VK_FORMAT_D32_SFLOAT_S8_UINT);
+}
+
+VkImageView Texture::createImageView(VkImageViewType viewType, VkFormat imageFormat, uint32_t numMips, uint32_t layers, const std::string& name)
+{
+	const VkImageAspectFlags aspectMask = isDepth() ? VK_IMAGE_ASPECT_DEPTH_BIT : (isStencil() ? VK_IMAGE_ASPECT_STENCIL_BIT : VK_IMAGE_ASPECT_COLOR_BIT);
+	
+	VkImageViewCreateInfo createInfo{};
+	createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	createInfo.flags = VkImageViewCreateFlags(0);
+	createInfo.image = image;
+	createInfo.viewType = viewType;
+	createInfo.format = imageFormat;
+
+	VkComponentMapping components;
+	components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+	components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+	components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+	components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+	createInfo.components = components;
+
+	VkImageSubresourceRange subresourceRange;
+	subresourceRange.aspectMask = aspectMask;
+	subresourceRange.baseMipLevel = 0;
+	subresourceRange.levelCount = numMips;
+	subresourceRange.baseArrayLayer = 0;
+	subresourceRange.layerCount = multiview ? VK_REMAINING_ARRAY_LAYERS : layers;
+	createInfo.subresourceRange = subresourceRange;
+
+	VkImageView imageView{VK_NULL_HANDLE};
+	VkResult result = vkCreateImageView(context.getDevice(), &createInfo, nullptr, &imageView);
+	if(result != VK_SUCCESS)
+	{
+		CORE_CRITICAL("Failed to create image view! Error code: {0}", result);
+		throw std::runtime_error("");
+	}
+
+	return imageView;
 }

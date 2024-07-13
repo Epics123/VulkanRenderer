@@ -20,7 +20,7 @@ struct ShaderParameters
 	float metallic;
 	uint32_t toggleTexture;
 
-	std::map<uint32_t, Texture> materialTextures;
+	std::map<uint32_t, Texture_> materialTextures;
 	std::string textureDir;
 
 	ShaderParameters();
