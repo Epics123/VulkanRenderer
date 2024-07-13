@@ -10,7 +10,7 @@ from io import BytesIO
 from urllib.request import urlopen
 
 class VulkanConfiguration:
-	requiredVulkanVersion = "1.2.189.2"
+	requiredVulkanVersion = "1.3.283.0"
 	vulkanDirectory = "../VulkanRenderer/Libraries/VulkanSDK"
 
 	@classmethod
@@ -46,7 +46,7 @@ class VulkanConfiguration:
 				return
 			permissionGranted = (reply == 'y')
 
-		vulkanInstallURL = f"https://sdk.lunarg.com/sdk/download/1.2.189.2/windows/VulkanSDK-1.2.189.2-Installer.exe"
+		vulkanInstallURL = f"https://sdk.lunarg.com/sdk/download/1.3.283.0/windows/VulkanSDK-1.3.283.0-Installer.exe"
 		vulkanPath = f"{cls.vulkanDirectory}/VulkanSDK-{cls.requiredVulkanVersion}-Installer.exe"
 		print("Downloading {0:s} to {1:s}".format(vulkanInstallURL, vulkanPath))
 		Utils.DownloadFile(vulkanInstallURL, vulkanPath)

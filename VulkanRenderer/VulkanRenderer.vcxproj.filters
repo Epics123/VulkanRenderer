@@ -192,7 +192,16 @@
     <ClInclude Include="Src\Core\CommandBuffer.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Core\CommandQueueManager.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
     <ClInclude Include="Src\Core\Context.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\Framebuffer.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\PhysicalDevice.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\Pipeline.h">
@@ -224,6 +233,9 @@
     </ClInclude>
     <ClInclude Include="Src\Engine\Renderer\Model.h">
       <Filter>Src\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Engine\Renderer\RenderPasses\GBufferPass.h">
+      <Filter>Src\Engine\Renderer\RenderPasses</Filter>
     </ClInclude>
     <ClInclude Include="Src\Engine\Renderer\RenderPasses\RenderPass.h">
       <Filter>Src\Engine\Renderer\RenderPasses</Filter>
@@ -282,9 +294,6 @@
     <ClInclude Include="Src\RenderSystems\WorldGridSystem.h">
       <Filter>Src\RenderSystems</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Engine\Renderer\RenderPasses\GBufferPass.h" />
-    <ClInclude Include="Src\Core\Framebuffer.h" />
-    <ClInclude Include="Src\Core\PhysicalDevice.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Libraries\ImGui\ImGuizmo\GraphEditor.cpp">
@@ -425,7 +434,16 @@
     <ClCompile Include="Src\Core\CommandBuffer.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Core\CommandQueueManager.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
     <ClCompile Include="Src\Core\Context.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\Framebuffer.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\PhysicalDevice.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Pipeline.cpp">
@@ -515,8 +533,6 @@
     <ClCompile Include="Src\RenderSystems\WorldGridSystem.cpp">
       <Filter>Src\RenderSystems</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\Framebuffer.cpp" />
-    <ClCompile Include="Src\Core\PhysicalDevice.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Src\resources\vulkan\shaders\BasicUnlit.frag">

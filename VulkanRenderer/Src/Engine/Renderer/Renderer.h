@@ -63,7 +63,7 @@ public:
 	void createCommandBuffers();
 	void freeCommandBuffers();
 
-	Context& getDevice() { return context; }
+	Context& getDevice() { return *context; }
 
 	void recreateSwapChain();
 	RenderPass getSwapChainRenderPass() const { return mSwapChain->getRenderPass(); }
@@ -131,7 +131,14 @@ private:
 	std::vector<VkCommandBuffer> commandBuffers;
 	std::vector<VkCommandBuffer> shadowCommandBuffers;
 	
-	Context context{*window};
+	//Context context {*window, VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT };
+
+	// DEFERRED RENDERING REFACTOR
+	std::unique_ptr<Context> context;
+
+	CommandQueueManager graphicsCommandManager;
+	// END DEFERRED RENDERING REFACTOR
+
 	std::unique_ptr <SwapChain> mSwapChain;
 
 	std::unique_ptr<DescriptorPool> globalDescriptorPool{};
@@ -145,14 +152,14 @@ private:
 
 	DepthPass depthPass;
 
-	RenderSystem renderSystem {context};
+	/*RenderSystem renderSystem {context};
 	PointLightSystem pointLightSystem {context};
 	WireframeSystem wireframeSystem {context};
 	ImGuiSystem imguiSystem {context};
 	UnlitSystem unlitSystem {context};
 	WorldGridSystem gridSystem {context};
 	SpotLightSystem spotLightSystem {context};
-	ShadowSystem shadowSystem {context};
+	ShadowSystem shadowSystem {context};*/
 
 	RenderMode renderMode = DEFAULT_LIT;
 
@@ -165,6 +172,11 @@ private:
 	uint32_t currentImageIndex;
 	int currentFrameIndex = 0;
 	bool frameStarted = false;
+
+	// DEFERRED RENDERING REFACTOR
+	uint32_t framesInFlight;
+
+	// END DEFERRED RENDERING REFACTOR
 
 	VkClearColorValue clearColor = { {0.01f, 0.01f, 0.01f, 1.0f} };
 

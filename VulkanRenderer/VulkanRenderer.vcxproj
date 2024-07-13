@@ -22,13 +22,13 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -58,7 +58,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.189.2\Include;Libraries\glfw\include;Libraries\glm;Libraries\ImGui;Libraries\ObjLoader;Libraries\ImgLoader;Libraries\spdlog\include;Libraries\yaml\include;Src\Core;Src\Engine;Src\Engine\Runtime;Src\Engine\Renderer;Src\Engine\Renderer\RenderPasses;Src\Engine\Logging;Src\Engine\Serialization;Src\Engine\Utils;Src\RenderSystems;Src\Engine\Scene;Src\Engine\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.283.0\Include;Libraries\glfw\include;Libraries\glm;Libraries\ImGui;Libraries\ObjLoader;Libraries\ImgLoader;Libraries\spdlog\include;Libraries\yaml\include;Src\Core;Src\Engine;Src\Engine\Runtime;Src\Engine\Renderer;Src\Engine\Renderer\RenderPasses;Src\Engine\Logging;Src\Engine\Serialization;Src\Engine\Utils;Src\RenderSystems;Src\Engine\Scene;Src\Engine\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -68,14 +68,14 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>glfw3_mt.lib;vulkan-1.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\VulkanSDK\1.2.189.2\Lib;Libraries\glfw\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\VulkanSDK\1.3.283.0\Lib;Libraries\glfw\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.2.189.2\Include;Libraries\glfw\include;Libraries\glm;Libraries\ImGui;Libraries\ObjLoader;Libraries\ImgLoader;Libraries\spdlog\include;Libraries\yaml\include;Src\Core;Src\Engine;Src\Engine\Runtime;Src\Engine\Renderer;Src\Engine\Renderer\RenderPasses;Src\Engine\Logging;Src\Engine\Serialization;Src\Engine\Utils;Src\RenderSystems;Src\Engine\Scene;Src\Engine\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.283.0\Include;Libraries\glfw\include;Libraries\glm;Libraries\ImGui;Libraries\ObjLoader;Libraries\ImgLoader;Libraries\spdlog\include;Libraries\yaml\include;Src\Core;Src\Engine;Src\Engine\Runtime;Src\Engine\Renderer;Src\Engine\Renderer\RenderPasses;Src\Engine\Logging;Src\Engine\Serialization;Src\Engine\Utils;Src\RenderSystems;Src\Engine\Scene;Src\Engine\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -89,7 +89,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>glfw3_mt.lib;vulkan-1.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\VulkanSDK\1.2.189.2\Lib;Libraries\glfw\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\VulkanSDK\1.3.283.0\Lib;Libraries\glfw\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -130,14 +130,15 @@
     <ClInclude Include="Libraries\yaml\src\stringsource.h" />
     <ClInclude Include="Libraries\yaml\src\tag.h" />
     <ClInclude Include="Libraries\yaml\src\token.h" />
-    <ClInclude Include="Src\Core\PhysicalDevice.h" />
     <ClInclude Include="Src\Application.h" />
     <ClInclude Include="Src\Common\Defines.h" />
     <ClInclude Include="Src\Common\Enums.h" />
     <ClInclude Include="Src\Core\Buffer.h" />
     <ClInclude Include="Src\Core\CommandBuffer.h" />
+    <ClInclude Include="Src\Core\CommandQueueManager.h" />
     <ClInclude Include="Src\Core\Context.h" />
     <ClInclude Include="Src\Core\Framebuffer.h" />
+    <ClInclude Include="Src\Core\PhysicalDevice.h" />
     <ClInclude Include="Src\Core\Pipeline.h" />
     <ClInclude Include="Src\Core\SwapChain.h" />
     <ClInclude Include="Src\Core\Texture.h" />
@@ -213,12 +214,13 @@
     <ClCompile Include="Libraries\yaml\src\singledocparser.cpp" />
     <ClCompile Include="Libraries\yaml\src\stream.cpp" />
     <ClCompile Include="Libraries\yaml\src\tag.cpp" />
-    <ClCompile Include="Src\Core\PhysicalDevice.cpp" />
     <ClCompile Include="Src\Application.cpp" />
     <ClCompile Include="Src\Core\Buffer.cpp" />
     <ClCompile Include="Src\Core\CommandBuffer.cpp" />
+    <ClCompile Include="Src\Core\CommandQueueManager.cpp" />
     <ClCompile Include="Src\Core\Context.cpp" />
     <ClCompile Include="Src\Core\Framebuffer.cpp" />
+    <ClCompile Include="Src\Core\PhysicalDevice.cpp" />
     <ClCompile Include="Src\Core\Pipeline.cpp" />
     <ClCompile Include="Src\Core\SwapChain.cpp" />
     <ClCompile Include="Src\Core\Texture.cpp" />

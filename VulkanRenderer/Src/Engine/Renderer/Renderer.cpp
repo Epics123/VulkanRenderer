@@ -68,21 +68,31 @@ void Renderer::init()
 {
 	// DEFERRED RENDERING REWORK
 
-	const SwapChainSupportDetails swapChainSupport = context.getSwapChainSupport();
+	Context::endableDefaultFeatures();
+	Context::enableIndirectRenderingFeature();
+	Context::enableSyncronizationFeature();
+	Context::enableBufferDeviceAddressFeature();
+
+	context = std::make_unique<Context>(*window, VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT);
+
+	const SwapChainSupportDetails swapChainSupport = context->getSwapChainSupport();
 	const VkFormat swapChainFormat = VK_FORMAT_B8G8R8A8_UNORM;
 
-	const VkSurfaceFormatKHR swapchainSurfaceFormat = context.chooseSwapSurfaceFormat(swapChainSupport.formats);
-	const VkPresentModeKHR swapchainPresentMode = context.chooseSwapPresentMode(swapChainSupport.presentModes, VK_PRESENT_MODE_FIFO_KHR);
-	const VkExtent2D extents = context.chooseSwapExtent(swapChainSupport.capabilities, window->getExtent());
+	const VkSurfaceFormatKHR swapchainSurfaceFormat = context->chooseSwapSurfaceFormat(swapChainSupport.formats);
+	const VkPresentModeKHR swapchainPresentMode = context->chooseSwapPresentMode(swapChainSupport.presentModes, VK_PRESENT_MODE_FIFO_KHR);
+	const VkExtent2D extents = context->chooseSwapExtent(swapChainSupport.capabilities, window->getExtent());
 
-	context.createSwapchain(swapChainFormat, swapchainSurfaceFormat, swapchainPresentMode, extents);
+	context->createSwapchain(swapChainFormat, swapchainSurfaceFormat, swapchainPresentMode, extents);
+	framesInFlight = context->getSwapchain()->getNumImages();
+
+	graphicsCommandManager = context->createGraphicsCommandQueue(context->getSwapchain()->getNumImages(), framesInFlight, "Graphics Command");
 
 	// END DEFERRED RENDERING REWORK
 
-	recreateSwapChain();
+	//recreateSwapChain();
 	
 	globalDescriptorPool =
-		DescriptorPool::Builder(context)
+		DescriptorPool::Builder(*context)
 		.setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT * 2)
 		.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
 		.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -91,7 +101,7 @@ void Renderer::init()
 		.build();
 
 	imguiDescriptorPool =
-		DescriptorPool::Builder(context)
+		DescriptorPool::Builder(*context)
 		.setMaxSets(1000)
 		.addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000)
 		.setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT)
@@ -104,24 +114,24 @@ void Renderer::init()
 	uboBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 	for (int i = 0; i < uboBuffers.size(); i++)
 	{
-		uboBuffers[i] = std::make_unique<Buffer>(context, sizeof(GlobalUbo), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+		uboBuffers[i] = std::make_unique<Buffer>(*context, sizeof(GlobalUbo), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		uboBuffers[i]->map();
 	}
 
 	lightUboBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 	for (int i = 0; i < lightUboBuffers.size(); i++)
 	{
-		lightUboBuffers[i] = std::make_unique<Buffer>(context, sizeof(LightUbo), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+		lightUboBuffers[i] = std::make_unique<Buffer>(*context, sizeof(LightUbo), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		lightUboBuffers[i]->map();
 	}
 
 	// highest set common to all shaders
-	std::unique_ptr<DescriptorSetLayout> globalSetLayout = DescriptorSetLayout::Builder(context)
+	std::unique_ptr<DescriptorSetLayout> globalSetLayout = DescriptorSetLayout::Builder(*context)
 		.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
 		.addBinding(1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
 		.build();
 
-	std::unique_ptr<DescriptorSetLayout> materialSetLayout = DescriptorSetLayout::Builder(context)
+	std::unique_ptr<DescriptorSetLayout> materialSetLayout = DescriptorSetLayout::Builder(*context)
 		.addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
 		.addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
 		.addBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, MAX_TEXTURE_BINDINGS)
@@ -146,17 +156,17 @@ void Renderer::init()
 
 	CORE_WARN("Loading Game Objects...")
 	SceneSerializer serializer;
-	if(!serializer.deserialize("Src/resources/scenes/untitled.scene", context, sceneData))
+	if(!serializer.deserialize("Src/resources/scenes/untitled.scene", *context, sceneData))
 	{
 		CORE_ERROR("Failed to load scene!")
 	}
 	CORE_WARN("Game Object Load Complete!")
 
 	materialUboBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
-	minUboAlignment = context.properties.limits.minUniformBufferOffsetAlignment;
+	minUboAlignment = context->properties.limits.minUniformBufferOffsetAlignment;
 	for (size_t i = 0; i < materialUboBuffers.size(); i++)
 	{
-		materialUboBuffers[i] = std::make_unique<Buffer>(context, sizeof(MaterialUbo), sceneData.materialCount, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, minUboAlignment);
+		materialUboBuffers[i] = std::make_unique<Buffer>(*context, sizeof(MaterialUbo), sceneData.materialCount, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, minUboAlignment);
 		materialUboBuffers[i]->map(materialUboBuffers[i]->getBufferSize());
 	}	
 
@@ -164,12 +174,12 @@ void Renderer::init()
 	loadMaterials(*materialSetLayout);
 	CORE_WARN("Material Load Finished!")
 
-	renderSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout(), materialSetLayout->getDescriptorSetLayout());
-	pointLightSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
-	wireframeSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
-	unlitSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout(), materialSetLayout->getDescriptorSetLayout());
-	gridSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
-	spotLightSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
+		/*renderSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout(), materialSetLayout->getDescriptorSetLayout());
+		pointLightSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
+		wireframeSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
+		unlitSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout(), materialSetLayout->getDescriptorSetLayout());
+		gridSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());
+		spotLightSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());*/
 	//shadowSystem.init(depthPass.renderPass, globalSetLayout->getDescriptorSetLayout());
 
 	mainCamera = Camera();
@@ -189,10 +199,10 @@ void Renderer::imguiInit()
 	ImGui_ImplGlfw_InitForVulkan(window->getWindow(), true);
 
 	ImGui_ImplVulkan_InitInfo init_info = {};
-	init_info.Instance = context.getInstance();
-	init_info.PhysicalDevice = context.getRawPhysicalDevice();
-	init_info.Device = context.getDevice();
-	init_info.Queue = context.graphicsQueue();
+	init_info.Instance = context->getInstance();
+	init_info.PhysicalDevice = context->getRawPhysicalDevice();
+	init_info.Device = context->getDevice();
+	init_info.Queue = context->graphicsQueue();
 	init_info.DescriptorPool = imguiDescriptorPool->getDescriptorPool();
 	init_info.MinImageCount = 3;
 	init_info.ImageCount = 3;
@@ -201,9 +211,9 @@ void Renderer::imguiInit()
 	ImGui_ImplVulkan_Init(&init_info, getSwapChainRenderPass().renderPass);
 
 	// Upload Fonts
-	VkCommandBuffer fontCmdBuffer = context.beginSingleTimeCommands();
+	VkCommandBuffer fontCmdBuffer = context->beginSingleTimeCommands();
 	ImGui_ImplVulkan_CreateFontsTexture(fontCmdBuffer);
-	context.endSingleTimeCommands(fontCmdBuffer);
+	context->endSingleTimeCommands(fontCmdBuffer);
 
 	//TEMP: Should make own key codes
 	//io.KeyMap[ImGuiKey_]
@@ -211,7 +221,7 @@ void Renderer::imguiInit()
 
 void Renderer::deviceWaitIdle()
 {
-	vkDeviceWaitIdle(context.getDevice());
+	vkDeviceWaitIdle(context->getDevice());
 }
 
 void Renderer::setRenderMode(RenderMode mode)
@@ -251,17 +261,17 @@ void Renderer::createCommandBuffers()
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandPool = context.getCommandPool();
+	allocInfo.commandPool = context->getCommandPool();
 	allocInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
 
-	if (vkAllocateCommandBuffers(context.getDevice(), &allocInfo, commandBuffers.data()) != VK_SUCCESS)
+	if (vkAllocateCommandBuffers(context->getDevice(), &allocInfo, commandBuffers.data()) != VK_SUCCESS)
 	{
 		CORE_ERROR("Failed to allocate command buffers!")
 		throw std::runtime_error("Failed to allocate command buffers!");
 	}
 
 	shadowCommandBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
-	if (vkAllocateCommandBuffers(context.getDevice(), &allocInfo, shadowCommandBuffers.data()) != VK_SUCCESS)
+	if (vkAllocateCommandBuffers(context->getDevice(), &allocInfo, shadowCommandBuffers.data()) != VK_SUCCESS)
 	{
 		CORE_ERROR("Failed to allocate shadow pass command buffers!")
 		throw std::runtime_error("Failed to allocate command buffers!");
@@ -270,7 +280,7 @@ void Renderer::createCommandBuffers()
 
 void Renderer::freeCommandBuffers()
 {
-	vkFreeCommandBuffers(context.getDevice(), context.getCommandPool(), static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+	vkFreeCommandBuffers(context->getDevice(), context->getCommandPool(), static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
 	commandBuffers.clear();
 }
 
@@ -287,20 +297,20 @@ void Renderer::recreateSwapChain()
 	}
 
 	if(depthPass.renderPass)
-		depthPass.cleanup(context);
+		depthPass.cleanup(*context);
 
-	vkDeviceWaitIdle(context.getDevice());
+	vkDeviceWaitIdle(context->getDevice());
 	mSwapChain = nullptr;
 	if (mSwapChain == nullptr)
 	{
-		mSwapChain = std::make_unique<SwapChain>(context, extent);
-		depthPass.createRenderPass(context, mSwapChain->getWidth(), mSwapChain->getHeight());
+		mSwapChain = std::make_unique<SwapChain>(*context, extent);
+		depthPass.createRenderPass(*context, mSwapChain->getWidth(), mSwapChain->getHeight());
 	}
 	else
 	{
 		std::shared_ptr<SwapChain> oldSwapChain = std::move(mSwapChain); // std::move makes a copy of ptr and sets mSwapChain to nullptr
-		mSwapChain = std::make_unique<SwapChain>(context, extent, oldSwapChain); 
-		depthPass.createRenderPass(context, mSwapChain->getWidth(), mSwapChain->getHeight());
+		mSwapChain = std::make_unique<SwapChain>(*context, extent, oldSwapChain); 
+		depthPass.createRenderPass(*context, mSwapChain->getWidth(), mSwapChain->getHeight());
 
 		if (!oldSwapChain->compareSwapFormats(*mSwapChain.get()))
 		{
@@ -349,7 +359,7 @@ void Renderer::cleanupTextures()
 {
 	for(auto& mat : sceneData.materials)
 	{
-		mat.second->cleanup(context);
+		mat.second->cleanup(*context);
 	}
 }
 
@@ -415,52 +425,52 @@ void Renderer::drawFrame(float dt)
 	uboBuffers[frameIndex]->writeToBuffer(&ubo);
 	uboBuffers[frameIndex]->flush();
 
-	LightUbo lightUbo{};
-	pointLightSystem.update(frameInfo, lightUbo);
-	spotLightSystem.update(frameInfo, lightUbo);
-	lightUboBuffers[frameIndex]->writeToBuffer(&lightUbo);
-	lightUboBuffers[frameIndex]->flush();
+	//LightUbo lightUbo{};
+	//pointLightSystem.update(frameInfo, lightUbo);
+	//spotLightSystem.update(frameInfo, lightUbo);
+	//lightUboBuffers[frameIndex]->writeToBuffer(&lightUbo);
+	//lightUboBuffers[frameIndex]->flush();
 
-	if (commandBuffer)
-	{
-		// render
-		beginSwapChainRenderPass(commandBuffer);
-		mainCamera.updateModel(dt);
+	//if (commandBuffer)
+	//{
+	//	// render
+	//	beginSwapChainRenderPass(commandBuffer);
+	//	mainCamera.updateModel(dt);
 
-		switch (renderMode)
-		{
-		case DEFAULT_LIT:
-			// order matters for transparency
-			renderSystem.update(frameInfo, materialUboBuffers[frameIndex].get());
-			renderSystem.render(frameInfo);
-			pointLightSystem.render(frameInfo, lightUbo);
-			spotLightSystem.render(frameInfo, lightUbo);
-			break;
-		case WIREFRAME:
-			wireframeSystem.render(frameInfo);
-			break;
-		case UNLIT:
-			unlitSystem.update(frameInfo, materialUboBuffers[frameIndex].get());
-			unlitSystem.render(frameInfo);
-			break;
-		default:
-			break;
-		}
+	//	switch (renderMode)
+	//	{
+	//	case DEFAULT_LIT:
+	//		// order matters for transparency
+	//		renderSystem.update(frameInfo, materialUboBuffers[frameIndex].get());
+	//		renderSystem.render(frameInfo);
+	//		pointLightSystem.render(frameInfo, lightUbo);
+	//		spotLightSystem.render(frameInfo, lightUbo);
+	//		break;
+	//	case WIREFRAME:
+	//		wireframeSystem.render(frameInfo);
+	//		break;
+	//	case UNLIT:
+	//		unlitSystem.update(frameInfo, materialUboBuffers[frameIndex].get());
+	//		unlitSystem.render(frameInfo);
+	//		break;
+	//	default:
+	//		break;
+	//	}
 
-		if(showGrid)
-			gridSystem.render(frameInfo, ubo);
+	//	if(showGrid)
+	//		gridSystem.render(frameInfo, ubo);
 
-		drawImGui(frameInfo);
-		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
+	//	drawImGui(frameInfo);
+	//	ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
 
-		endSwapChainRenderPass(commandBuffer);
+	//	endSwapChainRenderPass(commandBuffer);
 
-		//depthPass.begin(commandBuffer);
-		//shadowSystem.render(frameInfo);
-		//depthPass.end(commandBuffer);
+	//	//depthPass.begin(commandBuffer);
+	//	//shadowSystem.render(frameInfo);
+	//	//depthPass.end(commandBuffer);
 
-		endFrame();
-	}
+	//	endFrame();
+	//}
 }
 
 void Renderer::endFrame()
@@ -515,17 +525,17 @@ void Renderer::endSwapChainRenderPass(VkCommandBuffer commandBuffer)
 
 void Renderer::drawImGui(FrameInfo& frameInfo)
 {
-	imguiSystem.drawImGui(frameInfo);
+	//imguiSystem.drawImGui(frameInfo);
 }
 
 void Renderer::cleanup()
 {
 	cleanupTextures();
-	depthPass.cleanup(context);
+	depthPass.cleanup(*context);
 
-	renderSystem.cleanup();
+	/*renderSystem.cleanup();
 	unlitSystem.cleanup();
-	wireframeSystem.cleanup();
+	wireframeSystem.cleanup();*/
 
 	freeCommandBuffers();
 	window->cleanupWindow();

@@ -24,6 +24,8 @@ public:
 
     ~Swapchain();
 
+    uint32_t getNumImages() const { return static_cast<uint32_t>(swapchainImages.size()); }
+
 private:
     void createSwapchain(const Context& context, const PhysicalDevice& physicalDevice, VkSurfaceKHR surface, VkFormat imageFormat, 
                          VkColorSpaceKHR imageColorSpace, VkPresentModeKHR presentMode, VkExtent2D extent);

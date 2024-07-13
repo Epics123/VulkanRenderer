@@ -3,6 +3,7 @@
 #include "Renderer/Window.h"
 #include "../Common/Defines.h"
 #include "PhysicalDevice.h"
+#include "CommandQueueManager.h"
 
 #include <string>
 #include <vector>
@@ -69,6 +70,7 @@ struct PhysicalDeviceFeatures
 
         vulkan11Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
         vulkan12Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+        vullkan13Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
 
         accelStructFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
 
@@ -79,17 +81,20 @@ struct PhysicalDeviceFeatures
         multiviewFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES;
 
         fragmentDensityMapFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_FEATURES_EXT;
+        fragmentDensityMapOffsetFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_OFFSET_FEATURES_QCOM;
     }
 
 	VkPhysicalDeviceFeatures physicalDeviceFeatures;
 	VkPhysicalDeviceVulkan11Features vulkan11Features{};
 	VkPhysicalDeviceVulkan12Features vulkan12Features{};
+    VkPhysicalDeviceVulkan13Features vullkan13Features{};
 
 	VkPhysicalDeviceAccelerationStructureFeaturesKHR accelStructFeatures{};
 	VkPhysicalDeviceRayTracingPipelineFeaturesKHR rayTracingPipelineFeatures{};
 	VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures{};
 	VkPhysicalDeviceMultiviewFeatures multiviewFeatures{};
 	VkPhysicalDeviceFragmentDensityMapFeaturesEXT fragmentDensityMapFeatures{};
+    VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM fragmentDensityMapOffsetFeatures{};
 };
 
 class Context
@@ -101,11 +106,11 @@ public:
     const bool enableValidationLayers = false;
 #endif
 
-    Context(Window& window);
+    Context(Window& window, VkQueueFlags requestedQueueTypes = VK_QUEUE_GRAPHICS_BIT);
     ~Context();
 
     // Not copyable or movable
-	MOVABLE_ONLY(Context)
+	//MOVABLE_ONLY(Context)
 
     VkCommandPool getCommandPool() { return commandPool; }
     VkDevice getDevice() const { return device_; }
@@ -136,11 +141,20 @@ public:
 
     void createSwapchain(VkFormat format, VkSurfaceFormatKHR surfaceFormat, VkPresentModeKHR presentMode, const VkExtent2D& extent);
 
+    class Swapchain* getSwapchain() { return swapchain.get(); }
+
 	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes, VkPresentModeKHR desiredPresentMode);
 	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, VkExtent2D windowExtent);
 
+    CommandQueueManager createGraphicsCommandQueue(uint32_t count, uint32_t numConcurrentCommands, const std::string& name, int graphicsQueueIndex = -1);
+
     std::shared_ptr<class FRenderPass> createRenderPass(const std::vector<struct RenderPassInitInfo>& initInfos, const std::vector<std::shared_ptr<class Texture_>>& resolveAttachments = {});
+
+    static void endableDefaultFeatures();
+    static void enableIndirectRenderingFeature();
+    static void enableSyncronizationFeature();
+    static void enableBufferDeviceAddressFeature();
 
     // END_DEFERRED_RENDERING_REWORK
 
@@ -169,9 +183,11 @@ private:
 private:
     // DEFERRED_RENDERING_REWORK
     PhysicalDevice physicalDevice_;
-    PhysicalDeviceFeatures physicalDeviceFeatures;
+    static PhysicalDeviceFeatures physicalDeviceFeatures;
 
-    VkQueueFlags defaultRequestedQueues = VK_QUEUE_GRAPHICS_BIT;
+    VkQueueFlags requestedQueues;
+
+    std::unique_ptr<class Swapchain> swapchain;
     // END_DEFERRED_RENDERING_REWORK
 
     VkInstance instance;
@@ -179,8 +195,6 @@ private:
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
     Window& window;
     VkCommandPool commandPool;
-
-    std::unique_ptr<class Swapchain> swapchain;
 
     VkDevice device_;
     VkSurfaceKHR surface_;

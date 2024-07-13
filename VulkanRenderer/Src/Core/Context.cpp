@@ -55,8 +55,11 @@ void DestroyDebugUtilsMessengerEXT(
     }
 }
 
+PhysicalDeviceFeatures Context::physicalDeviceFeatures = PhysicalDeviceFeatures();
+
 // class member functions
-Context::Context(Window& window) : window{ window }
+Context::Context(Window& window, VkQueueFlags requestedQueueTypes) 
+    : window{ window }, requestedQueues{requestedQueueTypes}
 {
 	createInstance();
 	setupDebugMessenger();
@@ -64,22 +67,27 @@ Context::Context(Window& window) : window{ window }
 	pickPhysicalDevice();
 	createLogicalDevice();
 
-    //TODO: Initial swap chain creation
-
-	createCommandPool();
+	//createCommandPool();
 }
 
 Context::~Context()
 {
+    vkDeviceWaitIdle(device_);
+    swapchain.reset();
+
     vkDestroyCommandPool(device_, commandPool, nullptr);
     vkDestroyDevice(device_, nullptr);
 
-    if (enableValidationLayers)
+    if(surface_ != VK_NULL_HANDLE)
     {
-        DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
+        vkDestroySurfaceKHR(instance, surface_, nullptr);
     }
 
-    vkDestroySurfaceKHR(instance, surface_, nullptr);
+	if (enableValidationLayers)
+	{
+		DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
+	}
+
     vkDestroyInstance(instance, nullptr);
 }
 
@@ -165,7 +173,7 @@ void Context::pickPhysicalDevice()
     CORE_INFO("Physical Device: {0}", physicalDevice_.getDeviceProperties().deviceName);
 
     // Always request a graphics queue
-    physicalDevice_.reserveQueues(defaultRequestedQueues | VK_QUEUE_GRAPHICS_BIT, surface_);
+    physicalDevice_.reserveQueues(requestedQueues | VK_QUEUE_GRAPHICS_BIT, surface_);
 
     // END_DEFERRED_RENDERING_REWORK
 
@@ -866,9 +874,55 @@ VkExtent2D Context::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilitie
 	}
 }
 
+CommandQueueManager Context::createGraphicsCommandQueue(uint32_t count, uint32_t numConcurrentCommands, const std::string& name, int graphicsQueueIndex)
+{
+    if(graphicsQueueIndex != -1)
+    {
+        ASSERT(graphicsQueueIndex < graphicsQueues.size(), "Not enough graphics queues available, specify a smaller queue index");
+    }
+
+    const uint32_t graphicsFamilyIndex = physicalDevice_.getGraphicsFamilyIndex().value();
+    const VkQueue queue = graphicsQueueIndex != -1 ? graphicsQueues[graphicsQueueIndex] : graphicsQueues[0];
+
+    return CommandQueueManager(*this, device_, count, numConcurrentCommands, graphicsFamilyIndex, queue, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, name);
+}
+
 std::shared_ptr<class FRenderPass> Context::createRenderPass(const std::vector<RenderPassInitInfo>& initInfos, const std::vector<std::shared_ptr<class Texture_>>& resolveAttachments)
 {
     return std::make_shared<FRenderPass>(*this, initInfos, resolveAttachments);
+}
+
+void Context::endableDefaultFeatures()
+{
+	physicalDeviceFeatures.vulkan12Features.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+	physicalDeviceFeatures.vulkan12Features.shaderStorageImageArrayNonUniformIndexing = VK_TRUE;
+
+	physicalDeviceFeatures.vulkan12Features.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
+	physicalDeviceFeatures.vulkan12Features.descriptorBindingStorageBufferUpdateAfterBind = VK_TRUE;
+	physicalDeviceFeatures.vulkan12Features.descriptorBindingUpdateUnusedWhilePending = VK_TRUE;
+	physicalDeviceFeatures.vulkan12Features.descriptorBindingPartiallyBound = VK_TRUE;
+	physicalDeviceFeatures.vulkan12Features.descriptorBindingVariableDescriptorCount = VK_TRUE;
+	physicalDeviceFeatures.vulkan12Features.descriptorIndexing = VK_TRUE;
+	physicalDeviceFeatures.vulkan12Features.runtimeDescriptorArray = VK_TRUE;
+}
+
+void Context::enableIndirectRenderingFeature()
+{
+    physicalDeviceFeatures.vulkan11Features.shaderDrawParameters = VK_TRUE;
+    physicalDeviceFeatures.vulkan12Features.drawIndirectCount = VK_TRUE;
+    physicalDeviceFeatures.physicalDeviceFeatures.multiDrawIndirect = VK_TRUE;
+    physicalDeviceFeatures.physicalDeviceFeatures.drawIndirectFirstInstance = VK_TRUE;
+}
+
+void Context::enableSyncronizationFeature()
+{
+    physicalDeviceFeatures.vullkan13Features.synchronization2 = VK_TRUE;
+}
+
+void Context::enableBufferDeviceAddressFeature()
+{
+    physicalDeviceFeatures.vulkan12Features.bufferDeviceAddress;
+    physicalDeviceFeatures.vulkan12Features.bufferDeviceAddressCaptureReplay = VK_TRUE;
 }
 
 // END_DEFERRED_RENDERING_REWORK
