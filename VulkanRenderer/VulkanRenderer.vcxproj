@@ -225,6 +225,7 @@
     <ClCompile Include="Src\Core\SwapChain.cpp" />
     <ClCompile Include="Src\Core\Texture.cpp" />
     <ClCompile Include="Src\Core\VertexBuffer.cpp" />
+    <ClCompile Include="Src\Core\VmaUsage.cpp" />
     <ClCompile Include="Src\Engine\Logging\Log.cpp" />
     <ClCompile Include="Src\Engine\Renderer\Descriptors.cpp" />
     <ClCompile Include="Src\Engine\Renderer\Light.cpp" />

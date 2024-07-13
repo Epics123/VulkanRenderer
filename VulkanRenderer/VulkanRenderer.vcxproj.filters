@@ -458,6 +458,9 @@
     <ClCompile Include="Src\Core\VertexBuffer.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Core\VmaUsage.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
     <ClCompile Include="Src\Engine\Logging\Log.cpp">
       <Filter>Src\Engine\Logging</Filter>
     </ClCompile>

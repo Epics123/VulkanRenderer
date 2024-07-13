@@ -39,6 +39,7 @@ public:
 
 	const uint32_t getWidth() { return width; }
 	const uint32_t getHeight() { return height; }
+	const char* getName() { return name; }
 
 private:
 	const char* name;

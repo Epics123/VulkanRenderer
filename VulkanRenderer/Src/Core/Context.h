@@ -10,7 +10,8 @@
 #include <memory>
 #include <any>
 
-#include <vulkan/vulkan.h>
+//#include <vulkan/vulkan.h>
+#include <vma/vk_mem_alloc.h>
 
 struct SwapChainSupportDetails
 {
@@ -178,14 +179,23 @@ private:
     bool checkDeviceExtensionSupport(VkPhysicalDevice device);
     SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
 
+    // DEFERRED_RENDERING_REWORK
     void resizeQueues();
+
+    void createMemoryAllocator();
+    // END_DEFERRED_RENDERING_REWORK
 
 private:
     // DEFERRED_RENDERING_REWORK
+
+	VkApplicationInfo applicationInfo;
+
     PhysicalDevice physicalDevice_;
     static PhysicalDeviceFeatures physicalDeviceFeatures;
 
     VkQueueFlags requestedQueues;
+
+    VmaAllocator allocator;
 
     std::unique_ptr<class Swapchain> swapchain;
     // END_DEFERRED_RENDERING_REWORK

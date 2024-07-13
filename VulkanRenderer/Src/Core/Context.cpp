@@ -61,11 +61,18 @@ PhysicalDeviceFeatures Context::physicalDeviceFeatures = PhysicalDeviceFeatures(
 Context::Context(Window& window, VkQueueFlags requestedQueueTypes) 
     : window{ window }, requestedQueues{requestedQueueTypes}
 {
+	applicationInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
+	applicationInfo.pApplicationName = window.getName();
+    applicationInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0),
+    applicationInfo.apiVersion = VK_API_VERSION_1_3,
+
 	createInstance();
 	setupDebugMessenger();
 	createSurface();
 	pickPhysicalDevice();
 	createLogicalDevice();
+
+    createMemoryAllocator();
 
 	//createCommandPool();
 }
@@ -581,6 +588,25 @@ void Context::resizeQueues()
     {
         vkGetDeviceQueue(device_, physicalDevice_.getPresentationFamilyIndex().value(), 0, &presentQueue_);
     }
+}
+
+void Context::createMemoryAllocator()
+{
+	VmaAllocatorCreateInfo allocInfo{};
+#if defined(VK_KHR_buffer_device_address) && defined(_WIN32)
+	allocInfo.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
+#endif
+	allocInfo.physicalDevice = physicalDevice_.getPhysicalDevice();
+    allocInfo.device = device_;
+	allocInfo.instance = instance;
+	allocInfo.vulkanApiVersion = applicationInfo.apiVersion;
+
+	VkResult result = vmaCreateAllocator(&allocInfo, &allocator);
+	if (result != VK_SUCCESS)
+	{
+		CORE_CRITICAL("Failed to create VMA Allocator! Error code: {0}", result);
+		throw std::runtime_error("");
+	}
 }
 
 VkFormat Context::findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features)
