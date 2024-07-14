@@ -52,7 +52,7 @@ void PointLightSystem::render(FrameInfo& frameInfo, LightUbo& ubo)
 		if(!obj.pointLight)
 			continue;
 
-		glm::vec3 offset = frameInfo.camera.position - obj.transform.translation;
+		glm::vec3 offset = frameInfo.camera.getPosition() - obj.transform.translation;
 		float distSqr = glm::dot(offset, offset);
 		sortedLights[distSqr] = obj.getID();
 	}

@@ -849,6 +849,11 @@ void Context::createSwapchain(VkFormat format, VkSurfaceFormatKHR surfaceFormat,
 }
 
 
+void Context::clearSwapchain()
+{
+    swapchain.reset(nullptr);
+}
+
 VkSurfaceFormatKHR Context::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
 {
 	for (const auto& availableFormat : availableFormats)

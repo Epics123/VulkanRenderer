@@ -102,11 +102,16 @@ void Renderer::init()
 
 	emptyTexture = context->createTexture(emptyTextureInfo);
 
+	mainCamera = Camera();
+	cameraTransform.model = glm::mat4(1.0f);
+	cameraTransform.view = mainCamera.getViewMatrix();
+	cameraTransform.projection = mainCamera.getProjectionMatrix();
+
 	// END DEFERRED RENDERING REWORK
 
 	//recreateSwapChain();
 	
-	globalDescriptorPool =
+	/*globalDescriptorPool =
 		DescriptorPool::Builder(*context)
 		.setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT * 2)
 		.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -124,7 +129,7 @@ void Renderer::init()
 
 	createCommandBuffers();
 
-	imguiInit();
+	imguiInit();*/
 
 	/*uboBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 	for (int i = 0; i < uboBuffers.size(); i++)
@@ -171,10 +176,10 @@ void Renderer::init()
 
 	CORE_WARN("Loading Game Objects...")
 	SceneSerializer serializer;
-	if(!serializer.deserialize("Src/resources/scenes/untitled.scene", *context, sceneData))
+	/*if(!serializer.deserialize("Src/resources/scenes/untitled.scene", *context, sceneData))
 	{
 		CORE_ERROR("Failed to load scene!")
-	}
+	}*/
 	CORE_WARN("Game Object Load Complete!")
 
 	materialUboBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -186,7 +191,7 @@ void Renderer::init()
 	}	
 
 	CORE_WARN("Loading Materials...")
-	loadMaterials(*materialSetLayout);
+	//loadMaterials(*materialSetLayout);
 	CORE_WARN("Material Load Finished!")
 
 		/*renderSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout(), materialSetLayout->getDescriptorSetLayout());
@@ -197,9 +202,9 @@ void Renderer::init()
 		spotLightSystem.init(getSwapChainRenderPass().renderPass, globalSetLayout->getDescriptorSetLayout());*/
 	//shadowSystem.init(depthPass.renderPass, globalSetLayout->getDescriptorSetLayout());
 
-	mainCamera = Camera();
-	mainCamera.updateModel(0.0f);
-	mainCamera.setPerspectiveProjection(mainCamera.fov, mSwapChain->extentAspectRatio(), 0.1f, 50.0f);
+	//mainCamera = Camera();
+	/*mainCamera.updateModel(0.0f);
+	mainCamera.setPerspectiveProjection(mainCamera.fov, mSwapChain->extentAspectRatio(), 0.1f, 50.0f);*/
 }
 
 void Renderer::imguiInit()
@@ -311,27 +316,28 @@ void Renderer::recreateSwapChain()
 		glfwWaitEvents();
 	}
 
-	if(depthPass.renderPass)
-		depthPass.cleanup(*context);
+	/*if(depthPass.renderPass)
+		depthPass.cleanup(*context);*/
 
 	vkDeviceWaitIdle(context->getDevice());
-	mSwapChain = nullptr;
-	if (mSwapChain == nullptr)
-	{
-		mSwapChain = std::make_unique<SwapChain>(*context, extent);
-		depthPass.createRenderPass(*context, mSwapChain->getWidth(), mSwapChain->getHeight());
-	}
-	else
-	{
-		std::shared_ptr<SwapChain> oldSwapChain = std::move(mSwapChain); // std::move makes a copy of ptr and sets mSwapChain to nullptr
-		mSwapChain = std::make_unique<SwapChain>(*context, extent, oldSwapChain); 
-		depthPass.createRenderPass(*context, mSwapChain->getWidth(), mSwapChain->getHeight());
 
-		if (!oldSwapChain->compareSwapFormats(*mSwapChain.get()))
-		{
-			throw std::runtime_error("Swap chain image or depth format has changed!");
-		}
-	}
+	//mSwapChain = nullptr;
+	//if (mSwapChain == nullptr)
+	//{
+	//	mSwapChain = std::make_unique<SwapChain>(*context, extent);
+	//	depthPass.createRenderPass(*context, mSwapChain->getWidth(), mSwapChain->getHeight());
+	//}
+	//else
+	//{
+	//	std::shared_ptr<SwapChain> oldSwapChain = std::move(mSwapChain); // std::move makes a copy of ptr and sets mSwapChain to nullptr
+	//	mSwapChain = std::make_unique<SwapChain>(*context, extent, oldSwapChain); 
+	//	depthPass.createRenderPass(*context, mSwapChain->getWidth(), mSwapChain->getHeight());
+
+	//	if (!oldSwapChain->compareSwapFormats(*mSwapChain.get()))
+	//	{
+	//		throw std::runtime_error("Swap chain image or depth format has changed!");
+	//	}
+	//}
 }
 
 void Renderer::loadMaterials(DescriptorSetLayout& layout)
@@ -418,25 +424,39 @@ VkCommandBuffer Renderer::beginFrame()
 
 void Renderer::drawFrame(float dt)
 {
-	VkCommandBuffer commandBuffer = beginFrame();
-	int frameIndex = getFrameIndex();
+	if(mainCamera.cameraDirty())
+	{
+		cameraTransform.view = mainCamera.getViewMatrix();
+		mainCamera.setDirty(false);
+	}
 
-	FrameInfo frameInfo
+	// TODO: properly handle window resizing
+	if (window->wasWindowResized())
+	{
+		window->resetWindowResizedFlag();
+		recreateSwapChain();
+		frameStarted = false;
+	}
+
+	/*VkCommandBuffer commandBuffer = beginFrame();
+	int frameIndex = getFrameIndex();*/
+
+	/*FrameInfo frameInfo
 	{
 		frameIndex, currentFrametime, currentFramerate, dt,
 		showGrid, renderMode, commandBuffer, mainCamera,
 		globalDescriptorSets[frameIndex], materialDescriptorSets[frameIndex], sceneData.objects,
 		0, 0
-	};
+	};*/
 
-	frameInfo.numObjs = totalObjects;
+	//frameInfo.numObjs = totalObjects;
 	//frameInfo.dynamicOffset = materialUboBuffers[frameIndex]->getAlignmentSize();
 
 	// update ubos
-	GlobalUbo ubo{};
+	/*GlobalUbo ubo{};
 	ubo.projection = mainCamera.proj;
 	ubo.view = mainCamera.view;
-	ubo.inverseView = mainCamera.invView;
+	ubo.inverseView = mainCamera.invView;*/
 	/*uboBuffers[frameIndex]->writeToBuffer(&ubo);
 	uboBuffers[frameIndex]->flush();*/
 

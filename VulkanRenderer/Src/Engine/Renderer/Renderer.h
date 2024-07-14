@@ -178,6 +178,7 @@ private:
 	// DEFERRED RENDERING REFACTOR
 	uint32_t framesInFlight;
 
+	UniformTransforms cameraTransform;
 	// END DEFERRED RENDERING REFACTOR
 
 	VkClearColorValue clearColor = { {0.01f, 0.01f, 0.01f, 1.0f} };

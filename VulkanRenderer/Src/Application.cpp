@@ -191,7 +191,9 @@ void Application::processInput(GLFWwindow* window)
 		lastMouseX = (float)mouseX;
 		lastMouseY = (float)mouseY;
 
-		RendererInstance->getActiveCamera().updateCameraRotation(mouseOffsetX, -mouseOffsetY, 0.0f);
+		//RendererInstance->getActiveCamera().updateCameraRotation(mouseOffsetX, -mouseOffsetY, 0.0f);
+
+		RendererInstance->getActiveCamera().rotate(glm::vec2(mouseOffsetX, -mouseOffsetY));
 	}
 }
 

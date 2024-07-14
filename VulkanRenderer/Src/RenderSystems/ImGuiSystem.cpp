@@ -39,7 +39,7 @@ void ImGuiSystem::drawImGui(FrameInfo& frameInfo)
 	//ImGui::ShowDemoWindow();
 
 	ImGuiIO& io = ImGui::GetIO();
-	frameInfo.camera.canScroll = !io.WantCaptureMouse;
+	//frameInfo.camera.canScroll = !io.WantCaptureMouse;
 
 	drawDebugWindow();
 	if (ImGui::BeginMenuBar())
@@ -124,8 +124,8 @@ void ImGuiSystem::drawSceneInfo(FrameInfo& frameInfo)
 	{
 		if (ImGui::TreeNode("Camera"))
 		{
-			DrawVec3Control("Position", frameInfo.camera.position, 0.0f, 120.0f);
-			DrawVec3Control("Rotation", frameInfo.camera.rotation, 0.0f, 120.0f, true);
+			//DrawVec3Control("Position", frameInfo.camera.position, 0.0f, 120.0f);
+			//DrawVec3Control("Rotation", frameInfo.camera.rotation, 0.0f, 120.0f, true);
 
 			ImGui::TreePop();
 		}
@@ -210,7 +210,7 @@ void ImGuiSystem::drawGizmos(FrameInfo& frameInfo)
 		ImGuizmo::SetRect(x, y, windowWidth, windowHeight);
 
 		glm::mat4 cameraView = glm::inverse(frameInfo.camera.getTransform());
-		glm::mat4 cameraProjection = frameInfo.camera.proj;
+		glm::mat4 cameraProjection = frameInfo.camera.getProjectionMatrix();
 
 		glm::mat4 transform = selectedObject.transform.getTransform();
 

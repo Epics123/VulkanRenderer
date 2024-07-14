@@ -144,6 +144,7 @@ public:
     const PhysicalDevice& getPhysicalDevice() { return physicalDevice_; }
 
     void createSwapchain(VkFormat format, VkSurfaceFormatKHR surfaceFormat, VkPresentModeKHR presentMode, const VkExtent2D& extent);
+    void clearSwapchain();
 
     class Swapchain* getSwapchain() { return swapchain.get(); }
     inline VmaAllocator getMemoryAllocator() const { return allocator; }
