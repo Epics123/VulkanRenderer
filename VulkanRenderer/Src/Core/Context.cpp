@@ -82,6 +82,8 @@ Context::~Context()
     vkDeviceWaitIdle(device_);
     swapchain.reset();
 
+    vmaDestroyAllocator(allocator);
+
     vkDestroyCommandPool(device_, commandPool, nullptr);
     vkDestroyDevice(device_, nullptr);
 
