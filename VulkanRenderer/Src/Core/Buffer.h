@@ -11,7 +11,7 @@
 class Context;
 class Texture;
 
-class Buffer
+class Buffer final
 {
 public:
 	MOVABLE_ONLY(Buffer);
@@ -25,6 +25,20 @@ public:
 					const VmaAllocationCreateInfo& allocInfo, const std::string& name = "");
 
 	~Buffer();
+
+	VkDeviceSize getSize() const { return size; }
+	VkBuffer getBuffer() const { return buffer; }
+	VkDeviceAddress getDeviceAddress() const;
+
+	void upload(VkDeviceSize offset = 0) const;
+	void upload(VkDeviceSize offset, VkDeviceSize bufferSize) const;
+
+	// Uploads staging buffer to the GPU
+	void uploadStagingBuffer(const VkCommandBuffer& cmdBuffer, uint64_t srcOffset, uint64_t dstOffset);
+
+	void writeToBuffer(const void* data, size_t size);
+
+	VkBufferView requestBufferView(VkFormat viewFormat);
 
 private:
 	const Context* context = nullptr;

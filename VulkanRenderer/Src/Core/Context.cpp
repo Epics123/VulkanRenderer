@@ -920,6 +920,11 @@ std::shared_ptr<class FRenderPass> Context::createRenderPass(const std::vector<R
     return std::make_shared<FRenderPass>(*this, initInfos, resolveAttachments);
 }
 
+std::shared_ptr<Texture> Context::createTexture(const TextureCreationInfo& createInfo)
+{
+    return std::make_shared<Texture>(*this, createInfo);
+}
+
 void Context::endableDefaultFeatures()
 {
 	physicalDeviceFeatures.vulkan12Features.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;

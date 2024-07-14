@@ -137,6 +137,8 @@ private:
 	std::unique_ptr<Context> context;
 
 	CommandQueueManager graphicsCommandManager;
+
+	std::shared_ptr<Texture> emptyTexture;
 	// END DEFERRED RENDERING REFACTOR
 
 	std::unique_ptr <SwapChain> mSwapChain;

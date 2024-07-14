@@ -42,8 +42,8 @@ void RenderSystem::update(FrameInfo& frameInfo, Buffer* buffer)
 		ubo.metalic = shaderParams.metallic;
 
 		VkDeviceSize dynamicOffset = static_cast<VkDeviceSize>(i) * frameInfo.dynamicOffset;
-		buffer->writeToBuffer(&ubo, buffer->getAlignmentSize(), dynamicOffset);
-		buffer->flush(buffer->getBufferSize());
+		/*buffer->writeToBuffer(&ubo, buffer->getAlignmentSize(), dynamicOffset);
+		buffer->flush(buffer->getBufferSize());*/
 		i++;
 	}
 }

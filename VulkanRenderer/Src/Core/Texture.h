@@ -2,7 +2,7 @@
 
 #include "../Common/Defines.h"
 
-#include "vulkan/vulkan.h"
+#include <vma/vk_mem_alloc.h>
 
 #include <string>
 #include <unordered_map>
@@ -22,7 +22,7 @@ struct TextureCreationInfo
 	VkMemoryPropertyFlags memoryFlags;
 	bool generateMips = false;
 	VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_1_BIT;
-	const std::string& name = ""; 
+	std::string name = ""; 
 	bool multiview = false;
 	VkImageTiling tiling = VK_IMAGE_TILING_OPTIMAL;
 };
@@ -46,28 +46,37 @@ public:
 private:
 	VkImageView createImageView(VkImageViewType viewType, VkFormat imageFormat, uint32_t numMips, uint32_t layers, const std::string& name);
 
+	uint32_t getMipLevelCount(uint32_t textureWidth, uint32_t textureHeight) const;
+
 private:
 	const Context& context;
-	/*VmaAllocator vmaAllocator_ = nullptr;
-	VmaAllocation vmaAllocation_ = nullptr;*/
+	VmaAllocator vmaAllocator = nullptr;
+	VmaAllocation vmaAllocation = nullptr;
+
 	VkDeviceSize deviceSize = 0;
+
 	VkImageUsageFlags usageFlags = 0;
 	VkImageCreateFlags flags = 0;
-	VkImageType type = VK_IMAGE_TYPE_2D;
+
+	VkImageType imageType = VK_IMAGE_TYPE_2D;
 	VkImage image = VK_NULL_HANDLE;
 	VkImageView imageView = VK_NULL_HANDLE;
 	std::unordered_map<uint32_t, VkImageView> imageViewFramebuffers;
+
 	VkFormat format = VK_FORMAT_UNDEFINED;
 	VkExtent3D extents;
 	VkImageLayout layout = VK_IMAGE_LAYOUT_UNDEFINED;
 	bool ownsVkImage = false;
+
 	uint32_t mipLevels = 1;
 	uint32_t layerCount = 1;
 	bool multiview = false;
 	bool generateMips = false;
+
 	VkImageViewType viewType;
 	VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_1_BIT;
 	VkImageTiling imageTiling = VK_IMAGE_TILING_OPTIMAL;
+
 	std::string debugName;
 };
 

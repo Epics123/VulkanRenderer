@@ -76,6 +76,99 @@ Buffer::~Buffer()
 	vmaDestroyBuffer(allocator, buffer, allocation);
 }
 
+VkDeviceAddress Buffer::getDeviceAddress() const
+{
+	if(actualBufferIfStaging)
+	{
+		return actualBufferIfStaging->getDeviceAddress();
+	}
+
+#if defined(VK_KHR_buffer_device_address) && defined(_WIN32)
+	if(!bufferDeviceAddress)
+	{
+		VkBufferDeviceAddressInfo addressInfo{};
+		addressInfo.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
+		addressInfo.buffer = buffer;
+		addressInfo.pNext = VK_NULL_HANDLE;
+
+		bufferDeviceAddress = vkGetBufferDeviceAddress(context->getDevice(), &addressInfo);
+	}
+
+	return bufferDeviceAddress;
+#else
+	return 0;
+#endif
+}
+
+void Buffer::upload(VkDeviceSize offset) const
+{
+	upload(offset, size);
+}
+
+void Buffer::upload(VkDeviceSize offset, VkDeviceSize bufferSize) const
+{
+	VkResult result = vmaFlushAllocation(allocator, allocation, offset, bufferSize);
+	if(result != VK_SUCCESS)
+	{
+		CORE_CRITICAL("Failed to upload buffer: {0}! Error code: {1}", debugName, result);
+		throw std::runtime_error("");
+	}
+}
+
+void Buffer::uploadStagingBuffer(const VkCommandBuffer& cmdBuffer, uint64_t srcOffset, uint64_t dstOffset)
+{
+	VkBufferCopy copyRegion{};
+	copyRegion.srcOffset = srcOffset;
+	copyRegion.dstOffset = dstOffset;
+	copyRegion.size = size;
+
+	ASSERT(actualBufferIfStaging != nullptr, "Actual buffer can't be null when uploading a staging buffer!");
+
+	vkCmdCopyBuffer(cmdBuffer, buffer, actualBufferIfStaging->getBuffer(), 1, &copyRegion);
+}
+
+void Buffer::writeToBuffer(const void* data, size_t size)
+{
+	if(!mappedMemory)
+	{
+		VkResult result = vmaMapMemory(allocator, allocation, &mappedMemory);
+		if(result != VK_SUCCESS)
+		{
+			CORE_CRITICAL("Failed to map buffer memory for {0}! Error code {1}", debugName, result);
+			throw std::runtime_error("");
+		}
+	}
+}
+
+VkBufferView Buffer::requestBufferView(VkFormat viewFormat)
+{
+	auto itr = bufferViews.find(viewFormat);
+	if(itr != bufferViews.end())
+	{
+		return itr->second;
+	}
+
+	VkBufferViewCreateInfo createInfo{};
+	createInfo.sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO;
+	createInfo.flags = 0;
+	createInfo.buffer = buffer;
+	createInfo.format = viewFormat;
+	createInfo.offset = 0;
+	createInfo.range = size;
+	createInfo.pNext = VK_NULL_HANDLE;
+
+	VkBufferView bufferView;
+	VkResult result = vkCreateBufferView(context->getDevice(), &createInfo, nullptr, &bufferView);
+	if(result != VK_SUCCESS)
+	{
+		CORE_CRITICAL("Failed to request buffer view for {0}! Error code {1}", debugName, result);
+		throw std::runtime_error("");
+	}
+
+	bufferViews[viewFormat] = bufferView;
+	return bufferView;
+}
+
 // END DEFERRED RENDERING REWORK
 
 ///**

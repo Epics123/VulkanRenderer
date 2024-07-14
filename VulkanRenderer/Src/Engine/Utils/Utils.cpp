@@ -28,10 +28,10 @@ bool Utils::loadImageFromFile(Context& device, const char* filepath, Texture_& o
 	VkDeviceSize imageSize = width * height * 4;
 	VkFormat imageFormat = format;
 
-	Buffer stagingBuffer(device, imageSize, 1, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	/*Buffer stagingBuffer(device, imageSize, 1, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 	stagingBuffer.map();
 	stagingBuffer.writeToBuffer(pixelPtr, imageSize);
-	stagingBuffer.unmap();
+	stagingBuffer.unmap();*/
 
 	stbi_image_free(pixels);
 
@@ -56,7 +56,7 @@ bool Utils::loadImageFromFile(Context& device, const char* filepath, Texture_& o
 
 	device.createImageWithInfo(imgInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, outTexture.getTextureImage(), outTexture.getTextureImageMemory());
 	device.transitionImageLayout(outTexture.getTextureImage(), imageFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-	device.copyBufferToImage(stagingBuffer.getBuffer(), outTexture.getTextureImage(), static_cast<uint32_t>(width), static_cast<uint32_t>(height), 1);
+	//device.copyBufferToImage(stagingBuffer.getBuffer(), outTexture.getTextureImage(), static_cast<uint32_t>(width), static_cast<uint32_t>(height), 1);
 	device.transitionImageLayout(outTexture.getTextureImage(), imageFormat, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 	return true;

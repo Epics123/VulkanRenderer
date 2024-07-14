@@ -98,6 +98,9 @@ struct PhysicalDeviceFeatures
     VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM fragmentDensityMapOffsetFeatures{};
 };
 
+class Texture;
+struct TextureCreationInfo;
+
 class Context
 {
 public:
@@ -143,6 +146,7 @@ public:
     void createSwapchain(VkFormat format, VkSurfaceFormatKHR surfaceFormat, VkPresentModeKHR presentMode, const VkExtent2D& extent);
 
     class Swapchain* getSwapchain() { return swapchain.get(); }
+    inline VmaAllocator getMemoryAllocator() const { return allocator; }
 
 	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes, VkPresentModeKHR desiredPresentMode);
@@ -151,6 +155,8 @@ public:
     CommandQueueManager createGraphicsCommandQueue(uint32_t count, uint32_t numConcurrentCommands, const std::string& name, int graphicsQueueIndex = -1);
 
     std::shared_ptr<class FRenderPass> createRenderPass(const std::vector<struct RenderPassInitInfo>& initInfos, const std::vector<std::shared_ptr<class Texture_>>& resolveAttachments = {});
+
+    std::shared_ptr<Texture> createTexture(const TextureCreationInfo& createInfo);
 
     static void endableDefaultFeatures();
     static void enableIndirectRenderingFeature();

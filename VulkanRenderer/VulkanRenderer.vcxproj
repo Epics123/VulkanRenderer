@@ -137,6 +137,7 @@
     <ClInclude Include="Src\Core\CommandBuffer.h" />
     <ClInclude Include="Src\Core\CommandQueueManager.h" />
     <ClInclude Include="Src\Core\Context.h" />
+    <ClInclude Include="Src\Core\CoreUtils\VulkanUtils.h" />
     <ClInclude Include="Src\Core\Framebuffer.h" />
     <ClInclude Include="Src\Core\PhysicalDevice.h" />
     <ClInclude Include="Src\Core\Pipeline.h" />
@@ -219,6 +220,7 @@
     <ClCompile Include="Src\Core\CommandBuffer.cpp" />
     <ClCompile Include="Src\Core\CommandQueueManager.cpp" />
     <ClCompile Include="Src\Core\Context.cpp" />
+    <ClCompile Include="Src\Core\CoreUtils\VulkanUtils.cpp" />
     <ClCompile Include="Src\Core\Framebuffer.cpp" />
     <ClCompile Include="Src\Core\PhysicalDevice.cpp" />
     <ClCompile Include="Src\Core\Pipeline.cpp" />

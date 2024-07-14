@@ -87,6 +87,21 @@ void Renderer::init()
 
 	graphicsCommandManager = context->createGraphicsCommandQueue(context->getSwapchain()->getNumImages(), framesInFlight, "Graphics Command");
 
+	TextureCreationInfo emptyTextureInfo;
+	emptyTextureInfo.type = VK_IMAGE_TYPE_2D;
+	emptyTextureInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
+	emptyTextureInfo.flags = 0;
+	emptyTextureInfo.usageFlags = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+	emptyTextureInfo.extents = VkExtent3D{ static_cast<uint32_t>(1), static_cast<uint32_t>(1), static_cast<uint32_t>(1.0) };
+	emptyTextureInfo.layerCount = 1;
+	emptyTextureInfo.numMipLevels = 1;
+	emptyTextureInfo.memoryFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+	emptyTextureInfo.generateMips = false;
+	emptyTextureInfo.msaaSamples = VK_SAMPLE_COUNT_1_BIT;
+	emptyTextureInfo.name = "Empty Texture";
+
+	emptyTexture = context->createTexture(emptyTextureInfo);
+
 	// END DEFERRED RENDERING REWORK
 
 	//recreateSwapChain();
@@ -111,7 +126,7 @@ void Renderer::init()
 
 	imguiInit();
 
-	uboBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+	/*uboBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 	for (int i = 0; i < uboBuffers.size(); i++)
 	{
 		uboBuffers[i] = std::make_unique<Buffer>(*context, sizeof(GlobalUbo), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
@@ -123,7 +138,7 @@ void Renderer::init()
 	{
 		lightUboBuffers[i] = std::make_unique<Buffer>(*context, sizeof(LightUbo), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 		lightUboBuffers[i]->map();
-	}
+	}*/
 
 	// highest set common to all shaders
 	std::unique_ptr<DescriptorSetLayout> globalSetLayout = DescriptorSetLayout::Builder(*context)
@@ -142,7 +157,7 @@ void Renderer::init()
 		.build();
 
 	globalDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
-	for (int i = 0; i < globalDescriptorSets.size(); i++)
+	/*for (int i = 0; i < globalDescriptorSets.size(); i++)
 	{
 		VkDescriptorBufferInfo bufferInfo = uboBuffers[i]->descriptorInfo();
 		VkDescriptorBufferInfo lightBufferInfo = lightUboBuffers[i]->descriptorInfo();
@@ -150,7 +165,7 @@ void Renderer::init()
 			.writeBuffer(0, &bufferInfo)
 			.writeBuffer(1, &lightBufferInfo)
 			.build(globalDescriptorSets[i]);
-	}
+	}*/
 
 	materialDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 
@@ -166,8 +181,8 @@ void Renderer::init()
 	minUboAlignment = context->properties.limits.minUniformBufferOffsetAlignment;
 	for (size_t i = 0; i < materialUboBuffers.size(); i++)
 	{
-		materialUboBuffers[i] = std::make_unique<Buffer>(*context, sizeof(MaterialUbo), sceneData.materialCount, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, minUboAlignment);
-		materialUboBuffers[i]->map(materialUboBuffers[i]->getBufferSize());
+		/*materialUboBuffers[i] = std::make_unique<Buffer>(*context, sizeof(MaterialUbo), sceneData.materialCount, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, minUboAlignment);
+		materialUboBuffers[i]->map(materialUboBuffers[i]->getBufferSize());*/
 	}	
 
 	CORE_WARN("Loading Materials...")
@@ -321,11 +336,11 @@ void Renderer::recreateSwapChain()
 
 void Renderer::loadMaterials(DescriptorSetLayout& layout)
 {
-	for (uint32_t i = 0; i < (uint32_t)materialDescriptorSets.size(); i++)
+	/*for (uint32_t i = 0; i < (uint32_t)materialDescriptorSets.size(); i++)
 	{
 		VkDescriptorBufferInfo bufferInfo = materialUboBuffers[i]->descriptorInfo(materialUboBuffers[i]->getAlignmentSize());
 		DescriptorWriter(layout, *globalDescriptorPool).writeBuffer(6, &bufferInfo).build(materialDescriptorSets[i]);
-	}
+	}*/
 
 	uint32_t textureIndex = 0;
 	for (std::pair<std::string, std::shared_ptr<Material>> material : sceneData.materials)
@@ -415,15 +430,15 @@ void Renderer::drawFrame(float dt)
 	};
 
 	frameInfo.numObjs = totalObjects;
-	frameInfo.dynamicOffset = materialUboBuffers[frameIndex]->getAlignmentSize();
+	//frameInfo.dynamicOffset = materialUboBuffers[frameIndex]->getAlignmentSize();
 
 	// update ubos
 	GlobalUbo ubo{};
 	ubo.projection = mainCamera.proj;
 	ubo.view = mainCamera.view;
 	ubo.inverseView = mainCamera.invView;
-	uboBuffers[frameIndex]->writeToBuffer(&ubo);
-	uboBuffers[frameIndex]->flush();
+	/*uboBuffers[frameIndex]->writeToBuffer(&ubo);
+	uboBuffers[frameIndex]->flush();*/
 
 	//LightUbo lightUbo{};
 	//pointLightSystem.update(frameInfo, lightUbo);
