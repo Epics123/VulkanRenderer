@@ -13,6 +13,9 @@ class Context;
 class PhysicalDevice;
 class Texture;
 
+//temp
+class Texture_;
+
 // DEFERRED RENDERING REFACTOR
 
 class Swapchain final
@@ -66,7 +69,7 @@ public:
     //SwapChain(const SwapChain&) = delete;
     //SwapChain& operator=(const SwapChain&) = delete;
 
-    RenderPass& getRenderPass() { return renderPass; }
+    RenderPass_& getRenderPass() { return renderPass; }
     size_t imageCount() { return swapChainImages.size(); }
     VkFormat getSwapChainImageFormat() { return swapChainImageFormat; }
     VkExtent2D getSwapChainExtent() { return swapChainExtent; }
@@ -123,7 +126,7 @@ private:
     VkFormat swapChainDepthFormat;
     VkExtent2D swapChainExtent;
 
-    RenderPass renderPass;
+    RenderPass_ renderPass;
 	std::vector<VkImage> swapChainImages;
 
     Context& context;

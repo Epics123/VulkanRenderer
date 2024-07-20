@@ -1,9 +1,10 @@
 #include "Context.h"
 #include "Buffer.h"
-#include "Log.h"
-
+#include "Texture.h"
 #include "SwapChain.h"
 #include "RenderPass.h"
+
+#include "Log.h"
 
 #include <cstring>
 #include <iostream>
@@ -934,9 +935,10 @@ CommandQueueManager Context::createGraphicsCommandQueue(uint32_t count, uint32_t
     return CommandQueueManager(*this, device_, count, numConcurrentCommands, graphicsFamilyIndex, queue, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, name);
 }
 
-std::shared_ptr<class FRenderPass> Context::createRenderPass(const std::vector<RenderPassInitInfo>& initInfos, const std::vector<std::shared_ptr<class Texture_>>& resolveAttachments)
+std::shared_ptr<class RenderPass> Context::createRenderPass(const std::vector<RenderPassInitInfo>& initInfos, 
+                                                            const std::vector<std::shared_ptr<class Texture>>& resolveAttachments, const std::string& name)
 {
-    return std::make_shared<FRenderPass>(*this, initInfos, resolveAttachments);
+    return std::make_shared<RenderPass>(initInfos, resolveAttachments, name);
 }
 
 std::shared_ptr<Texture> Context::createTexture(const TextureCreationInfo& createInfo)

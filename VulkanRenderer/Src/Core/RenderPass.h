@@ -1,11 +1,10 @@
 #pragma once
 
 #include "../Common/Defines.h"
-#include "Texture.h"
 
 #include <vulkan/vulkan.h>
 #include <vector>
-
+#include <string>
 #include <memory>
 
 struct FrameBufferAttachment
@@ -17,9 +16,11 @@ struct FrameBufferAttachment
 
 // DEFERRED_RENDERING_REWORK
 
+class Texture;
+
 struct RenderPassInitInfo
 {
-	std::shared_ptr<Texture_> attachmentTexture;
+	std::shared_ptr<Texture> attachmentTexture;
 	VkAttachmentLoadOp loadOp;
 	VkAttachmentStoreOp storeOp;
 	VkImageLayout layout;
@@ -27,28 +28,30 @@ struct RenderPassInitInfo
 	std::string name = "";
 };
 
-class FRenderPass
+class RenderPass
 {
 public:
-	MOVABLE_ONLY(FRenderPass);
+	MOVABLE_ONLY(RenderPass);
 
-	FRenderPass(const Context& context, const std::vector<RenderPassInitInfo>& initInfos, const std::vector<std::shared_ptr<Texture_>> resolveAttachments);
-	~FRenderPass();
+	RenderPass(const std::vector<RenderPassInitInfo>& initInfos, const std::vector<std::shared_ptr<Texture>> resolveAttachments, const std::string& name);
+	~RenderPass();
 
 	VkRenderPass getRenderPass() const { return renderPass; };
 
 private:
 	VkDevice device = VK_NULL_HANDLE;
 	VkRenderPass renderPass = VK_NULL_HANDLE;
+
+	std::string debugName = "";
 };
 
 // END_DEFERRED_RENDERING_REWORK	
 
-class RenderPass
+class RenderPass_
 {
 public:
-	RenderPass();
-	~RenderPass();
+	RenderPass_();
+	~RenderPass_();
 
 	void begin(VkCommandBuffer commandBuffer, int frameIndex = 0);
 	void end(VkCommandBuffer commandBuffer);
@@ -84,7 +87,7 @@ protected:
 	bool shouldDestroyDepthImages = true;
 };
 
-class DepthPass : public RenderPass
+class DepthPass : public RenderPass_
 {
 public:
 	DepthPass();

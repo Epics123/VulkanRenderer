@@ -152,7 +152,7 @@
     <ClInclude Include="Src\Engine\Renderer\Mesh.h" />
     <ClInclude Include="Src\Engine\Renderer\Model.h" />
     <ClInclude Include="Src\Engine\Renderer\RenderPasses\GBufferPass.h" />
-    <ClInclude Include="Src\Engine\Renderer\RenderPasses\RenderPass.h" />
+    <ClInclude Include="Src\Core\RenderPass.h" />
     <ClInclude Include="Src\Engine\Renderer\Renderer.h" />
     <ClInclude Include="Src\Engine\Renderer\Window.h" />
     <ClInclude Include="Src\Engine\Runtime\Camera.h" />
@@ -236,7 +236,7 @@
     <ClCompile Include="Src\Engine\Renderer\Material.cpp" />
     <ClCompile Include="Src\Engine\Renderer\Mesh.cpp" />
     <ClCompile Include="Src\Engine\Renderer\Model.cpp" />
-    <ClCompile Include="Src\Engine\Renderer\RenderPasses\RenderPass.cpp" />
+    <ClCompile Include="Src\Core\RenderPass.cpp" />
     <ClCompile Include="Src\Engine\Renderer\Renderer.cpp" />
     <ClCompile Include="Src\Engine\Renderer\Window.cpp" />
     <ClCompile Include="Src\Engine\Runtime\Camera.cpp" />

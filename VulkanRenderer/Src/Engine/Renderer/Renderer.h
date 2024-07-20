@@ -67,7 +67,7 @@ public:
 	Context& getDevice() { return *context; }
 
 	void recreateSwapChain();
-	RenderPass getSwapChainRenderPass() const { return mSwapChain->getRenderPass(); }
+	RenderPass_ getSwapChainRenderPass() const { return mSwapChain->getRenderPass(); }
 
 	void loadMaterials(DescriptorSetLayout& layout);
 	void cleanupTextures();

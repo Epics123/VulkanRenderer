@@ -14,10 +14,8 @@ class Framebuffer
 public:
 	MOVABLE_ONLY(Framebuffer);
 
-	Framebuffer(const class Context& context, VkDevice device, VkRenderPass renderPass,
-				const std::vector<std::shared_ptr<class Texture_>>& attachments,
-				const std::shared_ptr<class Texture_> depthAttachment,
-				const std::shared_ptr<class Texture_> stencilAttachment,
+	Framebuffer(VkDevice device, VkRenderPass renderPass, const std::vector<std::shared_ptr<class Texture>>& attachments,
+				const std::shared_ptr<class Texture> depthAttachment, const std::shared_ptr<class Texture> stencilAttachment,
 				const std::string& name = "");
 	~Framebuffer();
 
@@ -26,4 +24,6 @@ public:
 private:
 	VkDevice device = VK_NULL_HANDLE;
 	VkFramebuffer framebuffer = VK_NULL_HANDLE;
+
+	std::string debugName = "";
 };

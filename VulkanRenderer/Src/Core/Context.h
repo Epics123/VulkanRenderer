@@ -158,7 +158,8 @@ public:
 
     CommandQueueManager createGraphicsCommandQueue(uint32_t count, uint32_t numConcurrentCommands, const std::string& name, int graphicsQueueIndex = -1);
 
-    std::shared_ptr<class FRenderPass> createRenderPass(const std::vector<struct RenderPassInitInfo>& initInfos, const std::vector<std::shared_ptr<class Texture_>>& resolveAttachments = {});
+    std::shared_ptr<class RenderPass> createRenderPass(const std::vector<struct RenderPassInitInfo>& initInfos, 
+                                                       const std::vector<std::shared_ptr<class Texture>>& resolveAttachments = {}, const std::string& name = "");
 
     std::shared_ptr<Texture> createTexture(const TextureCreationInfo& createInfo);
 

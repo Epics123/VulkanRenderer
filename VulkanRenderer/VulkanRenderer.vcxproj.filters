@@ -246,7 +246,7 @@
     <ClInclude Include="Src\Engine\Renderer\RenderPasses\GBufferPass.h">
       <Filter>Src\Engine\Renderer\RenderPasses</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Engine\Renderer\RenderPasses\RenderPass.h">
+    <ClInclude Include="Src\Core\RenderPass.h">
       <Filter>Src\Engine\Renderer\RenderPasses</Filter>
     </ClInclude>
     <ClInclude Include="Src\Engine\Renderer\Renderer.h">
@@ -494,7 +494,7 @@
     <ClCompile Include="Src\Engine\Renderer\Model.cpp">
       <Filter>Src\Engine\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Engine\Renderer\RenderPasses\RenderPass.cpp">
+    <ClCompile Include="Src\Core\RenderPass.cpp">
       <Filter>Src\Engine\Renderer\RenderPasses</Filter>
     </ClCompile>
     <ClCompile Include="Src\Engine\Renderer\Renderer.cpp">

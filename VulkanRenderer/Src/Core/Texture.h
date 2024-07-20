@@ -43,6 +43,12 @@ public:
 	bool isDepth() const;
 	bool isStencil() const;
 
+	VkFormat getFormat() const { return format; }
+	VkSampleCountFlagBits getSampleCount() const { return msaaSamples; }
+	VkImageLayout getLayout() const { return layout; }
+	VkImageView getImageView() const { return imageView; }
+	VkExtent3D getExtents() const { return extents; }
+
 private:
 	VkImageView createImageView(VkImageViewType viewType, VkFormat imageFormat, uint32_t numMips, uint32_t layers, const std::string& name);
 
