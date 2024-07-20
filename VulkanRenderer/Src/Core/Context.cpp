@@ -1,4 +1,5 @@
 #include "Context.h"
+#include "Buffer.h"
 #include "Log.h"
 
 #include "SwapChain.h"
@@ -120,6 +121,11 @@ void Context::createInstance()
     createInfo.pApplicationInfo = &appInfo;
 
     auto extensions = getRequiredExtensions();
+    for(auto extention : requestedInstanceExtensions)
+    {
+        extensions.push_back(extention);
+    }
+
     createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
     createInfo.ppEnabledExtensionNames = extensions.data();
 
@@ -229,7 +235,9 @@ void Context::createLogicalDevice()
     featureChain.pushBack(deviceFeatures);
     featureChain.pushBack(physicalDeviceFeatures.vulkan11Features);
     featureChain.pushBack(physicalDeviceFeatures.vulkan12Features);
-
+#if _WIN32
+    featureChain.pushBack(physicalDeviceFeatures.vullkan13Features);
+#endif
 	if (physicalDevice_.isRayTracingSupported() && shouldSupportRayTracing)
 	{
 		featureChain.pushBack(physicalDeviceFeatures.accelStructFeatures);
@@ -453,15 +461,15 @@ void Context::hasGflwRequiredInstanceExtensions()
     std::vector<VkExtensionProperties> extensions(extensionCount);
     vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
 
-    CORE_INFO("Available Extensions:")
-    std::unordered_set<std::string> available;
-    for (const auto& extension : extensions)
-    {
-        CORE_INFO("\t{0}", extension.extensionName)
-        available.insert(extension.extensionName);
-    }
+	std::unordered_set<std::string> available;
+	CORE_INFO("Available Instance Extensions:")
+	for (const auto& extension : extensions)
+	{
+		CORE_INFO("\t{0}", extension.extensionName)
+		available.insert(extension.extensionName);
+	}
 
-    CORE_WARN("Required Extensions:")
+    CORE_WARN("Required Instance Extensions:")
     auto requiredExtensions = getRequiredExtensions();
     for (const auto& required : requiredExtensions)
     {
@@ -484,6 +492,12 @@ bool Context::checkDeviceExtensionSupport(VkPhysicalDevice device)
         nullptr,
         &extensionCount,
         availableExtensions.data());
+
+	CORE_INFO("Available Device Extensions:")
+	for (const auto& extension : availableExtensions)
+	{
+		CORE_INFO("\t{0}", extension.extensionName)
+	}
 
     std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
 
@@ -930,6 +944,30 @@ std::shared_ptr<Texture> Context::createTexture(const TextureCreationInfo& creat
     return std::make_shared<Texture>(*this, createInfo);
 }
 
+std::shared_ptr<Buffer> Context::createPersistantBuffer(size_t size, VkBufferUsageFlags flags, const std::string& name)
+{
+	const VkMemoryPropertyFlags cpuVisibleMemoryFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |
+		                                                VK_MEMORY_PROPERTY_HOST_CACHED_BIT;
+
+    VkBufferUsageFlags2CreateInfoKHR flagInfo{};
+    flagInfo.usage = flags;
+
+    VkBufferCreateInfo createInfo{};
+    createInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    createInfo.size = size;
+    createInfo.usage = flags;
+    createInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    createInfo.pNext = VK_NULL_HANDLE;
+    createInfo.pQueueFamilyIndices = VK_NULL_HANDLE;
+    
+    VmaAllocationCreateInfo allocInfo{};
+    allocInfo.flags = 0;
+    allocInfo.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
+    allocInfo.requiredFlags = cpuVisibleMemoryFlags;
+
+    return std::make_shared<Buffer>(this, getMemoryAllocator(), createInfo, allocInfo, name);
+}
+
 void Context::endableDefaultFeatures()
 {
 	physicalDeviceFeatures.vulkan12Features.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
@@ -959,7 +997,7 @@ void Context::enableSyncronizationFeature()
 
 void Context::enableBufferDeviceAddressFeature()
 {
-    physicalDeviceFeatures.vulkan12Features.bufferDeviceAddress;
+    physicalDeviceFeatures.vulkan12Features.bufferDeviceAddress = VK_TRUE;
     physicalDeviceFeatures.vulkan12Features.bufferDeviceAddressCaptureReplay = VK_TRUE;
 }
 

@@ -21,6 +21,7 @@
 #include "Mesh.h"
 #include "SwapChain.h"
 #include "Buffer.h"
+#include "RingBuffer.h"
 #include "Descriptors.h"
 #include "../Common/Enums.h"
 #include "Utils/Utils.h"
@@ -139,6 +140,8 @@ private:
 	CommandQueueManager graphicsCommandManager;
 
 	std::shared_ptr<Texture> emptyTexture;
+
+	RingBuffer cameraBuffer;
 	// END DEFERRED RENDERING REFACTOR
 
 	std::unique_ptr <SwapChain> mSwapChain;

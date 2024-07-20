@@ -130,6 +130,7 @@
     <ClInclude Include="Libraries\yaml\src\stringsource.h" />
     <ClInclude Include="Libraries\yaml\src\tag.h" />
     <ClInclude Include="Libraries\yaml\src\token.h" />
+    <ClInclude Include="Src\Core\RingBuffer.h" />
     <ClInclude Include="Src\Application.h" />
     <ClInclude Include="Src\Common\Defines.h" />
     <ClInclude Include="Src\Common\Enums.h" />
@@ -215,6 +216,7 @@
     <ClCompile Include="Libraries\yaml\src\singledocparser.cpp" />
     <ClCompile Include="Libraries\yaml\src\stream.cpp" />
     <ClCompile Include="Libraries\yaml\src\tag.cpp" />
+    <ClCompile Include="Src\Core\RingBuffer.cpp" />
     <ClCompile Include="Src\Application.cpp" />
     <ClCompile Include="Src\Core\Buffer.cpp" />
     <ClCompile Include="Src\Core\CommandBuffer.cpp" />

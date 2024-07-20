@@ -70,7 +70,9 @@ struct PhysicalDeviceFeatures
         physicalDeviceFeatures.fragmentStoresAndAtomics = VK_TRUE;
 
         vulkan11Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
+
         vulkan12Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+
         vullkan13Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
 
         accelStructFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
@@ -99,6 +101,7 @@ struct PhysicalDeviceFeatures
 };
 
 class Texture;
+class Buffer;
 struct TextureCreationInfo;
 
 class Context
@@ -158,6 +161,8 @@ public:
     std::shared_ptr<class FRenderPass> createRenderPass(const std::vector<struct RenderPassInitInfo>& initInfos, const std::vector<std::shared_ptr<class Texture_>>& resolveAttachments = {});
 
     std::shared_ptr<Texture> createTexture(const TextureCreationInfo& createInfo);
+
+    std::shared_ptr<Buffer> createPersistantBuffer(size_t size, VkBufferUsageFlags flags, const std::string& name);
 
     static void endableDefaultFeatures();
     static void enableIndirectRenderingFeature();
@@ -229,5 +234,6 @@ private:
     VkPresentModeKHR defaultPresentMode = VK_PRESENT_MODE_FIFO_KHR;
 
     const std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
-    const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME}; //, VK_KHR_RAY_QUERY_EXTENSION_NAME, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME };
+    const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_EXT_MEMORY_BUDGET_EXTENSION_NAME }; //, VK_KHR_RAY_QUERY_EXTENSION_NAME, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME };
+	const std::vector<const char*> requestedInstanceExtensions = { VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME };
 };

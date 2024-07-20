@@ -107,6 +107,8 @@ void Renderer::init()
 	cameraTransform.view = mainCamera.getViewMatrix();
 	cameraTransform.projection = mainCamera.getProjectionMatrix();
 
+	cameraBuffer.init(context->getSwapchain()->getNumImages(), context.get(), sizeof(UniformTransforms));
+
 	// END DEFERRED RENDERING REWORK
 
 	//recreateSwapChain();
@@ -424,6 +426,8 @@ VkCommandBuffer Renderer::beginFrame()
 
 void Renderer::drawFrame(float dt)
 {
+// DEFERRED RENDERING REWORK
+
 	if(mainCamera.cameraDirty())
 	{
 		cameraTransform.view = mainCamera.getViewMatrix();
@@ -437,6 +441,10 @@ void Renderer::drawFrame(float dt)
 		recreateSwapChain();
 		frameStarted = false;
 	}
+
+	//CORE_INFO("Camera Position: ({0}, {1}, {2})", mainCamera.getPosition().x, mainCamera.getPosition().y, mainCamera.getPosition().z);
+
+// END DEFERRED RENDERING REWORK
 
 	/*VkCommandBuffer commandBuffer = beginFrame();
 	int frameIndex = getFrameIndex();*/

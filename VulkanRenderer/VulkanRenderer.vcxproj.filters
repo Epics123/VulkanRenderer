@@ -28,6 +28,9 @@
     <Filter Include="Src\Core">
       <UniqueIdentifier>{8537E246-7104-3D52-9A1D-2BFA864972E0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Core\CoreUtils">
+      <UniqueIdentifier>{EE48D6E1-DA2C-9737-438D-918A2F9081B9}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Src\Engine">
       <UniqueIdentifier>{F27CE08C-DE34-22DA-473C-FB353313BDCA}</UniqueIdentifier>
     </Filter>
@@ -198,6 +201,9 @@
     <ClInclude Include="Src\Core\Context.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Core\CoreUtils\VulkanUtils.h">
+      <Filter>Src\Core\CoreUtils</Filter>
+    </ClInclude>
     <ClInclude Include="Src\Core\Framebuffer.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
@@ -205,6 +211,9 @@
       <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\Pipeline.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\RingBuffer.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\SwapChain.h">
@@ -294,7 +303,6 @@
     <ClInclude Include="Src\RenderSystems\WorldGridSystem.h">
       <Filter>Src\RenderSystems</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Core\CoreUtils\VulkanUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Libraries\ImGui\ImGuizmo\GraphEditor.cpp">
@@ -441,6 +449,9 @@
     <ClCompile Include="Src\Core\Context.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Core\CoreUtils\VulkanUtils.cpp">
+      <Filter>Src\Core\CoreUtils</Filter>
+    </ClCompile>
     <ClCompile Include="Src\Core\Framebuffer.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
@@ -448,6 +459,9 @@
       <Filter>Src\Core</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Pipeline.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\RingBuffer.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\SwapChain.cpp">
@@ -537,7 +551,6 @@
     <ClCompile Include="Src\RenderSystems\WorldGridSystem.cpp">
       <Filter>Src\RenderSystems</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\CoreUtils\VulkanUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Src\resources\vulkan\shaders\BasicUnlit.frag">
