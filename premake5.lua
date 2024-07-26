@@ -19,6 +19,11 @@ project "VulkanRenderer"
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
+	flags
+	{
+		"MultiProcessorCompile"
+	}
+
 	files
 	{
 		"%{prj.name}/Src/**.h",
