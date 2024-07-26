@@ -49,8 +49,8 @@ void ShadowSystem::createPipeline(VkRenderPass renderPass)
 	assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout!");
 
 	PipelineConfigInfo pipelineConfig{};
-	Pipeline::defaultPipelineConfigInfo(pipelineConfig);
+	Pipeline_::defaultPipelineConfigInfo(pipelineConfig);
 	pipelineConfig.renderPass = renderPass;
 	pipelineConfig.pipelineLayout = pipelineLayout;
-	pipeline = std::make_unique<Pipeline>(device, vertFilePath, fragFilePath, pipelineConfig, PIPELINE_TYPE_DEPTH); // TODO: Create new function in Pipeline to create a pipeline mean for only depth output
+	pipeline = std::make_unique<Pipeline_>(device, vertFilePath, fragFilePath, pipelineConfig, PIPELINE_TYPE_DEPTH); // TODO: Create new function in Pipeline to create a pipeline mean for only depth output
 }

@@ -30,5 +30,12 @@ namespace Utils
 	std::unordered_set<std::string> filterExtensions(
 		std::vector<std::string> availableExtensions,
 		std::vector<std::string> requestedExtensions);
+
+	std::vector<char> readFile(const std::string& filepath, bool isBinary);
+
+	bool fileEndsWith(const char* filepath, const char* extension)
+	{
+		return (strstr(filepath, extension) - filepath) == (strlen(filepath) - strlen(extension));
+	}
 }
 

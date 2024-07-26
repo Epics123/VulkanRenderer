@@ -1,4 +1,5 @@
 #include "Pipeline.h"
+#include "Context.h"
 #include "VertexBuffer.h"
 #include "Light.h"
 #include "Model.h"
@@ -7,7 +8,7 @@
 #include <fstream>
 #include <cassert>
 
-Pipeline::Pipeline(Context& device, const std::string& vertFilePath, const std::string& fragFilePath, const PipelineConfigInfo& configInfo, PipelineType type)
+Pipeline_::Pipeline_(Context& device, const std::string& vertFilePath, const std::string& fragFilePath, const PipelineConfigInfo& configInfo, PipelineType type)
 	:device(device)
 {
 	switch (type)
@@ -24,7 +25,7 @@ Pipeline::Pipeline(Context& device, const std::string& vertFilePath, const std::
 	
 }
 
-Pipeline::~Pipeline()
+Pipeline_::~Pipeline_()
 {
 	if(vertShaderModule != VK_NULL_HANDLE)
 		vkDestroyShaderModule(device.getDevice(), vertShaderModule, nullptr);
@@ -33,7 +34,7 @@ Pipeline::~Pipeline()
 	vkDestroyPipeline(device.getDevice(), graphicsPipeline, nullptr);
 }
 
-void Pipeline::createGraphicsPipeline(const PipelineConfigInfo& configInfo, const std::string& vertFilePath, const std::string& fragFilePath)
+void Pipeline_::createGraphicsPipeline(const PipelineConfigInfo& configInfo, const std::string& vertFilePath, const std::string& fragFilePath)
 {
 	assert(configInfo.pipelineLayout != VK_NULL_HANDLE && "Cannot create graphics pipeline: no pipelineLayout provided in configInfo");
 	assert(configInfo.renderPass != VK_NULL_HANDLE && "Cannot create graphics pipeline: no renderPass provided in configInfo");
@@ -97,7 +98,7 @@ void Pipeline::createGraphicsPipeline(const PipelineConfigInfo& configInfo, cons
 	}
 }
 
-void Pipeline::createDepthPipeline(const PipelineConfigInfo& configInfo, const std::string& vertFilePath)
+void Pipeline_::createDepthPipeline(const PipelineConfigInfo& configInfo, const std::string& vertFilePath)
 {
 	assert(configInfo.pipelineLayout != VK_NULL_HANDLE && "Cannot create graphics pipeline: no pipelineLayout provided in configInfo");
 	assert(configInfo.renderPass != VK_NULL_HANDLE && "Cannot create graphics pipeline: no renderPass provided in configInfo");
@@ -152,7 +153,7 @@ void Pipeline::createDepthPipeline(const PipelineConfigInfo& configInfo, const s
 	}
 }
 
-void Pipeline::createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule)
+void Pipeline_::createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule)
 {
 	VkShaderModuleCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -163,7 +164,7 @@ void Pipeline::createShaderModule(const std::vector<char>& code, VkShaderModule*
 		throw std::runtime_error("Failed tp create shader module!");
 }
 
-void Pipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo)
+void Pipeline_::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo)
 {
 	configInfo.inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 	configInfo.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
@@ -235,7 +236,7 @@ void Pipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo)
 	configInfo.attributeDescriptions = Model::Vertex::getAttributeDescriptions();
 }
 
-void Pipeline::enableAlphaBlending(PipelineConfigInfo& configInfo)
+void Pipeline_::enableAlphaBlending(PipelineConfigInfo& configInfo)
 {
 	configInfo.colorBlendAttachment.blendEnable = VK_TRUE;
 
@@ -248,27 +249,27 @@ void Pipeline::enableAlphaBlending(PipelineConfigInfo& configInfo)
 	configInfo.colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
 }
 
-void Pipeline::enableWireframe(PipelineConfigInfo& configInfo)
+void Pipeline_::enableWireframe(PipelineConfigInfo& configInfo)
 {
 	configInfo.rasterizationInfo.polygonMode = VK_POLYGON_MODE_LINE;
 }
 
-void Pipeline::disableWireframe(PipelineConfigInfo& configInfo)
+void Pipeline_::disableWireframe(PipelineConfigInfo& configInfo)
 {
 	configInfo.rasterizationInfo.polygonMode = VK_POLYGON_MODE_FILL;
 }
 
-void Pipeline::bindPipeline(VkCommandBuffer commandBuffer, VkPipelineBindPoint pipelineBindPoint)
+void Pipeline_::bindPipeline(VkCommandBuffer commandBuffer, VkPipelineBindPoint pipelineBindPoint)
 {
 	vkCmdBindPipeline(commandBuffer, pipelineBindPoint, graphicsPipeline);
 }
 
-void Pipeline::bind(VkCommandBuffer commandBuffer)
+void Pipeline_::bind(VkCommandBuffer commandBuffer)
 {
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 }
 
-std::vector<char> Pipeline::readFile(const std::string& filename)
+std::vector<char> Pipeline_::readFile(const std::string& filename)
 {
 	// start reading at end of file and read as a binary file
 	std::ifstream file(filename, std::ios::ate | std::ios::binary);

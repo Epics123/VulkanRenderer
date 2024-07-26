@@ -82,11 +82,11 @@ void SpotLightSystem::createPipeline(VkRenderPass renderPass)
 	assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout!");
 
 	PipelineConfigInfo pipelineConfig{};
-	Pipeline::defaultPipelineConfigInfo(pipelineConfig);
-	Pipeline::enableAlphaBlending(pipelineConfig);
+	Pipeline_::defaultPipelineConfigInfo(pipelineConfig);
+	Pipeline_::enableAlphaBlending(pipelineConfig);
 	pipelineConfig.attributeDescriptions.clear();
 	pipelineConfig.bindingDescriptions.clear();
 	pipelineConfig.renderPass = renderPass;
 	pipelineConfig.pipelineLayout = pipelineLayout;
-	pipeline = std::make_unique<Pipeline>(device, "Src/resources/vulkan/shaders/SpotLightVert.spv", "Src/resources/vulkan/shaders/SpotLightFrag.spv", pipelineConfig);
+	pipeline = std::make_unique<Pipeline_>(device, "Src/resources/vulkan/shaders/SpotLightVert.spv", "Src/resources/vulkan/shaders/SpotLightFrag.spv", pipelineConfig);
 }

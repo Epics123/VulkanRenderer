@@ -27,7 +27,7 @@ private:
 
 	Context& device;
 
-	std::unique_ptr<class Pipeline> pipeline;
+	std::unique_ptr<class Pipeline_> pipeline;
 	VkPipelineLayout pipelineLayout;
 
 	float minClip = 0.1f;

@@ -6,6 +6,8 @@
 #include <stb_image.h>
 #include <intrin.h>
 #include <algorithm>
+#include <fstream>
+#include <iostream>
 
 //#include <windows.h>
 //#include <commdlg.h>
@@ -96,6 +98,35 @@ std::unordered_set<std::string> Utils::filterExtensions(std::vector<std::string>
 	std::vector<std::string> result;
 	std::set_intersection(availableExtensions.begin(), availableExtensions.end(), requestedExtensions.begin(), requestedExtensions.end(), std::back_inserter(result));
 	return std::unordered_set<std::string>(result.begin(), result.end());
+}
+
+std::vector<char> Utils::readFile(const std::string& filepath, bool isBinary)
+{
+	std::ios_base::openmode mode = std::ios::ate;
+	if(isBinary)
+	{
+		mode |= std::ios::binary;
+	}
+
+	std::ifstream file(filepath, mode);
+
+	size_t fileSize = (size_t)file.tellg();
+	if(!isBinary)
+	{
+		fileSize++; // Add extra for null char at end
+	}
+
+	std::vector<char> buffer(fileSize);
+	file.seekg(0);
+	file.read(reinterpret_cast<char*>(buffer.data()), fileSize);
+	file.close();
+
+	if(!isBinary)
+	{
+		buffer[buffer.size() - 1] = '\0';
+	}
+
+	return buffer;
 }
 
 //std::string Utils::FileDialogs::openFile(const char* filter)

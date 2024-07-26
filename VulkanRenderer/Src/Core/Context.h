@@ -39,25 +39,25 @@ public:
     template<typename T>
 	auto& pushBack(T nextVulkanChainStruct)
 	{
-		ASSERT(currentIndex_ < CHAIN_SIZE, "Chain is full");
-		data_[currentIndex_] = nextVulkanChainStruct;
+		ASSERT(currentIndex < CHAIN_SIZE, "Chain is full");
+		data_[currentIndex] = nextVulkanChainStruct;
 
         // TODO: Probably don't need to be casting here anymore
-		auto& next = std::any_cast<decltype(nextVulkanChainStruct)&>(data_[currentIndex_]);
+		auto& next = std::any_cast<decltype(nextVulkanChainStruct)&>(data[currentIndex]);
 
-		next.pNext = std::exchange(firstNext_, &next);
-		currentIndex_++;
+		next.pNext = std::exchange(firstNext, &next);
+		currentIndex++;
 
 		return next;
 	}
 
-	[[nodiscard]] void* firstNextPtr() const { return firstNext_; };
+	[[nodiscard]] void* firstNextPtr() const { return firstNext; };
 
 private:
-	std::array<std::any, CHAIN_SIZE> data_;
-	VkBaseInStructure* root_ = nullptr;
-	int currentIndex_ = 0;
-	void* firstNext_ = VK_NULL_HANDLE;
+	std::array<std::any, CHAIN_SIZE> data;
+	VkBaseInStructure* root = nullptr;
+	int currentIndex = 0;
+	void* firstNext = VK_NULL_HANDLE;
 };
 
 struct PhysicalDeviceFeatures
@@ -159,7 +159,7 @@ public:
     CommandQueueManager createGraphicsCommandQueue(uint32_t count, uint32_t numConcurrentCommands, const std::string& name, int graphicsQueueIndex = -1);
 
     std::shared_ptr<class RenderPass> createRenderPass(const std::vector<struct RenderPassInitInfo>& initInfos, 
-                                                       const std::vector<std::shared_ptr<class Texture>>& resolveAttachments = {}, const std::string& name = "");
+                                                       const std::vector<std::shared_ptr<Texture>>& resolveAttachments = {}, const std::string& name = "");
 
     std::shared_ptr<Texture> createTexture(const TextureCreationInfo& createInfo);
 

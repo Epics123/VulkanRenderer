@@ -49,9 +49,9 @@ void WireframeSystem::createPipeline(VkRenderPass renderPass)
 	assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout!");
 
 	PipelineConfigInfo pipelineConfig{};
-	Pipeline::defaultPipelineConfigInfo(pipelineConfig);
-	Pipeline::enableWireframe(pipelineConfig);
+	Pipeline_::defaultPipelineConfigInfo(pipelineConfig);
+	Pipeline_::enableWireframe(pipelineConfig);
 	pipelineConfig.renderPass = renderPass;
 	pipelineConfig.pipelineLayout = pipelineLayout;
-	pipeline = std::make_unique<Pipeline>(device, vertFilePath, fragFilePath, pipelineConfig);
+	pipeline = std::make_unique<Pipeline_>(device, vertFilePath, fragFilePath, pipelineConfig);
 }

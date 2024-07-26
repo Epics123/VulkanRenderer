@@ -8,7 +8,76 @@
 #include <glfw3native.h>
 #include <vector>
 
-#include "Context.h"
+// DEFERRED RENDERING REFACTOR
+class Context;
+
+struct SetDescriptor
+{
+	uint32_t set;
+	std::vector<VkDescriptorSetLayoutBinding> bindings;
+};
+
+struct PipelineViewport
+{
+	PipelineViewport(const VkExtent2D& extents)
+	{
+		viewport = fromExtents(extents);
+	}
+
+	PipelineViewport() = default;
+	PipelineViewport(const PipelineViewport&) = default;
+	PipelineViewport& operator=(const PipelineViewport&) = default;
+
+	PipelineViewport(const VkViewport& inViewport) : viewport(inViewport){}
+
+	PipelineViewport& operator=(const VkViewport& inViewport)
+	{
+		viewport = inViewport;
+		return *this;
+	}
+
+	PipelineViewport& operator=(const VkExtent2D inExtent)
+	{
+		viewport = fromExtents(inExtent);
+		return *this;
+	}
+
+	VkExtent2D toExtent2D()
+	{
+		return VkExtent2D{ static_cast<uint32_t>(std::abs(viewport.width), static_cast<uint32_t>(std::abs(viewport.height))) };
+	}
+
+	VkViewport toViewport() { return viewport; }
+
+private:
+	VkViewport fromExtents(const VkExtent2D& extents)
+	{
+		VkViewport newViewport;
+		newViewport.x = 0;
+		newViewport.y = 0;
+		newViewport.width = extents.width;
+		newViewport.height = extents.height;
+		newViewport.minDepth = 0.0f;
+		newViewport.maxDepth = 1.0f;
+
+		return newViewport;
+	}
+
+	VkViewport viewport = {};
+};
+
+struct GraphicsPipelineDescriptor
+{
+	
+};
+
+class Pipeline
+{
+public:
+	
+};
+
+// END DEFERRED RENDERING REFACTOR
 
 enum PipelineType
 {
@@ -39,18 +108,18 @@ struct PipelineConfigInfo
 	uint32_t subpass = 0;
 };
 
-class Pipeline
+class Pipeline_
 {
 public:
-	Pipeline() = delete;
+	Pipeline_() = delete;
 
 	//Pipeline(VkDevice device);
-	Pipeline(Context& device, const std::string& vertFilePath, const std::string& fragFilePath, const PipelineConfigInfo& configInfo, PipelineType type = PIPELINE_TYPE_DEFAULT);
+	Pipeline_(Context& device, const std::string& vertFilePath, const std::string& fragFilePath, const PipelineConfigInfo& configInfo, PipelineType type = PIPELINE_TYPE_DEFAULT);
 
-	~Pipeline();
+	~Pipeline_();
 
-	Pipeline(const Pipeline&) = delete;
-	Pipeline& operator=(const Pipeline&) = delete;
+	Pipeline_(const Pipeline_&) = delete;
+	Pipeline_& operator=(const Pipeline_&) = delete;
 
 	void createGraphicsPipeline(const PipelineConfigInfo& configInfo, const std::string& vertFilePath, const std::string& fragFilePath);
 	void createDepthPipeline(const PipelineConfigInfo& configInfo, const std::string& vertFilePath);
