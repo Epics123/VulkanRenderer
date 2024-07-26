@@ -72,7 +72,10 @@ void CommandQueueManager::waitForSubmission()
 	}
 
 	isSubmittedList[currentFenceIndex] = false;
-	buffersToDispose[currentFenceIndex].clear();
+	if (buffersToDispose.size() > 0)
+	{
+		buffersToDispose[currentFenceIndex].clear();
+	}
 
 	deallocateResources();
 }
@@ -114,10 +117,10 @@ void CommandQueueManager::disposeWhenSubmitCompletes(std::function<void()>&& dea
 	deallocators[currentFenceIndex].push_back(std::move(deallocator));
 }
 
-VkCommandBuffer CommandQueueManager::beginCurrentCmdBuffer()
+VkCommandBuffer CommandQueueManager::getAndBeginCmdBuffer()
 {
-	VkResult result = vkWaitForFences(device, 1, &fences[currentFenceIndex], true, UINT32_MAX);
-	if(result != VK_SUCCESS)
+	VkResult result = vkWaitForFences(device, 1, &fences[currentFenceIndex], VK_TRUE, UINT32_MAX);
+	if (result != VK_SUCCESS)
 	{
 		CORE_CRITICAL("Command Queue Manager failed to wait for fences! Error code: {0}", result);
 		throw std::runtime_error("");
@@ -231,7 +234,7 @@ void CommandQueueManager::createFences()
 			throw std::runtime_error("");
 		}
 
-		fences.push_back(fence);
+		fences.push_back(std::move(fence));
 		isSubmittedList.push_back(false);
 	}
 }

@@ -15,12 +15,20 @@
 // DEFERRED RENDERING REFACTOR
 
 Swapchain::Swapchain(const Context& context, const PhysicalDevice& physicalDevice, VkSurfaceKHR surface, VkQueue presentQueue, 
-                     VkSurfaceFormatKHR surfaceFormat, VkPresentModeKHR presentMode, VkExtent2D extent, const std::string& name /*= ""*/)
-    :device{context.getDevice()}, presentQueue{presentQueue}, extent{extent}
+                     VkSurfaceFormatKHR inSurfaceFormat, VkPresentModeKHR presentMode, VkExtent2D extent, const std::string& name)
+    :device{context.getDevice()}, presentQueue{presentQueue}, swapchainExtent{extent}, surfaceFormat{inSurfaceFormat}, currentPresentMode{presentMode}
 {
-    createSwapchain(context, physicalDevice, surface, surfaceFormat.format, surfaceFormat.colorSpace, presentMode, extent);
+    createSwapchain(context, physicalDevice, surface, surfaceFormat.format, surfaceFormat.colorSpace, presentMode, swapchainExtent);
 }
 
+
+Swapchain::Swapchain(const Context& context, const PhysicalDevice& physicalDevice, VkSurfaceKHR surface, VkQueue presentQueue, VkExtent2D extent, std::shared_ptr<Swapchain> oldSwapchain)
+    :device{context.getDevice()}, presentQueue{presentQueue}, swapchainExtent{extent}
+{
+    surfaceFormat = oldSwapchain->surfaceFormat;
+    currentPresentMode = oldSwapchain->getPresentMode();
+    createSwapchain(context, physicalDevice, surface, surfaceFormat.format, surfaceFormat.colorSpace, currentPresentMode, swapchainExtent, oldSwapchain->getSwapchain());
+}
 
 Swapchain::~Swapchain()
 {
@@ -37,8 +45,69 @@ Swapchain::~Swapchain()
    vkDestroySwapchainKHR(device, swapchain, nullptr);
 }
 
+std::shared_ptr<Texture> Swapchain::aquireImage()
+{
+    VkResult result = vkWaitForFences(device, 1, &acquireFence, VK_TRUE, UINT64_MAX);
+	if (result != VK_SUCCESS)
+	{
+		CORE_CRITICAL("Failed to wait for fence! Error code: {0}", result);
+		throw std::runtime_error("");
+	}
+
+    result = vkResetFences(device, 1, &acquireFence);
+	if (result != VK_SUCCESS)
+	{
+		CORE_CRITICAL("Failed to reset fence! Error code: {0}", result);
+		throw std::runtime_error("");
+	}
+
+    result = vkAcquireNextImageKHR(device, swapchain, UINT64_MAX, imageAvailable, acquireFence, &imageIndex);
+	if (result != VK_SUCCESS)
+	{
+		CORE_CRITICAL("Failed to aquire next swapchain image! Error code: {0}", result);
+		throw std::runtime_error("");
+	}
+
+    return swapchainImages[imageIndex];
+}
+
+VkSubmitInfo Swapchain::createSubmitInfo(const VkCommandBuffer* cmdBuffer, const VkPipelineStageFlags* submitStageMask, bool waitForAvailableImage, bool signalImagePresented)
+{
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.waitSemaphoreCount = waitForAvailableImage ? (imageAvailable ? 1u : 0) : 0;
+    submitInfo.pWaitSemaphores = waitForAvailableImage ? &imageAvailable : VK_NULL_HANDLE;
+    submitInfo.pWaitDstStageMask = submitStageMask;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = cmdBuffer;
+    submitInfo.signalSemaphoreCount = signalImagePresented ? (imageRendered ? 1u : 0) : 0;
+    submitInfo.pSignalSemaphores = signalImagePresented ? &imageRendered : VK_NULL_HANDLE;
+    submitInfo.pNext = VK_NULL_HANDLE;
+
+    return submitInfo;
+}
+
+void Swapchain::present()
+{
+    VkPresentInfoKHR presentInfo{};
+    presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    presentInfo.waitSemaphoreCount = 1;
+    presentInfo.pWaitSemaphores = &imageRendered;
+    presentInfo.swapchainCount = 1;
+    presentInfo.pSwapchains = &swapchain;
+    presentInfo.pImageIndices = &imageIndex;
+    presentInfo.pNext = VK_NULL_HANDLE;
+
+    VkResult result = vkQueuePresentKHR(presentQueue, &presentInfo);
+    if (result != VK_SUCCESS)
+    {
+		CORE_CRITICAL("Failed to present swapchain! Error code: {0}", result);
+		throw std::runtime_error("");
+    }
+}
+
 void Swapchain::createSwapchain(const Context& context, const PhysicalDevice& physicalDevice, VkSurfaceKHR surface, VkFormat imageFormat, 
-                                VkColorSpaceKHR imageColorSpace, VkPresentModeKHR presentMode, VkExtent2D extent)
+                                VkColorSpaceKHR imageColorSpace, VkPresentModeKHR presentMode, VkExtent2D extent, VkSwapchainKHR oldSwapchain)
 {
 	const uint32_t minImageCount = physicalDevice.getSurfaceCapabilities().minImageCount;
 	const uint32_t numImages = std::clamp(minImageCount + 1, minImageCount, physicalDevice.getSurfaceCapabilities().maxImageCount);
@@ -67,7 +136,7 @@ void Swapchain::createSwapchain(const Context& context, const PhysicalDevice& ph
    createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
    createInfo.presentMode = presentMode;
    createInfo.clipped = VK_TRUE;
-   createInfo.oldSwapchain = VK_NULL_HANDLE;
+   createInfo.oldSwapchain = oldSwapchain;
    createInfo.pNext = VK_NULL_HANDLE;
 
    VkResult result = vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapchain);
@@ -135,7 +204,7 @@ void Swapchain::createFence()
 {
     VkFenceCreateInfo createInfo;
     createInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    createInfo.flags = 0;
+    createInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
     createInfo.pNext = VK_NULL_HANDLE;
 
     VkResult result = vkCreateFence(device, &createInfo, nullptr, &acquireFence);
