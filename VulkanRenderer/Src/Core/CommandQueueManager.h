@@ -31,7 +31,7 @@ public:
 	void disposeWhenSubmitCompletes(std::shared_ptr<Buffer> buffer);
 	void disposeWhenSubmitCompletes(std::function<void()>&& deallocator);
 
-	VkCommandBuffer beginCurrentCmdBuffer();
+	VkCommandBuffer getAndBeginCmdBuffer();
 	VkCommandBuffer getCmdBufferFromPool();
 	void endCmdBuffer(VkCommandBuffer cmdBuffer);
 

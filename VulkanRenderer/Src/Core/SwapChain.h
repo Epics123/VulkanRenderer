@@ -21,17 +21,27 @@ class Texture_;
 class Swapchain final
 {
 public:
-    explicit Swapchain() = default;
-    explicit Swapchain(const Context& context, const PhysicalDevice& physicalDevice, VkSurfaceKHR surface, VkQueue presentQueue, 
-                       VkSurfaceFormatKHR surfaceFormat, VkPresentModeKHR presentMode, VkExtent2D extent, const std::string& name = "");
+    Swapchain() = default;
+    Swapchain(const Context& context, const PhysicalDevice& physicalDevice, VkSurfaceKHR surface, VkQueue presentQueue, 
+              VkSurfaceFormatKHR inSurfaceFormat, VkPresentModeKHR presentMode, VkExtent2D extent, const std::string& name = "");
+    Swapchain(const Context& context, const PhysicalDevice& physicalDevice, VkSurfaceKHR surface, VkQueue presentQueue, VkExtent2D extent, std::shared_ptr<Swapchain> oldSwapchain);
 
     ~Swapchain();
 
+    std::shared_ptr<Texture> aquireImage();
+    VkSubmitInfo createSubmitInfo(const VkCommandBuffer* cmdBuffer, const VkPipelineStageFlags* submitStageMask, bool waitForAvailableImage = true, bool signalImagePresented = true);
+    void present();
+
     uint32_t getNumImages() const { return static_cast<uint32_t>(swapchainImages.size()); }
+    VkExtent2D getExtent() const { return swapchainExtent; }
+    VkSurfaceFormatKHR getSurfaceFormat() const { return surfaceFormat; }
+    VkPresentModeKHR getPresentMode() const { return currentPresentMode; }
+    uint32_t getCurrentImageIndex() const { return imageIndex; }
+    VkSwapchainKHR getSwapchain() const { return swapchain; }
 
 private:
     void createSwapchain(const Context& context, const PhysicalDevice& physicalDevice, VkSurfaceKHR surface, VkFormat imageFormat, 
-                         VkColorSpaceKHR imageColorSpace, VkPresentModeKHR presentMode, VkExtent2D extent);
+                         VkColorSpaceKHR imageColorSpace, VkPresentModeKHR presentMode, VkExtent2D extent, VkSwapchainKHR oldSwapchain = VK_NULL_HANDLE);
 
     void createSwaphainImages(const Context& context, VkFormat imageFormat, const VkExtent2D& extent);
     void createSemaphores();
@@ -45,9 +55,12 @@ private:
 	VkSemaphore imageAvailable = VK_NULL_HANDLE;
 	VkSemaphore imageRendered = VK_NULL_HANDLE;
 	uint32_t imageIndex = 0;
-	VkExtent2D extent;
+	VkExtent2D swapchainExtent;
 	VkFormat imageFormat;
 	VkFence acquireFence = VK_NULL_HANDLE;
+
+    VkSurfaceFormatKHR surfaceFormat;
+    VkPresentModeKHR currentPresentMode;
 };
 
 // END DEFERRED RENDERING REFACTOR

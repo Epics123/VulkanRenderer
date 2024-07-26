@@ -147,6 +147,7 @@ public:
     const PhysicalDevice& getPhysicalDevice() { return physicalDevice_; }
 
     void createSwapchain(VkFormat format, VkSurfaceFormatKHR surfaceFormat, VkPresentModeKHR presentMode, const VkExtent2D& extent);
+    void recreateSwapchain(const VkExtent2D& extent);
     void clearSwapchain();
 
     class Swapchain* getSwapchain() { return swapchain.get(); }
@@ -156,7 +157,7 @@ public:
 	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes, VkPresentModeKHR desiredPresentMode);
 	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, VkExtent2D windowExtent);
 
-    CommandQueueManager createGraphicsCommandQueue(uint32_t count, uint32_t numConcurrentCommands, const std::string& name, int graphicsQueueIndex = -1);
+    std::unique_ptr<CommandQueueManager> createGraphicsCommandQueue(uint32_t count, uint32_t numConcurrentCommands, const std::string& name, int graphicsQueueIndex = -1);
 
     std::shared_ptr<class RenderPass> createRenderPass(const std::vector<struct RenderPassInitInfo>& initInfos, 
                                                        const std::vector<std::shared_ptr<Texture>>& resolveAttachments = {}, const std::string& name = "");

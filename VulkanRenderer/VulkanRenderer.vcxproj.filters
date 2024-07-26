@@ -213,6 +213,9 @@
     <ClInclude Include="Src\Core\Pipeline.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Core\RenderPass.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
     <ClInclude Include="Src\Core\RingBuffer.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
@@ -244,9 +247,6 @@
       <Filter>Src\Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Src\Engine\Renderer\RenderPasses\GBufferPass.h">
-      <Filter>Src\Engine\Renderer\RenderPasses</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\RenderPass.h">
       <Filter>Src\Engine\Renderer\RenderPasses</Filter>
     </ClInclude>
     <ClInclude Include="Src\Engine\Renderer\Renderer.h">
@@ -461,6 +461,9 @@
     <ClCompile Include="Src\Core\Pipeline.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Core\RenderPass.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
     <ClCompile Include="Src\Core\RingBuffer.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
@@ -494,7 +497,7 @@
     <ClCompile Include="Src\Engine\Renderer\Model.cpp">
       <Filter>Src\Engine\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\RenderPass.cpp">
+    <ClCompile Include="Src\Engine\Renderer\RenderPasses\GBufferPass.cpp">
       <Filter>Src\Engine\Renderer\RenderPasses</Filter>
     </ClCompile>
     <ClCompile Include="Src\Engine\Renderer\Renderer.cpp">

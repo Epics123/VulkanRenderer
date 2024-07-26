@@ -323,6 +323,8 @@ void Renderer::recreateSwapChain()
 
 	vkDeviceWaitIdle(context->getDevice());
 
+	context->recreateSwapchain(extent);
+
 	//mSwapChain = nullptr;
 	//if (mSwapChain == nullptr)
 	//{
@@ -428,11 +430,18 @@ void Renderer::drawFrame(float dt)
 {
 // DEFERRED RENDERING REWORK
 
+	graphicsCommandManager->waitForSubmission();
+
+	const std::shared_ptr<Texture> swapchainImage = context->getSwapchain()->aquireImage();
+	const uint32_t currentImgIndex = context->getSwapchain()->getCurrentImageIndex();
+
 	if(mainCamera.cameraDirty())
 	{
 		cameraTransform.view = mainCamera.getViewMatrix();
 		mainCamera.setDirty(false);
 	}
+
+	VkCommandBuffer commandBuffer = graphicsCommandManager->getAndBeginCmdBuffer();
 
 	// TODO: properly handle window resizing
 	if (window->wasWindowResized())
@@ -441,6 +450,15 @@ void Renderer::drawFrame(float dt)
 		recreateSwapChain();
 		frameStarted = false;
 	}
+
+	graphicsCommandManager->endCmdBuffer(commandBuffer);
+
+	VkPipelineStageFlags flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	VkSubmitInfo submitInfo = context->getSwapchain()->createSubmitInfo(&commandBuffer, &flags);
+	graphicsCommandManager->submit(&submitInfo);
+	graphicsCommandManager->moveToNextCommandBuffer();
+
+	context->getSwapchain()->present();
 
 	//CORE_INFO("Camera Position: ({0}, {1}, {2})", mainCamera.getPosition().x, mainCamera.getPosition().y, mainCamera.getPosition().z);
 

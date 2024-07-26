@@ -864,6 +864,18 @@ void Context::createSwapchain(VkFormat format, VkSurfaceFormatKHR surfaceFormat,
 }
 
 
+void Context::recreateSwapchain(const VkExtent2D& extent)
+{
+    ASSERT(surface_ != VK_NULL_HANDLE, "Trying to create a swapchain without a surface! The context must be provided a valid surface to create a swapchain.")
+
+    SwapChainSupportDetails swapChainSupport = getSwapChainSupport();
+
+	VkExtent2D newExtent = chooseSwapExtent(swapChainSupport.capabilities, extent);
+
+    std::shared_ptr<Swapchain> oldSwapChain = std::move(swapchain);
+    swapchain = std::make_unique<class Swapchain>(*this, physicalDevice_, surface_, presentQueue_, newExtent, oldSwapChain);
+}
+
 void Context::clearSwapchain()
 {
     swapchain.reset(nullptr);
@@ -922,7 +934,7 @@ VkExtent2D Context::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilitie
 	}
 }
 
-CommandQueueManager Context::createGraphicsCommandQueue(uint32_t count, uint32_t numConcurrentCommands, const std::string& name, int graphicsQueueIndex)
+std::unique_ptr<CommandQueueManager> Context::createGraphicsCommandQueue(uint32_t count, uint32_t numConcurrentCommands, const std::string& name, int graphicsQueueIndex)
 {
     if(graphicsQueueIndex != -1)
     {
@@ -932,7 +944,7 @@ CommandQueueManager Context::createGraphicsCommandQueue(uint32_t count, uint32_t
     const uint32_t graphicsFamilyIndex = physicalDevice_.getGraphicsFamilyIndex().value();
     const VkQueue queue = graphicsQueueIndex != -1 ? graphicsQueues[graphicsQueueIndex] : graphicsQueues[0];
 
-    return CommandQueueManager(*this, device_, count, numConcurrentCommands, graphicsFamilyIndex, queue, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, name);
+    return std::make_unique<CommandQueueManager>(*this, device_, count, numConcurrentCommands, graphicsFamilyIndex, queue, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, name);
 }
 
 std::shared_ptr<class RenderPass> Context::createRenderPass(const std::vector<RenderPassInitInfo>& initInfos, 

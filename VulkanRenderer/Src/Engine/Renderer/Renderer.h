@@ -137,7 +137,7 @@ private:
 	// DEFERRED RENDERING REFACTOR
 	std::unique_ptr<Context> context;
 
-	CommandQueueManager graphicsCommandManager;
+	std::unique_ptr<CommandQueueManager> graphicsCommandManager;
 
 	std::shared_ptr<Texture> emptyTexture;
 
