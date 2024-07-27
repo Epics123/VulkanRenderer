@@ -88,11 +88,33 @@ project "VulkanRenderer"
 
 	filter "system:windows"
 		cppdialect "C++17"
-		staticruntime "On"
+		--staticruntime "On"
 		systemversion "latest"
 
 	filter "configurations:Debug"
 		symbols "On"
+		staticruntime "off"
+		runtime "Debug"
+		links
+		{
+			"glslangd.lib",
+			"glslang-default-resource-limitsd.lib",
+			"GenericCodeGend.lib",
+			"SPIRVd.lib",
+			"OSDependentd.lib",
+			"MachineIndependentd.lib"
+		}
 
 	filter "configurations:Release"
 		optimize "On"
+		staticruntime "off"
+		runtime "Release"
+		links
+		{
+			"glslang.lib",
+			"glslang-default-resource-limits.lib",
+			"GenericCodeGen.lib",
+			"SPIRV.lib",
+			"OSDependent.lib",
+			"MachineIndependent.lib"
+		}

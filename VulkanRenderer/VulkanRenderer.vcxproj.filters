@@ -219,6 +219,9 @@
     <ClInclude Include="Src\Core\RingBuffer.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Core\ShaderModule.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
     <ClInclude Include="Src\Core\SwapChain.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
@@ -465,6 +468,9 @@
       <Filter>Src\Core</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\RingBuffer.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\ShaderModule.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\SwapChain.cpp">
