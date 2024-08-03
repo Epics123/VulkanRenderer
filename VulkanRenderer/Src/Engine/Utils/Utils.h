@@ -3,8 +3,11 @@
 #include <functional>
 #include <unordered_set>
 
+#include <vulkan/vk_enum_string_helper.h>
+
 #include "Context.h"
 #include "Texture.h"
+#include "Log.h"
 
 namespace Utils
 {
@@ -33,9 +36,17 @@ namespace Utils
 
 	std::vector<char> readFile(const std::string& filepath, bool isBinary);
 
-	bool fileEndsWith(const char* filepath, const char* extension)
+	bool fileEndsWith(const char* filepath, const char* extension);
+
+#define VK_CHECK(func, errorMsg) Utils::CheckVkResult(func, errorMsg)
+
+	static void CheckVkResult(VkResult result, const char* errorMessage)
 	{
-		return (strstr(filepath, extension) - filepath) == (strlen(filepath) - strlen(extension));
+		if (result != VK_SUCCESS)
+		{
+			CORE_CRITICAL("{0}. Error Code: {1}", errorMessage, string_VkResult(result));
+			assert(false);
+		}
 	}
 }
 

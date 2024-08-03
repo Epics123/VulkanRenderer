@@ -14,4 +14,4 @@
   CLASS_NAME(CLASS_NAME&&) noexcept = default;       \
   CLASS_NAME& operator=(CLASS_NAME&&) noexcept = default;
 
-  #define ENABLE_VALIDATION_LAYERS 1
+#define ENABLE_VALIDATION_LAYERS 1

@@ -40,7 +40,7 @@ public:
 	auto& pushBack(T nextVulkanChainStruct)
 	{
 		ASSERT(currentIndex < CHAIN_SIZE, "Chain is full");
-		data_[currentIndex] = nextVulkanChainStruct;
+		data[currentIndex] = nextVulkanChainStruct;
 
         // TODO: Probably don't need to be casting here anymore
 		auto& next = std::any_cast<decltype(nextVulkanChainStruct)&>(data[currentIndex]);

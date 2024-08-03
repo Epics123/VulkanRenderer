@@ -129,6 +129,11 @@ std::vector<char> Utils::readFile(const std::string& filepath, bool isBinary)
 	return buffer;
 }
 
+bool Utils::fileEndsWith(const char* filepath, const char* extension)
+{
+	return (strstr(filepath, extension) - filepath) == (strlen(filepath) - strlen(extension));
+}
+
 //std::string Utils::FileDialogs::openFile(const char* filter)
 //{
 //	OPENFILENAMEA ofn;

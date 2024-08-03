@@ -101,6 +101,8 @@ project "VulkanRenderer"
 			"glslang-default-resource-limitsd.lib",
 			"GenericCodeGend.lib",
 			"SPIRVd.lib",
+			"SPIRV-Toolsd.lib",
+			"SPIRV-Tools-optd.lib",
 			"OSDependentd.lib",
 			"MachineIndependentd.lib"
 		}
@@ -115,6 +117,8 @@ project "VulkanRenderer"
 			"glslang-default-resource-limits.lib",
 			"GenericCodeGen.lib",
 			"SPIRV.lib",
+			"SPIRV-Tools.lib",
+			"SPIRV-Tools-opt.lib",
 			"OSDependent.lib",
 			"MachineIndependent.lib"
 		}

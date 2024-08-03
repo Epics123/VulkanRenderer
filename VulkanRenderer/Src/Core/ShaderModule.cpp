@@ -40,8 +40,7 @@ public:
 		fileContent << fileStream.rdbuf();
 		fileStream.close();
 
-		// The Includer owns the content memory and will delete it when it is no
-		// longer needed.
+		// The Includer owns the content memory and will delete it when it is no longer needed.
 		char* content = new char[fileContent.str().length() + 1];
 		strncpy(content, fileContent.str().c_str(), fileContent.str().length());
 		content[fileContent.str().length()] = '\0';
@@ -64,7 +63,24 @@ private:
 ShaderModule::ShaderModule(const Context* inContext, const std::string& filePath, const std::string& entryPoint, VkShaderStageFlagBits stages, const std::string& name)
 	: context{inContext}, shaderEntryPoint{entryPoint}, vkStageFlags{stages}
 {
-	
+	createShader(filePath, shaderEntryPoint, name);
+}
+
+ShaderModule::ShaderModule(const Context* inContext, const std::vector<char>& data, const std::string& entryPoint, VkShaderStageFlagBits stages, const std::string& name)
+	: context{inContext}, shaderEntryPoint{entryPoint}, vkStageFlags{stages}
+{
+	createShader(data, shaderEntryPoint, name);
+}
+
+ShaderModule::ShaderModule(const Context* inContext, const std::string& filePath, VkShaderStageFlagBits stages, const std::string& name)
+	:ShaderModule(inContext, filePath, "main", stages, name)
+{
+
+}
+
+ShaderModule::~ShaderModule()
+{
+	vkDestroyShaderModule(context->getDevice(), vkShaderModule, nullptr);
 }
 
 void ShaderModule::createShader(const std::string& filepath, const std::string& entryPoint, const std::string& name)
@@ -80,8 +96,10 @@ void ShaderModule::createShader(const std::string& filepath, const std::string& 
 	}
 	else
 	{
-
+		spirv = glslToSpirV(fileData, shaderStageFromFileName(filepath.c_str()), file.parent_path().string(), entryPoint.c_str());
 	}
+
+	createShader(spirv, entryPoint, name);
 }
 
 void ShaderModule::createShader(const std::vector<char> spirv, const std::string& entryPoint, const std::string& name)
@@ -105,7 +123,7 @@ const std::vector<char> ShaderModule::glslToSpirV(const std::vector<char>& data,
 {
 	static bool glslangInitialized = false;
 
-	if(!glslangInitialized)
+	if (!glslangInitialized)
 	{
 		glslang::InitializeProcess();
 		glslangInitialized = true;
@@ -118,7 +136,7 @@ const std::vector<char> ShaderModule::glslToSpirV(const std::vector<char>& data,
 	glslang::EShTargetClientVersion clientVersion = glslang::EShTargetVulkan_1_3;
 	glslang::EShTargetLanguageVersion langVersion = glslang::EShTargetSpv_1_0;
 
-	if(shaderStage == EShLangRayGen || shaderStage == EShLangAnyHit || shaderStage == EShLangClosestHit || shaderStage == EShLangMiss)
+	if (shaderStage == EShLangRayGen || shaderStage == EShLangAnyHit || shaderStage == EShLangClosestHit || shaderStage == EShLangMiss)
 	{
 		langVersion = glslang::EShTargetSpv_1_4;
 	}
@@ -140,5 +158,115 @@ const std::vector<char> ShaderModule::glslToSpirV(const std::vector<char>& data,
 	const EShMessages messages = static_cast<EShMessages>(EShMsgDefault | EShMsgSpvRules | EShMsgVulkanRules | EShMsgDebugInfo);
 
 	CustomIncluder includer(shaderDir);
+	
+	std::string preprocessedGLSL;
+	if(!tmpShader.preprocess(resources, 460, ENoProfile, false, false, messages, &preprocessedGLSL, includer))
+	{
+		CORE_ERROR("Preprocessing failed for shader: ");
+		CORE_ERROR("\t{0}", tmpShader.getInfoLog());
+		CORE_ERROR("\t{0}", tmpShader.getInfoDebugLog());
 
+		return std::vector<char>();
+	}
+
+	preprocessedGLSL = removeUnnecessaryLines(preprocessedGLSL);
+
+	const char* preprocessedGLSLStr = preprocessedGLSL.c_str();
+	shader.setStrings(&preprocessedGLSLStr, 1);
+	if(!shader.parse(resources, 460, false, messages))
+	{
+		CORE_ERROR("Parsing failed for shader: ");
+		CORE_ERROR("\t{0}", shader.getInfoLog());
+		CORE_ERROR("\t{0}", shader.getInfoDebugLog());
+
+		return std::vector<char>();
+	}
+
+	glslang::SpvOptions options;
+
+#if _DEBUG
+	shader.setDebugInfo(true);
+	options.generateDebugInfo = true;
+	options.disableOptimizer = true;
+	options.optimizeSize = false;
+	options.stripDebugInfo = false;
+#else
+	// Might not actually need this
+	options.disableOptimizer = true; // this ensure that variables that aren't used in shaders are not removed, without this flag, SPIRV
+									 // generated will be optimized & unused variables will be removed,
+									 // this will cause issues in debug vs release if struct on cpu vs gpu are different
+	options.optimizeSize = true;
+	options.stripDebugInfo = true;
+#endif
+
+	glslang::TProgram program;
+	program.addShader(&shader);
+	if(!program.link(messages))
+	{
+		CORE_ERROR("Linking failed for shader: ");
+		CORE_ERROR("\t{0}", program.getInfoLog());
+		CORE_ERROR("\t{0}", program.getInfoDebugLog());
+
+		return std::vector<char>();
+	}
+
+	std::vector<uint32_t> spirvData;
+	spv::SpvBuildLogger spvLogger;
+	glslang::GlslangToSpv(*program.getIntermediate(shaderStage), spirvData, &spvLogger, &options);
+
+	std::vector<char> bytcode;
+	bytcode.resize(spirvData.size() * (sizeof(uint32_t) / sizeof(char)));
+	std::memcpy(bytcode.data(), spirvData.data(), bytcode.size());
+	return bytcode;
+}
+
+std::string ShaderModule::removeUnnecessaryLines(const std::string& str)
+{
+	std::istringstream iss(str);
+	std::ostringstream oss;
+	std::string line;
+
+	while (std::getline(iss, line))
+	{
+		if(line != "#extension GL_GOOGLE_include_directive : require" && line.substr(0, 5) != "#line")
+		{
+			oss << line << '\n';
+		}
+	}
+
+	return oss.str();
+}
+
+EShLanguage ShaderModule::shaderStageFromFileName(const char* fileName)
+{
+	if(Utils::fileEndsWith(fileName, ".vert"))
+	{
+		return EShLangVertex;
+	}
+	else if(Utils::fileEndsWith(fileName, ".frag"))
+	{
+		return EShLangFragment;
+	}
+	else if(Utils::fileEndsWith(fileName, ".comp"))
+	{
+		return EShLangCompute;
+	}
+	else if(Utils::fileEndsWith(fileName, ".rgen"))
+	{
+		return EShLangRayGen;
+	}
+	else if(Utils::fileEndsWith(fileName, ".rmiss"))
+	{
+		return EShLangMiss;
+	}
+	else if(Utils::fileEndsWith(fileName, ".rchit"))
+	{
+		return EShLangClosestHit;
+	}
+	else if(Utils::fileEndsWith(fileName, ".rahit"))
+	{
+		return EShLangAnyHit;
+	}
+
+	return EShLangVertex;
 }

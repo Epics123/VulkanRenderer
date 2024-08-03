@@ -4,17 +4,32 @@
 
 #define GLFW_INCLUDE_VULKAN
 
+#include "../Common/Defines.h"
+
 #include <glfw3.h>
 #include <glfw3native.h>
+
 #include <vector>
+#include <string>
+#include <memory>
+#include <unordered_map>
+#include <mutex>
 
 // DEFERRED RENDERING REFACTOR
 class Context;
+class ShaderModule;
 
 struct SetDescriptor
 {
 	uint32_t set;
 	std::vector<VkDescriptorSetLayoutBinding> bindings;
+};
+
+struct SetAndCount
+{
+	uint32_t set;
+	uint32_t count;
+	std::string name;
 };
 
 struct PipelineViewport
@@ -47,7 +62,7 @@ struct PipelineViewport
 		return VkExtent2D{ static_cast<uint32_t>(std::abs(viewport.width), static_cast<uint32_t>(std::abs(viewport.height))) };
 	}
 
-	VkViewport toViewport() { return viewport; }
+	VkViewport toVkViewport() { return viewport; }
 
 private:
 	VkViewport fromExtents(const VkExtent2D& extents)
@@ -68,13 +83,132 @@ private:
 
 struct GraphicsPipelineDescriptor
 {
-	
+	GraphicsPipelineDescriptor()
+	{
+		vertexInputCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+		vertexInputCreateInfo.vertexBindingDescriptionCount = 0;
+		vertexInputCreateInfo.vertexAttributeDescriptionCount = 0;
+	}
+
+	std::vector<SetDescriptor> setDescriptors;
+	std::weak_ptr<ShaderModule> vertexShader;
+	std::weak_ptr<ShaderModule> fragmentShader;
+	std::vector<VkPushConstantRange> pushConstants;
+	std::vector<VkDynamicState> dynamicStates;
+
+	std::vector<VkFormat> colorTextureFormats;
+	VkFormat depthTextureFormat = VK_FORMAT_UNDEFINED;
+	VkFormat stencilTextureFormat = VK_FORMAT_UNDEFINED;
+
+	bool useDynamicRendering = false;
+	bool depthTestEnable = true;
+	bool depthWriteEnable = true;
+
+	VkCompareOp depthCompareOperation = VK_COMPARE_OP_LESS;
+
+	bool blendEnable = false;
+	uint32_t numBlendAttachments = 0;
+
+	VkPrimitiveTopology primitiveTopology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+	VkSampleCountFlagBits sampleCount = VK_SAMPLE_COUNT_1_BIT;
+	VkCullModeFlagBits cullMode = VK_CULL_MODE_BACK_BIT;
+	VkFrontFace frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+
+	PipelineViewport viewport;
+
+	VkPipelineVertexInputStateCreateInfo vertexInputCreateInfo;
+
+	std::vector<VkSpecializationMapEntry> vertexSpecConstants;
+	std::vector<VkSpecializationMapEntry> fragmentSpecConstants;
+
+	void* vertexSpecializationData = nullptr;
+	void* fragmentSpecializationData = nullptr;
+
+	std::vector<VkPipelineColorBlendAttachmentState> blendAttachmentStates;
+};
+
+struct ComputePipelineDescriptor
+{
+	std::vector<SetDescriptor> setDescriptors;
+	std::weak_ptr<ShaderModule> computeShader;
+	std::vector<VkPushConstantRange> pushConstants;
+	std::vector<VkSpecializationMapEntry> specializationConstants;
+	void* specializationData = nullptr;
+};
+
+struct RayTracingPipelineDescriptor
+{
+	std::vector<SetDescriptor> setDescriptors;
+	std::weak_ptr<ShaderModule> rayGenShader;
+	std::vector<std::weak_ptr<ShaderModule>> rayMissShaders;
+	std::vector<std::weak_ptr<ShaderModule>> rayClosestHitShaders;
+	std::vector<VkPushConstantRange> pushConstants;
+
+	// Add specialization const, but they are needed per shaderModule?
 };
 
 class Pipeline
 {
 public:
-	
+	Pipeline(const Context* inContext, const GraphicsPipelineDescriptor& pipelineDesc, VkRenderPass renderPass, const std::string& name = "");
+	Pipeline(const Context* inContext, const ComputePipelineDescriptor& pipelineDesc, const std::string& name = "");
+	Pipeline(const Context* inContext, const RayTracingPipelineDescriptor& pipelineDesc, const std::string& name = "");
+
+	~Pipeline();
+
+	VkPipeline getPipeline() const { return pipeline; }
+	VkPipelineLayout getPipelineLayout() const { return pipelineLayout; }
+
+	bool isValid() const { return pipeline == VK_NULL_HANDLE; }
+
+	void allocateDescriptors(const std::vector<SetAndCount> setAndCount);
+
+	void updatePushConstant(VkCommandBuffer cmdBuffer, VkShaderStageFlags flags, uint32_t size, const void* data);
+
+	void updateDescriptorSets();
+
+	void bind(VkCommandBuffer cmdBuffer);
+
+private:
+	void createGraphicsPipeline();
+	void createComputePipeline();
+	void createRayTracingPipeline();
+
+	void initDescriptorLayout();
+	void initDescriptorPool();
+
+	VkPipelineLayout createPipelineLayout(const std::vector<VkDescriptorSetLayout>& descLayouts, const std::vector<VkPushConstantRange>& pushConstants);
+
+	void getSetDescriptorsFromBindPoint(std::vector<SetDescriptor>& inOutSets);
+
+private:
+	const Context* context = nullptr;
+	GraphicsPipelineDescriptor graphicsPipelineDesc;
+	ComputePipelineDescriptor computePipelineDesc;
+	RayTracingPipelineDescriptor rayTracingPipelineDesc;
+
+	VkPipelineBindPoint bindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+	VkPipeline pipeline = VK_NULL_HANDLE;
+	VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
+	VkRenderPass vkRenderPass = VK_NULL_HANDLE;
+
+	std::string debugName;
+
+	struct DescriptorSet
+	{
+		std::vector<VkDescriptorSet> sets;
+		VkDescriptorSetLayout layout = VK_NULL_HANDLE;
+	};
+
+	std::unordered_map<uint32_t, DescriptorSet> descriptorSets;
+	VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
+
+	std::list<std::vector<VkDescriptorBufferInfo>> bufferInfo;
+	std::list<VkBufferView> bufferViewInfo;
+	std::list<std::vector<VkDescriptorImageInfo>> imageInfo;
+	std::vector<VkWriteDescriptorSetAccelerationStructureKHR> accelerationStructInfo;
+	std::vector<VkWriteDescriptorSet> writeDescSets;
+	std::mutex mutex;
 };
 
 // END DEFERRED RENDERING REFACTOR
